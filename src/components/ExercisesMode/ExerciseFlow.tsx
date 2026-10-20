@@ -53,11 +53,6 @@ export const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
       {/* Topo do catálogo */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
-              Atividades corporais
-            </span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
             Catálogo de exercícios
           </h1>

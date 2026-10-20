@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navbar, ActiveTab } from './components/Navbar';
 import { HomeDashboard } from './components/Home/HomeDashboard';
 import { QuestionFlow } from './components/QuestionsMode/QuestionFlow';
@@ -22,6 +22,11 @@ export const App: React.FC = () => {
     loadQuestionHistory()
   );
   const [cameraActive, setCameraActive] = useState(false);
+
+  // Cada aba abre do topo, sem herdar a rolagem da anterior
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeTab]);
 
   const refreshData = () => {
     setClassroom(loadClassroom());

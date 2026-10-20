@@ -60,11 +60,6 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
       {/* Cabeçalho da página */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
-              Gestão da turma
-            </span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
             Alunos e cartões cadastrados
           </h1>
@@ -175,6 +170,7 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
                         />
                         <button
                           onClick={() => handleSaveEdit(student.id)}
+                          aria-label="Salvar nome"
                           className="btn btn-sm btn-success btn-square"
                         >
                           <Check className="w-3.5 h-3.5" />
@@ -196,6 +192,7 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
                       onClick={() => handleRemove(student.id)}
                       className="btn btn-sm btn-ghost btn-square text-base-content/60 hover:text-error"
                       title="Remover aluno"
+                      aria-label={`Remover ${student.name}`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

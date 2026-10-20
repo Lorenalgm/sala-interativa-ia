@@ -187,11 +187,6 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
       {/* Topo informativo */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
-              Fluxo da aula
-            </span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
             Preparação das perguntas
           </h1>
@@ -375,10 +370,6 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
             Limpar seleção
           </button>
         </div>
-
-        <span className="text-xs text-base-content/60">
-          Por padrão a lista mostra só os enunciados
-        </span>
       </div>
 
       {/* Lista de perguntas (exibindo por padrão apenas o enunciado) */}
@@ -401,10 +392,10 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                 <div className="flex items-start gap-3 min-w-0">
                   <input
                     type="checkbox"
-                    className="checkbox checkbox-primary mt-0.5 pointer-events-none"
+                    className="checkbox checkbox-primary mt-0.5"
                     checked={isSelected}
-                    readOnly
-                    tabIndex={-1}
+                    onChange={() => toggleSelect(q.id)}
+                    onClick={(e) => e.stopPropagation()}
                     aria-label={`Selecionar questão ${idx + 1}`}
                   />
 
@@ -442,6 +433,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                     onClick={(e) => handleDelete(q.id, e)}
                     className="btn btn-sm btn-ghost btn-square text-base-content/60 hover:text-error"
                     title="Excluir questão"
+                    aria-label={`Excluir questão ${idx + 1}`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

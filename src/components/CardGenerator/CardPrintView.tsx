@@ -20,11 +20,6 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
       <div className="no-print bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 shadow-sm space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider">
-                Material para a turma
-              </span>
-            </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
               Impressão dos cartões de resposta
             </h1>

@@ -76,9 +76,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
 
             <div>
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider block mb-1">
-                Estilo Plickers
-              </span>
               <h2 className="text-2xl font-bold text-base-content tracking-tight">
                 Perguntas e cartões
               </h2>
@@ -122,9 +119,6 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
 
             <div>
-              <span className="text-xs font-semibold text-amber-700 uppercase tracking-wider block mb-1">
-                Visão computacional
-              </span>
               <h2 className="text-2xl font-bold text-base-content tracking-tight">
                 Exercícios corporais
               </h2>
