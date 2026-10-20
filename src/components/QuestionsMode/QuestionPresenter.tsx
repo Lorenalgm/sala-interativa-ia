@@ -405,32 +405,31 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
       {/* Grid principal dividida: lado esquerdo para a pergunta (9 colunas) e lado direito para câmera e alunos (3 colunas) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0">
         {/* Painel Esquerdo: Pergunta e Alternativas ou Gabarito (ocupa 9 colunas) */}
-        <div className="lg:col-span-9 flex flex-col justify-between space-y-4 min-h-0">
+        <div className="lg:col-span-9 flex flex-col min-h-0">
           {!isAnswerRevealed ? (
-            <div className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 shadow-sm flex flex-col justify-between flex-1 min-h-0 space-y-6">
+            <div className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-10 flex flex-col gap-8 lg:gap-10 flex-1 min-h-0">
               {/* Enunciado amplo e de fácil leitura de longe */}
-              <div className="my-auto">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-base-content tracking-tight leading-tight">
-                  {currentQuestion.prompt}
-                </h1>
-              </div>
+              <h1 className="text-3xl sm:text-4xl xl:text-5xl font-extrabold text-base-content tracking-tight leading-tight max-w-[32ch]">
+                {currentQuestion.prompt}
+              </h1>
 
-              {/* Alternativas A, B, C, D */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+              {/* Alternativas A, B, C, D: sempre as quatro visíveis, em tamanho de sala */}
+              <ol className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
                 {optionsKeys.map((opt) => (
-                  <div
-                    key={opt}
-                    className="flex items-start gap-3.5 p-4 sm:p-5 rounded-2xl border border-base-300 bg-base-200/70 hover:bg-base-200 transition-colors"
-                  >
-                    <span className="w-10 h-10 rounded-xl bg-primary text-base-content flex items-center justify-center font-black text-lg flex-shrink-0 shadow-sm">
+                  <li key={opt} className="flex items-center gap-4">
+                    <span
+                      aria-hidden="true"
+                      className="w-14 h-14 lg:w-16 lg:h-16 rounded-btn bg-primary text-primary-content flex items-center justify-center font-extrabold text-2xl lg:text-3xl flex-shrink-0"
+                    >
                       {opt}
                     </span>
-                    <p className="text-lg sm:text-xl font-bold text-base-content pt-1 leading-snug">
+                    <p className="text-2xl lg:text-3xl font-bold text-base-content leading-snug">
+                      <span className="sr-only">{opt}: </span>
                       {currentQuestion.options[opt]}
                     </p>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ol>
             </div>
           ) : (
             <div className="flex-1 min-h-0">

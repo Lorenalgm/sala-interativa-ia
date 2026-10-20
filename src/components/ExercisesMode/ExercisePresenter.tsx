@@ -401,28 +401,28 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
               Desafio corporal ativo
             </span>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content">
+            <h1 className="text-3xl sm:text-4xl xl:text-5xl font-extrabold text-base-content tracking-tight leading-tight">
               {currentExercise.title}
             </h1>
 
-            <p className="text-base-content/70 text-sm leading-relaxed">
+            <p className="text-xl lg:text-2xl text-base-content/80 leading-relaxed">
               {currentExercise.description}
             </p>
 
-            <div className="space-y-3 bg-base-200 p-4 rounded-2xl border border-base-300">
-              <span className="text-xs font-bold text-base-content block uppercase tracking-wide">
-                Instruções para os alunos
-              </span>
-              <ul className="space-y-2 text-xs sm:text-sm text-base-content/70">
+            <div className="space-y-4 border-t border-base-300 pt-5">
+              <h2 className="text-xl lg:text-2xl font-bold text-base-content">
+                Como fazer
+              </h2>
+              <ol className="space-y-4 text-xl lg:text-2xl text-base-content leading-snug">
                 {currentExercise.instructions.map((step, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="badge badge-primary badge-sm w-5 h-5 p-0 font-bold flex-shrink-0 mt-0.5">
+                  <li key={idx} className="flex items-start gap-3">
+                    <span className="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-extrabold text-lg flex-shrink-0">
                       {idx + 1}
                     </span>
                     <span>{step}</span>
                   </li>
                 ))}
-              </ul>
+              </ol>
             </div>
           </div>
 
