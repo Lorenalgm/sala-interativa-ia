@@ -8,7 +8,6 @@ import {
   Camera,
   CameraOff,
   Maximize2,
-  Minimize2,
   ChevronLeft,
   ChevronRight,
   Sparkles,
@@ -227,10 +226,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
   };
 
   const handleNext = () => {
-    if (isLastQuestion) {
-      handleCompleteRound();
-      return;
-    }
+    if (isLastQuestion) return;
 
     setIsAnswerRevealed(false);
     const nextIdx = currentIndex + 1;
@@ -274,12 +270,54 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen().catch(() => {});
-      setIsFullscreen(false);
     }
   };
+
+  // Espaço: mostra a resposta certa; depois avança ou finaliza a rodada
+  const handlePrimaryAction = () => {
+    if (!isAnswerRevealed) {
+      handleRevealAnswer();
+    } else if (isLastQuestion) {
+      handleCompleteRound();
+    } else {
+      handleNext();
+    }
+  };
+
+  // Mantém o estado de tela cheia em sincronia quando o professor sai com Esc
+  useEffect(() => {
+    const onFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
+
+  // Atalhos para conduzir a aula sem procurar botões
+  const shortcutsRef = useRef({ handlePrimaryAction, handleNext, handlePrev, toggleFullscreen });
+  shortcutsRef.current = { handlePrimaryAction, handleNext, handlePrev, toggleFullscreen };
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('input, textarea, select, button, [contenteditable="true"]')) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      const actions = shortcutsRef.current;
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        actions.handlePrimaryAction();
+      } else if (e.key === 'ArrowRight') {
+        actions.handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        actions.handlePrev();
+      } else if (e.key === 'f' || e.key === 'F') {
+        actions.toggleFullscreen();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   const optionsKeys: Alternative[] = ['A', 'B', 'C', 'D'];
 
@@ -290,117 +328,113 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
         isFullscreen ? 'h-screen p-4 bg-base-200 overflow-hidden' : 'min-h-[calc(100vh-120px)] pb-4'
       }`}
     >
-      {/* Barra superior de controle completa (todos os botões no topo) */}
-      <div className="no-print bg-base-100 border border-base-300 rounded-2xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-3 mb-4">
-        {/* Navegação entre perguntas */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handlePrev}
-            disabled={currentIndex === 0}
-            className="btn btn-sm btn-square"
-            title="Pergunta anterior"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          <span className="text-xs sm:text-sm font-bold text-base-content px-2 whitespace-nowrap">
-            Pergunta {currentIndex + 1} de {questions.length}
-          </span>
-
-          <button
-            onClick={handleNext}
-            disabled={isLastQuestion && !isAnswerRevealed}
-            className="btn btn-sm btn-square"
-            title="Próxima pergunta"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-
-          <span className="hidden sm:inline-flex badge badge-ghost">
-            {currentQuestion.category}
-          </span>
-        </div>
-
-        {/* Botões centrais e de ação da pergunta */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Botão de revelação ou encerramento da pergunta */}
-          {!isAnswerRevealed ? (
+      {/* Barra de controle do professor: some na tela cheia, onde vale o teclado */}
+      {!isFullscreen && (
+        <div className="no-print bg-base-100 border border-base-300 rounded-box px-3 py-2.5 flex flex-wrap items-center justify-between gap-3 mb-4">
+          {/* Navegação entre perguntas */}
+          <div className="flex items-center gap-2">
             <button
-              onClick={handleRevealAnswer}
-              className="btn btn-sm btn-primary"
+              onClick={handlePrev}
+              disabled={currentIndex === 0}
+              className="btn btn-sm btn-square"
+              aria-label="Pergunta anterior"
+              title="Pergunta anterior (←)"
             >
-              <Award className="w-4 h-4" />
-              <span>Encerrar pergunta e ver gabarito</span>
+              <ChevronLeft className="w-4 h-4" />
             </button>
-          ) : (
-            <div className="flex items-center gap-2">
+
+            <span className="text-base font-bold text-base-content px-1 whitespace-nowrap">
+              Pergunta {currentIndex + 1} de {questions.length}
+            </span>
+
+            <button
+              onClick={handleNext}
+              disabled={isLastQuestion}
+              className="btn btn-sm btn-square"
+              aria-label="Próxima pergunta"
+              title="Próxima pergunta (→)"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+
+            <span className="hidden sm:inline-flex badge badge-ghost">
+              {currentQuestion.category}
+            </span>
+          </div>
+
+          {/* Ações: a principal fica sempre por último, no mesmo lugar */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={handleSimulateQuickAnswers}
+              className="btn btn-sm btn-ghost"
+              title="Preenche respostas falsas para testar sem câmera"
+            >
+              <Sparkles className="w-4 h-4 text-amber-600" />
+              <span className="hidden sm:inline">Simular respostas</span>
+            </button>
+
+            {isCameraActive ? (
+              <button
+                onClick={stopCamera}
+                className="btn btn-sm btn-outline btn-error"
+              >
+                <CameraOff className="w-4 h-4" />
+                <span className="hidden sm:inline">Desligar câmera</span>
+              </button>
+            ) : (
+              <button
+                onClick={startCamera}
+                className="btn btn-sm btn-neutral"
+              >
+                <Camera className="w-4 h-4 text-amber-400" />
+                <span>Conectar câmera</span>
+              </button>
+            )}
+
+            <button
+              onClick={toggleFullscreen}
+              className="btn btn-sm"
+              title="Tela cheia para projetar (F)"
+            >
+              <Maximize2 className="w-4 h-4" />
+              <span className="hidden md:inline">Projetar</span>
+            </button>
+
+            {isAnswerRevealed && (
               <button
                 onClick={handleReset}
                 className="btn btn-sm"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="w-4 h-4" />
                 <span>Repetir</span>
               </button>
+            )}
 
-              {isLastQuestion ? (
-                <button
-                  onClick={handleCompleteRound}
-                  className="btn btn-sm btn-primary"
-                >
+            <button
+              onClick={handlePrimaryAction}
+              className="btn btn-sm btn-primary min-w-[12rem]"
+              title="Espaço"
+            >
+              {!isAnswerRevealed ? (
+                <>
                   <Award className="w-4 h-4" />
-                  <span>Finalizar rodada e ver resumo</span>
-                </button>
+                  <span>Mostrar resposta certa</span>
+                </>
+              ) : isLastQuestion ? (
+                <>
+                  <Award className="w-4 h-4" />
+                  <span>Finalizar rodada</span>
+                </>
               ) : (
-                <button
-                  onClick={handleNext}
-                  className="btn btn-sm btn-primary"
-                >
+                <>
                   <span>Próxima pergunta</span>
                   <ChevronRight className="w-4 h-4" />
-                </button>
+                </>
               )}
-            </div>
-          )}
-
-          {/* Botão da câmera */}
-          {isCameraActive ? (
-            <button
-              onClick={stopCamera}
-              className="btn btn-sm btn-outline btn-error"
-            >
-              <CameraOff className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Desligar câmera</span>
             </button>
-          ) : (
-            <button
-              onClick={startCamera}
-              className="btn btn-sm btn-neutral"
-            >
-              <Camera className="w-3.5 h-3.5 text-amber-400" />
-              <span>Conectar câmera</span>
-            </button>
-          )}
-
-          {/* Simulação de respostas para testes rápidos */}
-          <button
-            onClick={handleSimulateQuickAnswers}
-            className="btn btn-sm"
-            title="Simula as respostas dos alunos"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span className="hidden sm:inline">Simular</span>
-          </button>
-
-          {/* Alternar tela cheia */}
-          <button
-            onClick={toggleFullscreen}
-            className="btn btn-sm btn-square"
-            title="Alternar tela cheia"
-          >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Grid principal dividida: lado esquerdo para a pergunta (9 colunas) e lado direito para câmera e alunos (3 colunas) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0">
@@ -495,6 +529,14 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
           {/* Quadrante de respostas dos alunos */}
           <ResponseRoster students={students} responses={responses} />
+
+          {isFullscreen && (
+            <p className="text-sm text-base-content/70 text-center">
+              <kbd className="kbd kbd-sm">Espaço</kbd> resposta / próxima ·{' '}
+              <kbd className="kbd kbd-sm">←</kbd> <kbd className="kbd kbd-sm">→</kbd> navegar ·{' '}
+              <kbd className="kbd kbd-sm">Esc</kbd> sair
+            </p>
+          )}
         </div>
       </div>
     </div>
