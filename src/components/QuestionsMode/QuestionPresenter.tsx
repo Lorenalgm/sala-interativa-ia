@@ -384,24 +384,6 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
               <span className="hidden sm:inline">Simular respostas</span>
             </button>
 
-            {isCameraActive ? (
-              <button
-                onClick={stopCamera}
-                className="btn btn-sm btn-outline btn-error"
-              >
-                <CameraOff className="w-4 h-4" />
-                <span className="hidden sm:inline">Desligar câmera</span>
-              </button>
-            ) : (
-              <button
-                onClick={startCamera}
-                className="btn btn-sm btn-neutral"
-              >
-                <Camera className="w-4 h-4 text-amber-400" />
-                <span>Conectar câmera</span>
-              </button>
-            )}
-
             <button
               onClick={toggleFullscreen}
               className="btn btn-sm"
@@ -498,9 +480,14 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
               <span className="font-bold text-base-content">
                 Câmera da sala
               </span>
-              <span className={`text-xs font-semibold ${isCameraActive ? 'text-emerald-700' : 'text-base-content/60'}`}>
-                {isCameraActive ? 'Leitura de cartões ativa' : 'Desconectada'}
-              </span>
+              {isCameraActive ? (
+                <button onClick={stopCamera} className="btn btn-xs btn-ghost text-error no-print">
+                  <CameraOff className="w-3.5 h-3.5" />
+                  Desligar
+                </button>
+              ) : (
+                <span className="text-xs font-semibold text-base-content/70">Desligada</span>
+              )}
             </div>
 
             <div className="w-full aspect-video bg-neutral rounded-xl relative overflow-hidden flex items-center justify-center">

@@ -30,6 +30,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [cameraError, setCameraError] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
   const [completedReps, setCompletedReps] = useState(0);
   const [holdTime, setHoldTime] = useState(0);
   const [feedback, setFeedback] = useState<PoseFeedbackResult>({
@@ -248,6 +249,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
 
   const handleSimulatePose = () => {
     isSimulatingRef.current = true;
+    setIsSimulating(true);
     let progress = 0;
 
     const dummyLandmarks: PoseLandmark[] = Array.from({ length: 33 }, () => ({
@@ -307,6 +309,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
         clearInterval(interval);
         triggerSuccess();
         isSimulatingRef.current = false;
+        setIsSimulating(false);
       }
     }, 500);
   };
@@ -357,30 +360,13 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {isCameraActive ? (
-            <button
-              onClick={stopCamera}
-              className="btn btn-sm btn-outline btn-error"
-            >
-              <CameraOff className="w-3.5 h-3.5" />
-              <span>Desligar câmera</span>
-            </button>
-          ) : (
-            <button
-              onClick={startCamera}
-              className="btn btn-sm btn-neutral"
-            >
-              <Camera className="w-3.5 h-3.5 text-amber-400" />
-              <span>Conectar câmera</span>
-            </button>
-          )}
-
           <button
             onClick={handleSimulatePose}
-            className="btn btn-sm btn-secondary"
+            disabled={isSimulating}
+            className="btn btn-sm btn-ghost"
             title="Simula uma pose correta sem ninguém se mexer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+            <Sparkles className="w-4 h-4 text-amber-600" />
             <span>Simular pose</span>
           </button>
 
@@ -442,15 +428,23 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
             <span className="font-bold text-base-content">
               Câmera e pontos do corpo
             </span>
-            <span className="text-xs text-base-content/60 font-medium">
-              Alvo: {currentExercise.targetDurationSeconds} segundos contínuos
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-base-content/70 font-medium">
+                Segurar por {currentExercise.targetDurationSeconds} segundos
+              </span>
+              {isCameraActive && (
+                <button onClick={stopCamera} className="btn btn-xs btn-ghost text-error">
+                  <CameraOff className="w-3.5 h-3.5" />
+                  Desligar câmera
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="w-full aspect-video bg-neutral rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
             <canvas ref={canvasRef} className="w-full h-full object-contain" />
 
-            {!isCameraActive && (
+            {!isCameraActive && !isSimulating && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral/80 p-6 text-center space-y-3">
                 <div className="w-12 h-12 rounded-2xl bg-neutral-content/10 flex items-center justify-center text-neutral-content/70">
                   <Camera className="w-6 h-6" />
