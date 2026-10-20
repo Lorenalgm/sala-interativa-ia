@@ -50,6 +50,7 @@ rounded:
   btn: "12px"
   book-edge: "12px"
   panel: "20px"
+  band: "28px"
   spread: "16px"
   tile: "8px"
   pill: "9999px"
@@ -133,7 +134,28 @@ components:
     backgroundColor: "{colors.page-white}"
     textColor: "{colors.ink}"
     rounded: "{rounded.spread}"
-    padding: "36px 40px"---
+    padding: "36px 40px"
+  scene-panel:
+    backgroundColor: "{colors.mist}"
+    textColor: "{colors.ink}"
+    padding: "0"
+  closing-band:
+    backgroundColor: "{colors.teal}"
+    textColor: "{colors.page-white}"
+    padding: "48px 56px"
+  button-closing:
+    backgroundColor: "{colors.cover-mustard}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.btn}"
+  need-tile:
+    backgroundColor: "{colors.teal}"
+    textColor: "{colors.page-white}"
+    size: "48px"
+  camera-status:
+    backgroundColor: "{colors.teal}"
+    textColor: "{colors.page-white}"
+    rounded: "{rounded.pill}"
+---
 
 # Design System: ClassPlay
 
@@ -161,7 +183,7 @@ Paleta de papelaria sobre névoa verde: um teal profundo para estrutura e ação
 - **Azul-Petróleo** (#0a4d4a): barra de navegação, botões primários, filtro ativo, blocos de ícone do "Antes da aula", numeração das etapas, contorno de foco dos livros, seleção e foco de campos. É o `primary` do tema daisyUI `classplay`.
 
 ### Secondary
-- **Mostarda de Capa** (#f2a900): capa de livro e indicador de câmera ligada na barra.
+- **Mostarda de Capa** (#f2a900): capa de livro, enquadramento e alternativa destacada na cena da landing, ponto de câmera desligada na barra e o botão da faixa de fechamento da landing.
 - **Vermelho de Capa** (#d62839): segunda capa de livro e destaque `accent`; usado em capa e no friso da marca.
 
 ### Tertiary
@@ -176,7 +198,7 @@ Paleta de papelaria sobre névoa verde: um teal profundo para estrutura e ação
 - Estados: informação #0369a1, sucesso #047857, erro #be123c, aviso #f2a900 com texto #451a03.
 
 ### Named Rules
-**A Regra da Cor de Material.** Mostarda e vermelho aparecem como objetos (capas de livro), nunca como fundo de seção inteira nem como bloco de ação. O fundo é sempre a névoa verde, o papel sempre branco.
+**A Regra da Cor de Material.** Mostarda e vermelho aparecem como objetos (capas de livro, enquadramento da câmera, cartões), nunca como fundo de seção inteira. A única ação mostarda é o botão sobre a faixa petróleo de fechamento da landing; em qualquer outro lugar a ação é petróleo. O fundo é sempre a névoa verde, o papel sempre branco.
 
 **A Regra do Texto Legível.** Texto sobre a névoa e o papel é tinta (#101820) ou a 65-75% dela; sobre mostarda é tinta, nunca branco; sobre vermelho e petróleo é branco.
 
@@ -205,6 +227,8 @@ Abaixo, uma grade de duas partes (lacuna 2rem, alinhada ao topo): a estante e um
 
 A página do roteiro é um livro aberto de até 72rem (`max-w-6xl`): duas colunas iguais a partir de `lg`, altura mínima `min(34rem, 100dvh - 11rem)` para caber numa viewport de desktop; empilhada abaixo de `lg`, capa em cima. À esquerda a capa de tecido (nome, objetivo, minutos, formato, etapas e emblema grande centralizado); à direita a folha branca com Etapas, Material e a ação "Preparar aula" alinhada à direita no pé. A barra de navegação é fixa no topo (4rem), com rótulos ocultos abaixo de `sm`.
 
+A landing (exibida só na primeira visita; a marca na barra volta a ela) usa o mesmo contêiner de 80rem, com 5rem entre seções. Abertura em 12 colunas a partir de `lg`: título, frase de apoio e botão em 5 colunas à esquerda, cena em 7 à direita, alinhadas ao centro; abaixo, três legendas numeradas em linha a partir de `md`. Depois, "O que muda na sua aula" (título em 4 colunas, lista de definição em 8, separada por filetes de névoa), "Aprendizagem ativa, em poucas palavras" (mesma divisão 4/8, com mini-livros fechados) e "O que você precisa" (três colunas), e por fim a faixa de fechamento.
+
 Na condução, a lista de perguntas (QuestionFlow) é uma grade de 1 coluna que passa a 2 a partir de `lg`, lacuna de 0.75rem, cartões de padding 1rem, alinhados ao topo.
 
 ## Elevation & Depth
@@ -223,7 +247,7 @@ Híbrido: superfícies chapadas, sem gradiente, e sombra só como apoio de objet
 
 ## Shapes
 
-Forma de livro: o lado da lombada quase reto (2px), o lado externo arredondado (12px), nas três camadas. O livro aberto da página do roteiro tem 16px nos cantos externos e é reto na costura central. Botões em 12px, o painel lateral em 20px (`rounded-box`), blocos de ícone e itens da lista em 8px, pílulas de filtro, selos e números em pílula/círculo. Lombada: faixa de 1.25rem de preto a 20% com dois frisos brancos a 40%, de 2px, nas pontas. A capa leva uma moldura estampada de 2px, raio 6px, recuada da borda (tinta a 25% na mostarda, branco a 35% na vermelha). A capa leva uma trama de tecido (`.cloth`): filetes de 1px a cada 3px, pretos a 5% na horizontal e brancos a 6% na vertical, sobre a cor da capa. A borda das folhas é um padrão de linhas de 1px a cada 3px no bloco de páginas. O vazio é marcado por borda tracejada (itens "Em breve" e seu marcador de livro).
+Forma de livro: o lado da lombada quase reto (2px), o lado externo arredondado (12px), nas três camadas. O livro aberto da página do roteiro tem 16px nos cantos externos e é reto na costura central. Botões em 12px, a faixa de fechamento e o painel da cena da landing em 28px, o painel lateral em 20px (`rounded-box`), blocos de ícone e itens da lista em 8px, pílulas de filtro, selos e números em pílula/círculo. Lombada: faixa de 1.25rem de preto a 20% com dois frisos brancos a 40%, de 2px, nas pontas. A capa leva uma moldura estampada de 2px, raio 6px, recuada da borda (tinta a 25% na mostarda, branco a 35% na vermelha). A capa leva uma trama de tecido (`.cloth`): filetes de 1px a cada 3px, pretos a 5% na horizontal e brancos a 6% na vertical, sobre a cor da capa. A borda das folhas é um padrão de linhas de 1px a cada 3px no bloco de páginas. O vazio é marcado por borda tracejada (itens "Em breve" e seu marcador de livro).
 
 ## Components
 
@@ -250,7 +274,17 @@ Painel branco (`base-100`), borda de névoa de 1px, raio 20px, padding 1.25rem, 
 Sob o painel, sem cartão: título "Em breve" (0.875rem bold, a 70%) e itens pequenos com borda tracejada de 1px na cor névoa, raio 8px, padding 0.5rem 0.75rem. Cada item leva um marcador de livro tracejado (1.5rem x 2rem, borda de 2px a 35%), o nome (0.875rem 600) e os minutos a 65%. Sem interação; o objetivo aparece como `title`.
 
 ### Navegação
-Barra petróleo fixa, borda inferior branca a 15%. Marca ClassPlay em Bricolage 800 com três barras (mostarda, vermelha, branca) que sobem 2px no hover. Itens em pílula: ativo em branco com texto petróleo e `aria-current="page"`; inativos fantasmas a 85% de branco com hover a 10%. Indicador de câmera como selo: mostarda ligado, translúcido desligado.
+Barra petróleo fixa, borda inferior branca a 15%. Marca ClassPlay em Bricolage 800 com três barras (mostarda, vermelha, branca) que sobem 2px no hover; a marca leva à landing. Só três itens em pílula: Biblioteca, Turma e Desempenho; ativo em branco com texto petróleo e `aria-current="page"`; inativos fantasmas a 85% de branco com hover a 10%. À direita, o estado da câmera é um botão em pílula ("Testar câmera" / "Câmera ligada", rótulo oculto abaixo de `sm`) que abre o teste da câmera: fundo branco a 10% com borda branca a 25% (branco com texto petróleo quando a tela do teste está ativa) e um ponto de 8px, mostarda com a câmera desligada e verde (`success`) com ela ligada. Cartões e teste da câmera também se alcançam pela lateral da biblioteca e pela Turma.
+
+### Landing: cena da sala (componente assinatura)
+Ilustração SVG fornecida pela equipe (`src/assets/sala-classplay.svg`, viewBox 1200x664), com as cores do sistema aplicadas e inserida inline por `ClassroomScene.tsx` para usar as fontes da página. Fica à direita do título, num painel de 28px de raio com filete de 1px na borda da névoa. Mostra a professora ao lado do quadro com a pergunta (barras no lugar do texto), o datashow no teto com o feixe em mostarda, a câmera com o cone de leitura tracejado, e alunos sentados levantando cartões com marcador e etiquetas "#NN ✓"; o cartão ainda não lido tem contorno tracejado. Piso e paredes em tons da névoa, camisas em petróleo, vermelho, tinta e mostarda. O feixe e o cone usam degradê só como luz, nunca como preenchimento de interface. `role="img"` e `aria-label` vêm do próprio SVG. Sem sombras.
+
+### Landing: seções de apoio
+- **Legendas numeradas:** círculo petróleo de 2rem com número em Bricolage, texto em 1.125rem.
+- **O que muda:** lista de definição entre filetes de 1px na névoa; termo em Bricolage 800 (1.25rem), descrição em Atkinson 1.125rem a 85%. Sem cartões.
+- **Mini-livro:** livro fechado de 3.5rem x 4.75rem com capa de tecido na cor do roteiro, lombada de 0.5rem e apoio próprio; a 70% de opacidade quando o roteiro é "em breve". Ao lado, título em Bricolage e texto.
+- **O que você precisa:** três blocos de ícone petróleo de 3rem (raio 12px, ícone branco de 1.5rem) com título e linha de apoio, sem cartão.
+- **Faixa de fechamento:** única faixa petróleo da página, raio 28px, título em Display e botão mostarda "Abrir a biblioteca" com seta. O botão do topo é petróleo.
 
 ### Livro Aberto (página do roteiro)
 Duas metades sob uma única sombra de apoio. Esquerda: capa de tecido (cor e moldura do `bindingFor`, lombada, padding 2.5rem com 3.5rem à esquerda) com nome em Display, objetivo em 1.25rem, minutos, formato e número de etapas, e o emblema `lg` centralizado no espaço restante. Direita: folha branca de padding 2.25rem a 2.5rem com "Etapas" (círculos petróleo de 2rem numerando cada passo, texto 1.125rem), "Material" (selos de fundo névoa com borda de névoa) e o botão petróleo grande "Preparar aula" no pé. Botão "Biblioteca" de volta acima, em pílula pequena.
@@ -261,6 +295,9 @@ Cartões de padding 1rem, raio 16px, borda de névoa; selecionado fica opaco com
 ## Do's and Don'ts
 
 ### Do:
+- **Do** mostrar a aula antes de explicá-la na landing: ilustração da sala num painel com filete, com cartões levantados e etiquetas de leitura.
+- **Do** reutilizar `AnswerCardShape` para qualquer cartão desenhado dentro de outro SVG do app, para que o cartão seja o mesmo em todo o app.
+- **Do** manter a navegação com três destinos (Biblioteca, Turma, Desempenho) e o estado da câmera como botão que leva ao teste.
 - **Do** manter a biblioteca sobre a névoa verde (#e8f0ee), como as demais telas, e pousar objetos coloridos (livros) sobre ela.
 - **Do** dar a todo livro lombada à esquerda com dois frisos, cantos 2px/12px e camadas de profundidade em `translateZ`.
 - **Do** usar texto tinta (#101820) sobre mostarda e branco sobre vermelho e petróleo.
@@ -273,6 +310,8 @@ Cartões de padding 1rem, raio 16px, borda de névoa; selecionado fica opaco com
 - **Do** manter itens futuros pequenos, tracejados e na lateral, abaixo do painel de preparo.
 
 ### Don't:
+- **Don't** repetir a faixa petróleo ou o botão mostarda fora do fechamento da landing, nem usar grade de cartões com ícone para benefícios: a landing usa lista de definição entre filetes.
+- **Don't** pôr sombra na cena da landing; só os mini-livros e os cartões pousados têm apoio.
 - **Don't** usar simbologia de jogo de azar (ficha, feltro, bingo, dado, baralho); o tom é de ferramenta séria. O cartão de resposta de papel é o próprio instrumento da aula e pode aparecer, sempre como cartão branco com marcador e letra.
 - **Don't** voltar ao campo petróleo escuro, à classe `.desk`, ao cabeçalho com parágrafo de apresentação nem à tábua da estante.
 - **Don't** voltar a livros "em breve" como livros de contorno na grade; eles são itens pequenos na lateral.
