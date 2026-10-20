@@ -221,7 +221,7 @@ O tom é de ferramenta séria e legível de longe. Superfícies são chapadas, s
 - Capa em coluna: título, emblema do cartão de resposta no meio (mostra a atividade), objetivo e metadados embaixo. Na página do roteiro, a mesma capa vira o lado esquerdo de um livro aberto.
 - Coluna lateral discreta: painel branco "Antes da aula" e lista quieta "Em breve".
 - Contraste alto e alvos grandes, pensados para projeção e para crianças.
-- Landing enxuta em quatro seções sem mensagens repetidas: abertura com a cena, simulação ("Levante um cartão"), base pedagógica com referências e uma única faixa petróleo com o que a primeira aula exige. As seções sobem e aparecem uma vez ao entrar na tela.
+- Landing enxuta em quatro seções sem mensagens repetidas: abertura com a cena, simulação ("Levante um cartão"), metodologias ativas pelo nome e uma única faixa petróleo com o que a primeira aula exige. As seções sobem e aparecem uma vez ao entrar na tela.
 
 ## Colors
 
@@ -263,8 +263,8 @@ Paleta de papelaria sobre névoa verde: um teal profundo para estrutura e ação
 - **Headline** (800, 2.25rem a 3rem, 1.02): nome do roteiro encabeçando a página do roteiro.
 - **Title** (800, 1.5rem, 1.1): "Etapas" na folha do roteiro; nome do livro na biblioteca em 1.8rem; "Antes da aula" em 1.125rem.
 - **Editorial Headline** (Literata 700, 2.25rem a 3rem, 1.08, -0.015em): só o h1 da landing.
-- **Editorial Section** (Literata 700, 1.875rem a 2.25rem, -0.015em): h2 da landing ("Levante um cartão...", "Em que o ClassPlay se apoia", "Para a primeira aula...").
-- **Editorial Title** (Literata 700, 1.5rem, -0.01em): título de cada uma das cinco ideias da base pedagógica.
+- **Editorial Section** (Literata 700, 1.875rem a 2.25rem, -0.015em): h2 da landing ("Levante um cartão...", "Metodologias ativas, prontas para a aula", "O que você precisa para começar").
+- **Editorial Title** (Literata 700, 1.5rem, -0.01em): título de cada uma das quatro ideias das metodologias.
 - **Body** (400, 1rem a 1.25rem): linha de apoio do cabeçalho (1rem, a 75%), objetivo na capa da página do roteiro (1.25rem), etapas (1.125rem), itens do painel (1rem, 600). Objetivo do livro na biblioteca em 0.875rem. Parágrafos com `text-wrap: pretty`, títulos com `balance`.
 - **Label** (600-800, 0.875rem a 1rem): minutos, formato, pílulas de filtro e suas contagens, "Em breve" (0.875rem), nomes dos itens futuros (0.875rem, 600).
 
@@ -279,9 +279,9 @@ Abaixo, uma grade de duas partes (lacuna 2rem, alinhada ao topo): a estante e um
 
 A página do roteiro é um livro aberto de até 72rem (`max-w-6xl`): duas colunas iguais a partir de `lg`, altura mínima `min(34rem, 100dvh - 11rem)` para caber numa viewport de desktop; empilhada abaixo de `lg`, capa em cima. À esquerda a capa de tecido (nome, objetivo, minutos, formato, etapas e emblema grande centralizado); à direita a folha branca com Etapas, Material e a ação "Preparar aula" alinhada à direita no pé. A barra de navegação é fixa no topo (4rem), com rótulos ocultos abaixo de `sm`.
 
-Regra de conteúdo da landing: citar o que a pesquisa mostra e o que o ClassPlay faz, sem afirmar resultados do próprio ClassPlay.
+Regra de conteúdo da landing: nomear metodologias e benefícios em linguagem simples de professor; nunca citar autores, estudos ou números de pesquisa, nunca escrever como artigo, nunca afirmar resultados do próprio ClassPlay.
 
-A landing (exibida só na primeira visita; a marca na barra volta a ela) usa o mesmo contêiner de 80rem, com 6rem entre seções (`space-y-24`) e quatro seções. Abertura em 12 colunas a partir de `lg`: título, um parágrafo, botão e o link "Experimente agora" em 5 colunas à esquerda, cena em 7 à direita, alinhadas ao centro. Depois, "Levante um cartão e veja a turma responder" (simulação em 12 colunas a partir de `lg`: projeção em 7, painel branco do visitante em 5, lacuna de 1.5rem a 2rem). Depois, "Em que o ClassPlay se apoia" em 12 colunas (lacuna 2.5rem a 4rem): à esquerda, em 4, título, parágrafo sobre orquestração da sala e `<details>` "Ver as referências"; à direita, em 8, lista numerada de cinco ideias separadas por filetes de névoa (padding vertical 2rem). Por fim, a única faixa petróleo, "Para a primeira aula, você precisa de", com três necessidades em três colunas.
+A landing (exibida só na primeira visita; a marca na barra volta a ela) usa o mesmo contêiner de 80rem, com 6rem entre seções (`space-y-24`) e quatro seções. Abertura em 12 colunas a partir de `lg`: título, um parágrafo, botão e o link "Experimente agora" em 5 colunas à esquerda, cena em 7 à direita, alinhadas ao centro. Depois, "Levante um cartão e veja a turma responder" (simulação em 12 colunas a partir de `lg`: projeção em 7, painel branco do visitante em 5, lacuna de 1.5rem a 2rem). Depois, "Metodologias ativas, prontas para a aula" em 12 colunas (lacuna 2.5rem a 4rem): à esquerda, em 4, título e um parágrafo curto que define aprendizagem ativa; à direita, em 8, lista de quatro ideias (Avaliação formativa, Aprendizagem em grupo, Instrução por pares, Informação na hora) separadas por filetes de névoa (padding vertical 2rem). Por fim, a única faixa petróleo, "O que você precisa para começar", com três necessidades em três colunas.
 
 Na condução, a lista de perguntas (QuestionFlow) é uma grade de 1 coluna que passa a 2 a partir de `lg`, lacuna de 0.75rem, cartões de padding 1rem, alinhados ao topo.
 
@@ -334,9 +334,9 @@ Barra petróleo fixa, borda inferior branca a 15%. Marca ClassPlay em Bricolage 
 Ilustração SVG fornecida pela equipe (`src/assets/sala-classplay.svg`, viewBox 1200x664), com as cores do sistema aplicadas e inserida inline por `ClassroomScene.tsx` para usar as fontes da página. Fica à direita do título, num painel de 28px de raio com filete de 1px na borda da névoa. Mostra a professora ao lado do quadro com a pergunta (barras no lugar do texto), o datashow no teto com o feixe em mostarda, a câmera com o cone de leitura tracejado, e alunos sentados levantando cartões com marcador e etiquetas "#NN ✓"; o cartão ainda não lido tem contorno tracejado. Piso e paredes em tons da névoa, camisas em petróleo, vermelho, tinta e mostarda. O feixe e o cone usam degradê só como luz, nunca como preenchimento de interface. `role="img"` e `aria-label` vêm do próprio SVG. Sem sombras.
 
 ### Landing: seções de apoio
-- **Base pedagógica ("Em que o ClassPlay se apoia"):** coluna esquerda com título Literata, parágrafo em 1.125rem a 85% e `<details>` nativo "Ver as referências" (sumário em negrito sublinhado, lista a 80%). Coluna direita: lista numerada entre filetes de 1px na névoa (`divide-y` e filetes no topo e na base), cada ideia com título Literata 700 (1.5rem), parágrafo em 1.125rem a 85% (máx. 42rem), linha de citação (0.875rem 600, a 65%) e, em duas delas, uma ação em texto petróleo em negrito com seta ("Abrir Pergunta rápida", "Abrir Grupo com sorteio") que abre o roteiro; a seta desliza 0.25rem no hover, só com movimento permitido. Sem cartões, sem fundos.
+- **Metodologias ativas ("Metodologias ativas, prontas para a aula"):** coluna esquerda com título Literata e um parágrafo em 1.125rem a 85%. Coluna direita: lista entre filetes de 1px na névoa (`divide-y` e filetes no topo e na base), cada ideia com título Literata 700 (1.5rem) e parágrafo simples em 1.125rem a 85% (máx. 42rem); nas duas primeiras, ao final, uma ação em texto petróleo em negrito com seta ("Abrir Pergunta rápida", "Abrir Grupo com sorteio") que abre o roteiro; a seta desliza 0.25rem no hover, só com movimento permitido. Sem cartões, sem fundos.
 - **Entrada das seções (`Reveal`):** cada seção abaixo da abertura sobe 28px e aparece (opacidade) uma única vez ao entrar na tela (limiar 15%), 0.8s `cubic-bezier(0.16, 1, 0.3, 1)`. Sem efeito sob `prefers-reduced-motion: reduce`, e sem `IntersectionObserver` aparece direto.
-- **Faixa "Para a primeira aula, você precisa de":** única faixa petróleo da página, raio 28px, padding 3.5rem a 3.5rem lateral, título Literata. Três necessidades em linha: bloco de ícone de 3.5rem (raio 12px) translúcido, preenchimento branco a 10% com anel de 1px branco a 35%, ícone branco de 1.75rem; título em Bricolage 800 (1.25rem) e apoio em 1.125rem a 85%. Embaixo, a linha de privacidade dos dados (1rem, a 80%) e o botão mostarda "Abrir a biblioteca" com seta. O botão do topo é petróleo.
+- **Faixa "O que você precisa para começar":** única faixa petróleo da página, raio 28px, padding 3.5rem a 3.5rem lateral, título Literata. Três necessidades em linha: bloco de ícone de 3.5rem (raio 12px) translúcido, preenchimento branco a 10% com anel de 1px branco a 35%, ícone branco de 1.75rem; título em Bricolage 800 (1.25rem) e apoio em 1.125rem a 85%. Embaixo, a linha de privacidade dos dados (1rem, a 80%) e o botão mostarda "Abrir a biblioteca" com seta. O botão do topo é petróleo.
 
 ### Landing: simulação "Experimente" (componente assinatura)
 Duas metades, rotuladas como simulação com turma de exemplo ("Na aula, a câmera lê os cartões de papel de verdade").
@@ -368,14 +368,14 @@ Cartões de padding 1rem, raio 16px, borda de névoa; selecionado fica opaco com
 - **Do** deixar a grade crescer com o acervo (colunas `auto-fill` de 17rem) e manter o cabeçalho compacto.
 - **Do** deixar a landing mostrar o fluxo funcionando (levantar o cartão, a câmera ler, a projeção contar) em simulação rotulada como exemplo.
 - **Do** fazer cada seção da landing subir uma única vez ao entrar na tela, e desligar o movimento sob `prefers-reduced-motion`.
-- **Do** dizer cada mensagem uma só vez na landing, citando o que a pesquisa mostra e o que o ClassPlay faz.
-- **Do** abrir roteiros a partir das ideias da base pedagógica por ação em texto, não por cartão.
+- **Do** dizer cada mensagem uma só vez na landing, nomeando metodologias e benefícios em linguagem simples de professor.
+- **Do** abrir roteiros a partir das ideias das metodologias por ação em texto, não por cartão.
 - **Do** manter itens futuros pequenos, tracejados e na lateral, abaixo do painel de preparo.
 
 ### Don't:
-- **Don't** repetir a faixa petróleo ou o botão mostarda fora do fechamento da landing (a única exceção é a projeção da simulação, que é a tela do datashow e não uma faixa de seção), nem usar grade de cartões para benefícios: a base pedagógica usa lista numerada entre filetes.
+- **Don't** repetir a faixa petróleo ou o botão mostarda fora do fechamento da landing (a única exceção é a projeção da simulação, que é a tela do datashow e não uma faixa de seção), nem usar grade de cartões para benefícios: as metodologias usam lista entre filetes.
 - **Don't** pôr sombra na cena da landing; só os cartões pousados têm apoio.
-- **Don't** usar Literata fora dos títulos da landing, nem afirmar na landing resultados que o próprio ClassPlay produziria.
+- **Don't** usar Literata fora dos títulos da landing, nem afirmar na landing resultados que o próprio ClassPlay produziria, nem citar autores, estudos ou números de pesquisa.
 - **Don't** usar simbologia de jogo de azar (ficha, feltro, bingo, dado, baralho); o tom é de ferramenta séria. O cartão de resposta de papel é o próprio instrumento da aula e pode aparecer, sempre como cartão branco com marcador e letra.
 - **Don't** voltar ao campo petróleo escuro, à classe `.desk`, ao cabeçalho com parágrafo de apresentação nem à tábua da estante.
 - **Don't** voltar a livros "em breve" como livros de contorno na grade; eles são itens pequenos na lateral.
