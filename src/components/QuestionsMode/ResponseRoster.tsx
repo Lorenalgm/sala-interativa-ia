@@ -22,7 +22,7 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
           <h3 className="text-xs font-bold text-zinc-950 uppercase tracking-wide">
             Respostas da turma
           </h3>
-          <span className="text-[11px] text-zinc-400">
+          <span className="text-xs text-zinc-400">
             Cartões captados pela câmera
           </span>
         </div>
@@ -31,7 +31,7 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
           <span className="text-xs font-bold text-zinc-800">
             {answeredCount}/{totalCount}
           </span>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 border border-amber-200 text-amber-900 font-bold">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 border border-amber-200 text-amber-900 font-bold">
             {progressPercent}%
           </span>
         </div>
@@ -59,7 +59,7 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
             >
               <div className="flex items-center gap-1.5 min-w-0">
                 <span
-                  className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded text-[10px] font-bold font-mono ${
+                  className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded text-xs font-bold font-mono ${
                     hasAnswered
                       ? 'bg-emerald-600 text-white'
                       : 'bg-zinc-200 text-zinc-600'
@@ -67,7 +67,7 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
                 >
                   {String(student.id).padStart(2, '0')}
                 </span>
-                <span className="truncate text-[11px]">
+                <span className="truncate text-xs">
                   {student.name}
                 </span>
               </div>

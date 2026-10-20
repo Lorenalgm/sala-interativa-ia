@@ -450,7 +450,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
               <span className="font-bold text-zinc-950">
                 Câmera da sala
               </span>
-              <span className={`text-[11px] font-semibold ${isCameraActive ? 'text-emerald-700' : 'text-zinc-400'}`}>
+              <span className={`text-xs font-semibold ${isCameraActive ? 'text-emerald-700' : 'text-zinc-400'}`}>
                 {isCameraActive ? 'Leitura de cartões ativa' : 'Desconectada'}
               </span>
             </div>
@@ -472,7 +472,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
               {!isCameraActive && (
                 <div className="flex flex-col items-center justify-center text-center p-3 space-y-2">
                   <Camera className="w-6 h-6 text-zinc-500" />
-                  <p className="text-[11px] text-zinc-400">
+                  <p className="text-xs text-zinc-400">
                     A câmera detecta os cartões da turma.
                   </p>
                   <button
@@ -487,7 +487,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
             {/* Indicação sutil de cartão reconhecido */}
             {lastDetectedStudent && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-50 text-emerald-900 text-[11px] font-medium truncate">
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-50 text-emerald-900 text-xs font-medium truncate">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
                 <span className="truncate">{lastDetectedStudent}</span>
               </div>

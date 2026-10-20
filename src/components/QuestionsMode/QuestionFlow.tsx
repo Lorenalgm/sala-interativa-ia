@@ -410,7 +410,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                       <span className="text-xs font-bold text-zinc-500">
                         Questão {idx + 1}
                       </span>
-                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-stone-100 text-zinc-600 border border-zinc-200">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-stone-100 text-zinc-600 border border-zinc-200">
                         {q.category}
                       </span>
                     </div>
@@ -460,7 +460,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                       <strong className="mr-1">{opt}:</strong>
                       <span>{q.options[opt]}</span>
                       {opt === q.correctOption && (
-                        <span className="ml-1 text-[10px] text-emerald-700 font-bold uppercase">
+                        <span className="ml-1 text-xs text-emerald-700 font-bold uppercase">
                           (Gabarito)
                         </span>
                       )}

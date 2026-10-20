@@ -186,7 +186,7 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
                   #{String(student.id).padStart(2, '0')} {student.name.split(' ')[0]}
                 </span>
 
-                <span className="font-bold text-[11px]">
+                <span className="font-bold text-xs">
                   {total > 0 ? `${pct}%` : 'Ausente'}
                 </span>
               </div>

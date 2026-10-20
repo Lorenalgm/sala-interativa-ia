@@ -155,7 +155,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
             <span className="text-3xl font-extrabold text-zinc-950">
               {totalResponsesCollected}
             </span>
-            <span className="text-[11px] text-zinc-400 block">
+            <span className="text-xs text-zinc-400 block">
               Distribuídas em {totalQuestionsApplied} questões
             </span>
           </div>
@@ -241,7 +241,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
 
                     <div className="flex items-center gap-5">
                       <div className="text-right">
-                        <span className="text-[11px] text-zinc-400 block font-medium">Aproveitamento</span>
+                        <span className="text-xs text-zinc-400 block font-medium">Aproveitamento</span>
                         <span className="text-lg font-black text-emerald-600">
                           {round.overallAccuracy}%
                         </span>
@@ -284,7 +284,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                                     <span className="font-bold text-zinc-700">
                                       Questão {qIdx + 1}
                                     </span>
-                                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-semibold text-[10px]">
+                                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-semibold text-xs">
                                       Gabarito {q.correctOption}
                                     </span>
                                   </div>
@@ -295,13 +295,13 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
 
                                 <div className="flex items-center gap-4 text-right">
                                   <div>
-                                    <span className="text-[10px] text-zinc-400 block">Acertos</span>
+                                    <span className="text-xs text-zinc-400 block">Acertos</span>
                                     <span className="text-sm font-bold text-emerald-600">
                                       {acc}%
                                     </span>
                                   </div>
                                   <div className="pl-3 border-l border-zinc-200">
-                                    <span className="text-[10px] text-zinc-400 block">Votos</span>
+                                    <span className="text-xs text-zinc-400 block">Votos</span>
                                     <span className="text-sm font-bold text-zinc-900">
                                       {votes}
                                     </span>
@@ -352,7 +352,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                                   #{String(student.id).padStart(2, '0')} {student.name.split(' ')[0]}
                                 </span>
 
-                                <span className="font-bold text-[11px]">
+                                <span className="font-bold text-xs">
                                   {studentTotal > 0 ? `${pct}%` : 'Ausente'}
                                 </span>
                               </div>

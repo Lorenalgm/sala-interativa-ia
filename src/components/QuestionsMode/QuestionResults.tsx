@@ -110,7 +110,7 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
                   >
                     {percent}%
                   </span>
-                  <span className="text-[11px] text-zinc-400 block font-medium">
+                  <span className="text-xs text-zinc-400 block font-medium">
                     {count} {count === 1 ? 'voto' : 'votos'}
                   </span>
                 </div>

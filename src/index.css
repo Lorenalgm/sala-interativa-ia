@@ -3,8 +3,17 @@
 @tailwind utilities;
 
 @layer base {
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
   body {
     @apply bg-stone-50 text-zinc-900 antialiased font-sans selection:bg-amber-300 selection:text-zinc-950;
+    font-variant-numeric: tabular-nums;
   }
 }
 

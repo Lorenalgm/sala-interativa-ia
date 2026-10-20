@@ -34,7 +34,7 @@ export const PoseFeedback: React.FC<PoseFeedbackProps> = ({
             </div>
           )}
           <div>
-            <span className="text-[11px] text-zinc-500 block uppercase tracking-wide font-semibold">
+            <span className="text-xs text-zinc-500 block uppercase tracking-wide font-semibold">
               Status ao vivo
             </span>
             <span
