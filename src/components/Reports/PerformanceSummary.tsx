@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Classroom, RoundSession, ScriptId } from '../../types';
 import { getScript } from '../../data/scripts';
+import { MasteryPanel } from './MasteryPanel';
 import {
   clearRoundHistory,
   loadRoundHistory,
@@ -27,6 +28,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
   onRefresh,
 }) => {
   const [allRounds, setRounds] = useState<RoundSession[]>(() => loadRoundHistory());
+  const [tab, setTab] = useState<'rounds' | 'mastery'>('rounds');
   const [scriptFilter, setScriptFilter] = useState<'all' | ScriptId>('all');
   // Registros antigos não têm roteiro: contam como pergunta rápida
   const scriptOf = (r: RoundSession): ScriptId => r.scriptId ?? 'quick-question';
@@ -132,6 +134,19 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
         </div>
       </div>
 
+      <div role="tablist" aria-label="Seção do desempenho" className="join">
+        <button role="tab" aria-selected={tab === 'rounds'} onClick={() => setTab('rounds')} className={`btn btn-sm join-item ${tab === 'rounds' ? 'btn-neutral' : ''}`}>
+          Rodadas
+        </button>
+        <button role="tab" aria-selected={tab === 'mastery'} onClick={() => setTab('mastery')} className={`btn btn-sm join-item ${tab === 'mastery' ? 'btn-neutral' : ''}`}>
+          Domínio
+        </button>
+      </div>
+
+      {tab === 'mastery' ? (
+        <MasteryPanel classroom={classroom} rounds={allRounds} />
+      ) : (
+      <>
       {/* Cartões de indicadores gerais */}
       <div className="stats stats-vertical sm:stats-horizontal w-full bg-base-100 border border-base-300">
         <div className="stat">
@@ -377,6 +392,8 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };
