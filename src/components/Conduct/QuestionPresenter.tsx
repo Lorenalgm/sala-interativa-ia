@@ -10,6 +10,7 @@ import {
   Student,
 } from '../../types';
 import { DiscussionTimer, DrawPanel, GroupResultsPanel } from './GroupPanels';
+import { openClassroomCamera } from '../../services/camera';
 import { StableReader } from '../../services/stableReader';
 import { drawFromGroup, drawOnePerGroup } from '../../services/groupDraw';
 import { ResponseRoster } from './ResponseRoster';
@@ -127,14 +128,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user',
-        },
-        audio: false,
-      });
+      const stream = await openClassroomCamera();
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
