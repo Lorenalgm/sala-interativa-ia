@@ -290,7 +290,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
       setFeedback({
         isMatch: true,
         score: 100,
-        feedback: 'Pose correta detectada em modo simulado.',
+        feedback: 'Pose correta! Segure a posição.',
       });
 
       if (canvasRef.current) {

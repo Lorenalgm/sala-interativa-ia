@@ -118,7 +118,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
   const handleDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm('Deseja excluir esta pergunta?')) {
+    if (confirm('Excluir esta pergunta?')) {
       deleteQuestion(id);
       setSelectedIds((prev) => prev.filter((item) => item !== id));
       onRefreshQuestions();
@@ -173,7 +173,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
           </button>
 
           <span className="text-xs text-base-content/60 font-medium">
-            Sessão com {activeQuestions.length} {activeQuestions.length === 1 ? 'questão' : 'questões'}
+            Rodada com {activeQuestions.length} {activeQuestions.length === 1 ? 'pergunta' : 'perguntas'}
           </span>
         </div>
 
@@ -198,7 +198,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
             Preparação das perguntas
           </h1>
           <p className="text-sm text-base-content/70 mt-1">
-            Selecione as perguntas que farão parte desta rodada ou adicione novas questões.
+            Escolha as perguntas desta rodada ou crie novas.
           </p>
         </div>
 
@@ -273,7 +273,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
               <div>
                 <label className="text-xs font-medium text-base-content/80 block mb-1">
-                  Alternativa correta (gabarito)
+                  Resposta certa
                 </label>
                 <select
                   value={correct}
@@ -326,7 +326,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
             <div>
               <label className="text-xs font-medium text-base-content/80 block mb-1">
-                Explicação do gabarito (opcional)
+                Explicação da resposta (opcional)
               </label>
               <input
                 type="text"
@@ -403,13 +403,13 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                     checked={isSelected}
                     onChange={() => toggleSelect(q.id)}
                     onClick={(e) => e.stopPropagation()}
-                    aria-label={`Selecionar questão ${idx + 1}`}
+                    aria-label={`Selecionar pergunta ${idx + 1}`}
                   />
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-base-content/60">
-                        Questão {idx + 1}
+                        Pergunta {idx + 1}
                       </span>
                       <span className="badge badge-ghost badge-sm">
                         {q.category}
@@ -426,7 +426,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                   <button
                     onClick={(e) => toggleExpand(q.id, e)}
                     className="btn btn-sm"
-                    title={isExpanded ? 'Ocultar alternativas' : 'Ver alternativas e gabarito'}
+                    title={isExpanded ? 'Ocultar alternativas' : 'Ver alternativas e resposta certa'}
                   >
                     <span>{isExpanded ? 'Ocultar' : 'Ver alternativas'}</span>
                     {isExpanded ? (
@@ -439,8 +439,8 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                   <button
                     onClick={(e) => handleDelete(q.id, e)}
                     className="btn btn-sm btn-ghost btn-square text-base-content/60 hover:text-error"
-                    title="Excluir questão"
-                    aria-label={`Excluir questão ${idx + 1}`}
+                    title="Excluir pergunta"
+                    aria-label={`Excluir pergunta ${idx + 1}`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -463,7 +463,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                       <span>{q.options[opt]}</span>
                       {opt === q.correctOption && (
                         <span className="ml-1 text-xs text-emerald-700 font-bold uppercase">
-                          (Gabarito)
+                          (resposta certa)
                         </span>
                       )}
                     </div>

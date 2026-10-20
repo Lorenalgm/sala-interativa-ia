@@ -9,6 +9,9 @@ import {
 import { defaultStudents } from '../data/defaultStudents';
 import { defaultQuestions } from '../data/defaultQuestions';
 
+// IDs das perguntas de exemplo da primeira versão
+const LEGACY_DEFAULT_IDS = ['ia-01', 'ia-02', 'ia-03', 'ia-04', 'ia-05', 'ia-06'];
+
 const STORAGE_KEYS = {
   CLASSROOM: 'classplay_turma_v2',
   QUESTIONS: 'classplay_perguntas_v2',
@@ -78,7 +81,15 @@ export function loadQuestions(): Question[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.QUESTIONS);
     if (raw) {
-      return JSON.parse(raw);
+      const stored: Question[] = JSON.parse(raw);
+      // Troca as antigas perguntas de exemplo sobre IA pelas novas, mantendo as criadas pelo professor
+      if (stored.some((q) => LEGACY_DEFAULT_IDS.includes(q.id))) {
+        const custom = stored.filter((q) => !LEGACY_DEFAULT_IDS.includes(q.id));
+        const migrated = [...custom, ...defaultQuestions];
+        saveQuestions(migrated);
+        return migrated;
+      }
+      return stored;
     }
   } catch (err) {
     console.error('Falha ao carregar perguntas:', err);

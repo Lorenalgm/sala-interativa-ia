@@ -56,7 +56,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
       return;
     }
 
-    let csv = 'Rodada,Data,Questão,Gabarito,Total Votos,Taxa Acerto (%)\n';
+    let csv = 'Rodada,Data,Pergunta,Resposta certa,Respostas,Acertos (%)\n';
     rounds.forEach((round, rIdx) => {
       const roundName = round.name || `Rodada ${rIdx + 1}`;
       const date = new Date(round.timestamp).toLocaleString('pt-BR');
@@ -140,9 +140,9 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
           <div className="stat-figure text-amber-700">
             <HelpCircle className="w-7 h-7" />
           </div>
-          <div className="stat-title">Total de respostas computadas</div>
+          <div className="stat-title">Respostas recebidas</div>
           <div className="stat-value font-extrabold">{totalResponsesCollected}</div>
-          <div className="stat-desc">Distribuídas em {totalQuestionsApplied} questões</div>
+          <div className="stat-desc">Em {totalQuestionsApplied} perguntas</div>
         </div>
 
         <div className="stat">
@@ -161,7 +161,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
             Rodadas registradas
           </h2>
           <span className="text-xs text-base-content/60">
-            Clique em uma rodada para expandir as questões e respostas individuais
+            Clique em uma rodada para ver as perguntas e os alunos
           </span>
         </div>
 
@@ -209,14 +209,14 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                           </span>
                         </div>
                         <span className="text-xs text-base-content/60">
-                          {round.questions.length} {round.questions.length === 1 ? 'pergunta' : 'perguntas'} • {round.totalResponses} votos computados
+                          {round.questions.length} {round.questions.length === 1 ? 'pergunta' : 'perguntas'} • {round.totalResponses} respostas
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-5">
                       <div className="text-right">
-                        <span className="text-xs text-base-content/60 block font-medium">Aproveitamento</span>
+                        <span className="text-xs text-base-content/70 block font-medium">Acertos</span>
                         <span className="text-lg font-black text-success">
                           {round.overallAccuracy}%
                         </span>
@@ -291,7 +291,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                       {/* Respostas individuais dos alunos nesta rodada */}
                       <div className="space-y-3">
                         <h4 className="text-xs font-bold text-base-content uppercase tracking-wide">
-                          Aproveitamento dos alunos nesta rodada
+                          Resultado por aluno
                         </h4>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-48 overflow-y-auto pr-1">

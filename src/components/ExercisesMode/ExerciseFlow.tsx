@@ -93,7 +93,7 @@ export const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 
                   <div className="flex items-center gap-1 text-xs text-base-content/60">
                     <Clock className="w-3.5 h-3.5" />
-                    <span>{item.targetDurationSeconds}s de sustentação</span>
+                    <span>Segurar {item.targetDurationSeconds}s</span>
                   </div>
                 </div>
 

@@ -70,24 +70,9 @@ export const PoseFeedback: React.FC<PoseFeedbackProps> = ({
           }`}
           value={holdPercent}
           max={100}
-          aria-label="Tempo de sustentação da postura"
+          aria-label="Tempo segurando a postura"
         />
       </div>
-
-      {/* Ângulos detectados */}
-      {feedback.activeAngles && (
-        <div className="flex items-center gap-3 pt-1 text-xs text-base-content/60">
-          <span>Ângulos medidos:</span>
-          {Object.entries(feedback.activeAngles).map(([name, val]) => (
-            <span
-              key={name}
-              className="badge badge-ghost font-mono font-medium"
-            >
-              {name}: {val}°
-            </span>
-          ))}
-        </div>
-      )}
     </div>
   );
 };

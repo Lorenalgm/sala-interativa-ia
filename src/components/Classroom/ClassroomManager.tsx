@@ -64,7 +64,7 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
             Alunos e cartões cadastrados
           </h1>
           <p className="text-sm text-base-content/70 mt-1">
-            Cada aluno tem um número de cartão, ligado a um marcador ArUco só dele.
+            Cada aluno tem um número de cartão. O desenho no meio do cartão é só dele, e é por ele que a câmera reconhece quem respondeu.
           </p>
         </div>
 
