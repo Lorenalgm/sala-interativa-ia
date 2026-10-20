@@ -16,7 +16,8 @@ Os dados (turma, perguntas e histórico) ficam salvos no `localStorage` do naveg
 
 - [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
+- [Tailwind CSS](https://tailwindcss.com/) e [daisyUI](https://daisyui.com/), com o tema `classplay` definido em `tailwind.config.js`
+- Fonte [Atkinson Hyperlegible Next](https://fonts.google.com/specimen/Atkinson+Hyperlegible+Next)
 - [MediaPipe Pose](https://developers.google.com/mediapipe) (via CDN)
 - [lucide-react](https://lucide.dev/) e [canvas-confetti](https://github.com/catdad/canvas-confetti)
 
