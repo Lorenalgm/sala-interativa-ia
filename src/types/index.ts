@@ -60,7 +60,7 @@ export interface RoundSession {
 export interface DetectedMarker {
   id: number;
   corners: { x: number; y: number }[];
-  rotation: number; // 0: A, 1: B, 2: C, 3: D
+  rotation: number; // 0: A em cima, 1: D, 2: C, 3: B (ver ROTATION_TO_ALTERNATIVE)
   option: Alternative;
 }
 

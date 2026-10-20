@@ -5,3 +5,12 @@ export const CALIBRATION_MARKERS = { min: 900, max: 903 } as const;
 
 export const isStudentMarker = (id: number): boolean =>
   id >= STUDENT_MARKERS.min && id <= STUDENT_MARKERS.max;
+
+// Paleta da lousa: uma por grupo, ids 200 a 209 (a paleta do grupo N é 199 + N)
+export const PADDLE_MARKERS = { min: 200, max: 209 } as const;
+
+export const isPaddleMarker = (id: number): boolean =>
+  id >= PADDLE_MARKERS.min && id <= PADDLE_MARKERS.max;
+
+export const isCalibrationMarker = (id: number): boolean =>
+  id >= CALIBRATION_MARKERS.min && id <= CALIBRATION_MARKERS.max;

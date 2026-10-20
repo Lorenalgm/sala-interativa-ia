@@ -1,7 +1,7 @@
 import aruco from 'js-aruco2/src/aruco.js';
 import 'js-aruco2/src/dictionaries/aruco_4x4_1000.js';
 import { Alternative, DetectedMarker } from '../types';
-import { isStudentMarker } from './markerRanges';
+import { isCalibrationMarker, isPaddleMarker, isStudentMarker } from './markerRanges';
 
 export const DICTIONARY_NAME = 'ARUCO_4X4_1000';
 
@@ -92,6 +92,15 @@ export class ArucoCardDetector {
   // Marcadores que não são de aluno (quadro, calibração) ficam de fora das respostas
   public static studentsOnly(markers: DetectedMarker[]): DetectedMarker[] {
     return markers.filter((m) => isStudentMarker(m.id));
+  }
+
+  // Lousa: só as paletas dos grupos e só os 4 marcadores de calibração
+  public static paddlesOnly(markers: DetectedMarker[]): DetectedMarker[] {
+    return markers.filter((m) => isPaddleMarker(m.id));
+  }
+
+  public static calibrationOnly(markers: DetectedMarker[]): DetectedMarker[] {
+    return markers.filter((m) => isCalibrationMarker(m.id));
   }
 }
 
