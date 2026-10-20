@@ -98,7 +98,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLibrary }) => {
             </div>
           </div>
 
-          <div className="lg:col-span-7 bg-[#d5e3df] rounded-[1.75rem] px-3 sm:px-6 pt-5">
+          <div className="lg:col-span-7 rounded-[1.75rem] overflow-hidden border border-base-300">
             <ClassroomScene />
           </div>
         </div>

@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 664" width="1200" height="664" role="img" aria-label="Sala de aula com datashow projetando uma pergunta, alunos levantando cartões de papel e uma câmera lendo as respostas">
+<defs>
+<linearGradient id="beam" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2a900" stop-opacity="0.55"/><stop offset="1" stop-color="#f2a900" stop-opacity="0.12"/></linearGradient>
+<linearGradient id="scan" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f2a900" stop-opacity="0.22"/><stop offset="1" stop-color="#f2a900" stop-opacity="0.03"/></linearGradient>
+</defs>
+<rect width="1200" height="664" fill="#e8f0ee"/>
+<rect y="612" width="1200" height="52" fill="#d9e6e2"/>
+<line x1="0" y1="612" x2="1200" y2="612" stroke="#c2d3ce" stroke-width="2"/>
+<rect width="1200" height="26" fill="#dde8e5"/>
+<rect x="48" y="132" width="396" height="266" rx="10" fill="#c2d3ce"/>
+<rect x="56" y="140" width="380" height="250" rx="4" fill="#ffffff"/>
+<rect x="96" y="398" width="300" height="8" rx="4" fill="#b5c8c2"/>
+<polygon points="734,74 734,90 436,390 436,140" fill="url(#beam)"/>
+<rect x="82" y="166" width="88" height="10" rx="5" fill="#f2a900"/>
+<rect x="82" y="190" width="300" height="16" rx="8" fill="#101820"/>
+<rect x="82" y="214" width="220" height="16" rx="8" fill="#101820"/>
+<rect x="82" y="254" width="156" height="48" rx="10" fill="#e8f0ee" stroke="#d3dfdb"/>
+<rect x="90" y="262" width="32" height="32" rx="8" fill="#f2a900"/>
+<text x="106" y="284" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="18" fill="#101820">A</text>
+<rect x="132" y="273" width="86" height="10" rx="5" fill="#a9bbb6"/>
+<rect x="248" y="254" width="156" height="48" rx="10" fill="#e8f0ee" stroke="#d3dfdb"/>
+<rect x="256" y="262" width="32" height="32" rx="8" fill="#f2a900"/>
+<text x="272" y="284" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="18" fill="#101820">B</text>
+<rect x="298" y="273" width="70" height="10" rx="5" fill="#a9bbb6"/>
+<rect x="82" y="314" width="156" height="48" rx="10" fill="#e8f0ee" stroke="#d3dfdb"/>
+<rect x="90" y="322" width="32" height="32" rx="8" fill="#f2a900"/>
+<text x="106" y="344" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="18" fill="#101820">C</text>
+<rect x="132" y="333" width="92" height="10" rx="5" fill="#a9bbb6"/>
+<rect x="248" y="314" width="156" height="48" rx="10" fill="#e8f0ee" stroke="#d3dfdb"/>
+<rect x="256" y="322" width="32" height="32" rx="8" fill="#f2a900"/>
+<text x="272" y="344" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="18" fill="#101820">D</text>
+<rect x="298" y="333" width="64" height="10" rx="5" fill="#a9bbb6"/>
+<rect x="756" y="26" width="8" height="26" fill="#9e988b"/>
+<rect x="726" y="50" width="84" height="40" rx="10" fill="#101820"/>
+<circle cx="734" cy="70" r="11" fill="#1f2a33"/><circle cx="734" cy="70" r="6" fill="#f2a900"/>
+<rect x="400" y="122" width="12" height="12" fill="#9e988b"/>
+<rect x="380" y="98" width="56" height="26" rx="13" fill="#101820"/>
+<circle cx="424" cy="111" r="8" fill="#1f2a33"/><circle cx="424" cy="111" r="4" fill="#6fa8ff"/>
+<polygon points="430,106 1190,230 1190,612 700,612 430,116" fill="url(#scan)"/>
+<line x1="430" y1="106" x2="1190" y2="230" stroke="#9c6a00" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="6 8"/>
+<line x1="430" y1="116" x2="700" y2="612" stroke="#9c6a00" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="6 8"/>
+<rect x="454" y="500" width="110" height="10" rx="3" fill="#b9a585"/>
+<rect x="462" y="510" width="8" height="102" fill="#a8946f"/><rect x="548" y="510" width="8" height="102" fill="#a8946f"/>
+<path d="M490 500 l14 -36 h44 l-10 36 z" fill="#1f2a33"/><rect x="486" y="497" width="64" height="5" rx="2" fill="#57534c"/>
+<rect x="438" y="510" width="14" height="102" rx="6" fill="#2f3b52"/><rect x="456" y="510" width="14" height="102" rx="6" fill="#2f3b52"/>
+<rect x="431" y="418" width="46" height="100" rx="20" fill="#0a4d4a"/>
+<circle cx="455" cy="396" r="21" fill="#8d5a3b"/>
+<circle cx="443" cy="398" r="2.4" fill="#101820"/>
+<path d="M433 392 a22 22 0 0 1 44 -4 c-6 -10 -20 -12 -30 -6 c-6 4 -10 8 -14 10 z" fill="#101820"/>
+<line x1="447" y1="440" x2="405" y2="398" stroke="#0a4d4a" stroke-width="14" stroke-linecap="round"/>
+<circle cx="401" cy="394" r="7" fill="#8d5a3b"/>
+<rect x="532" y="476" width="92" height="10" rx="3" fill="#c4b08e"/>
+<rect x="538" y="486" width="8" height="126" fill="#ad9873"/><rect x="608" y="486" width="8" height="126" fill="#ad9873"/>
+<rect x="640" y="520" width="52" height="9" rx="3" fill="#7d776b"/>
+<rect x="684" y="458" width="8" height="70" rx="3" fill="#7d776b"/>
+<rect x="644" y="529" width="6" height="83" fill="#7d776b"/><rect x="684" y="529" width="6" height="83" fill="#7d776b"/>
+<path d="M668 516 L616 516 L612 608" fill="none" stroke="#3d4659" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="606" cy="608" rx="13" ry="6" fill="#101820"/>
+<rect x="644" y="428" width="40" height="92" rx="18" fill="#d62839"/>
+<circle cx="660" cy="408" r="20" fill="#f1c7a4"/>
+<circle cx="648" cy="406" r="2.4" fill="#101820"/>
+<path d="M642 404 a20 20 0 0 1 38 -2 c2 10 0 22 -4 30 c-2 -14 -6 -22 -14 -26 c-6 4 -14 4 -20 -2 z" fill="#4a3121"/>
+<line x1="656" y1="440" x2="636" y2="352" stroke="#d62839" stroke-width="13" stroke-linecap="round"/>
+<circle cx="636" cy="352" r="7" fill="#f1c7a4"/>
+<g transform="rotate(-8 636 320.0)">
+<rect x="604.0" y="286" width="64" height="64" rx="5" fill="#fff" stroke="#c2d3ce"/>
+<rect x="614.0" y="296.0" width="44.0" height="44.0" fill="#101820"/><rect x="621.3" y="303.3" width="7.6" height="7.6" fill="#fff"/><rect x="636.0" y="303.3" width="7.6" height="7.6" fill="#fff"/><rect x="628.7" y="310.7" width="7.6" height="7.6" fill="#fff"/><rect x="636.0" y="310.7" width="7.6" height="7.6" fill="#fff"/><rect x="621.3" y="318.0" width="7.6" height="7.6" fill="#fff"/><rect x="628.7" y="318.0" width="7.6" height="7.6" fill="#fff"/><rect x="643.3" y="318.0" width="7.6" height="7.6" fill="#fff"/><rect x="628.7" y="325.3" width="7.6" height="7.6" fill="#fff"/><rect x="643.3" y="325.3" width="7.6" height="7.6" fill="#fff"/>
+<text x="636" y="294" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="7" fill="#8a857a">A</text>
+<rect x="598.0" y="280" width="76" height="76" rx="8" fill="none" stroke="#9c6a00" stroke-width="3"/>
+</g>
+<rect x="658.0" y="266" width="50" height="22" rx="11" fill="#101820"/>
+<text x="683.0" y="281" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="12" fill="#fff">#07 ✓</text>
+<rect x="692" y="476" width="92" height="10" rx="3" fill="#c4b08e"/>
+<rect x="698" y="486" width="8" height="126" fill="#ad9873"/><rect x="768" y="486" width="8" height="126" fill="#ad9873"/>
+<rect x="800" y="520" width="52" height="9" rx="3" fill="#7d776b"/>
+<rect x="844" y="458" width="8" height="70" rx="3" fill="#7d776b"/>
+<rect x="804" y="529" width="6" height="83" fill="#7d776b"/><rect x="844" y="529" width="6" height="83" fill="#7d776b"/>
+<path d="M828 516 L776 516 L772 608" fill="none" stroke="#3d4659" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="766" cy="608" rx="13" ry="6" fill="#101820"/>
+<rect x="804" y="428" width="40" height="92" rx="18" fill="#101820"/>
+<circle cx="820" cy="408" r="20" fill="#8d5a3b"/>
+<circle cx="808" cy="406" r="2.4" fill="#101820"/>
+<path d="M800 406 a20 20 0 0 1 40 0 c-8 -6 -18 -8 -26 -4 c-6 2 -10 4 -14 4 z" fill="#101820"/><circle cx="824" cy="392" r="10" fill="#101820"/>
+<line x1="816" y1="440" x2="796" y2="342" stroke="#101820" stroke-width="13" stroke-linecap="round"/>
+<circle cx="796" cy="342" r="7" fill="#8d5a3b"/>
+<g transform="rotate(6 796 310.0)">
+<rect x="764.0" y="276" width="64" height="64" rx="5" fill="#fff" stroke="#c2d3ce"/>
+<rect x="774.0" y="286.0" width="44.0" height="44.0" fill="#101820"/><rect x="781.3" y="293.3" width="7.6" height="7.6" fill="#fff"/><rect x="788.7" y="293.3" width="7.6" height="7.6" fill="#fff"/><rect x="796.0" y="293.3" width="7.6" height="7.6" fill="#fff"/><rect x="803.3" y="293.3" width="7.6" height="7.6" fill="#fff"/><rect x="781.3" y="300.7" width="7.6" height="7.6" fill="#fff"/><rect x="788.7" y="300.7" width="7.6" height="7.6" fill="#fff"/><rect x="788.7" y="308.0" width="7.6" height="7.6" fill="#fff"/><rect x="803.3" y="308.0" width="7.6" height="7.6" fill="#fff"/><rect x="781.3" y="315.3" width="7.6" height="7.6" fill="#fff"/><rect x="788.7" y="315.3" width="7.6" height="7.6" fill="#fff"/><rect x="796.0" y="315.3" width="7.6" height="7.6" fill="#fff"/>
+<text x="796" y="284" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="7" fill="#8a857a">C</text>
+<rect x="758.0" y="270" width="76" height="76" rx="8" fill="none" stroke="#9c6a00" stroke-width="3"/>
+</g>
+<rect x="818.0" y="256" width="50" height="22" rx="11" fill="#101820"/>
+<text x="843.0" y="271" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="12" fill="#fff">#12 ✓</text>
+<rect x="852" y="476" width="92" height="10" rx="3" fill="#c4b08e"/>
+<rect x="858" y="486" width="8" height="126" fill="#ad9873"/><rect x="928" y="486" width="8" height="126" fill="#ad9873"/>
+<rect x="960" y="520" width="52" height="9" rx="3" fill="#7d776b"/>
+<rect x="1004" y="458" width="8" height="70" rx="3" fill="#7d776b"/>
+<rect x="964" y="529" width="6" height="83" fill="#7d776b"/><rect x="1004" y="529" width="6" height="83" fill="#7d776b"/>
+<path d="M988 516 L936 516 L932 608" fill="none" stroke="#3d4659" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="926" cy="608" rx="13" ry="6" fill="#101820"/>
+<rect x="964" y="428" width="40" height="92" rx="18" fill="#f2a900"/>
+<circle cx="980" cy="408" r="20" fill="#c99068"/>
+<circle cx="968" cy="406" r="2.4" fill="#101820"/>
+<path d="M962 404 a20 20 0 0 1 38 -2 c2 10 0 22 -4 30 c-2 -14 -6 -22 -14 -26 c-6 4 -14 4 -20 -2 z" fill="#6b3b1f"/>
+<line x1="976" y1="440" x2="956" y2="352" stroke="#f2a900" stroke-width="13" stroke-linecap="round"/>
+<circle cx="956" cy="352" r="7" fill="#c99068"/>
+<g transform="rotate(-4 956 320.0)">
+<rect x="924.0" y="286" width="64" height="64" rx="5" fill="#fff" stroke="#c2d3ce"/>
+<rect x="934.0" y="296.0" width="44.0" height="44.0" fill="#101820"/><rect x="956.0" y="310.7" width="7.6" height="7.6" fill="#fff"/><rect x="963.3" y="310.7" width="7.6" height="7.6" fill="#fff"/><rect x="963.3" y="318.0" width="7.6" height="7.6" fill="#fff"/><rect x="941.3" y="325.3" width="7.6" height="7.6" fill="#fff"/><rect x="948.7" y="325.3" width="7.6" height="7.6" fill="#fff"/>
+<text x="956" y="294" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="7" fill="#8a857a">A</text>
+<rect x="918.0" y="280" width="76" height="76" rx="8" fill="none" stroke="#9c6a00" stroke-width="3"/>
+</g>
+<rect x="978.0" y="266" width="50" height="22" rx="11" fill="#101820"/>
+<text x="1003.0" y="281" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="12" fill="#fff">#03 ✓</text>
+<rect x="1002" y="476" width="92" height="10" rx="3" fill="#c4b08e"/>
+<rect x="1008" y="486" width="8" height="126" fill="#ad9873"/><rect x="1078" y="486" width="8" height="126" fill="#ad9873"/>
+<rect x="1110" y="520" width="52" height="9" rx="3" fill="#7d776b"/>
+<rect x="1154" y="458" width="8" height="70" rx="3" fill="#7d776b"/>
+<rect x="1114" y="529" width="6" height="83" fill="#7d776b"/><rect x="1154" y="529" width="6" height="83" fill="#7d776b"/>
+<path d="M1138 516 L1086 516 L1082 608" fill="none" stroke="#3d4659" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="1076" cy="608" rx="13" ry="6" fill="#101820"/>
+<rect x="1114" y="428" width="40" height="92" rx="18" fill="#1f6f69"/>
+<circle cx="1130" cy="408" r="20" fill="#5c3a24"/>
+<circle cx="1118" cy="406" r="2.4" fill="#101820"/>
+<path d="M1110 406 a20 20 0 0 1 40 0 c-8 -6 -18 -8 -26 -4 c-6 2 -10 4 -14 4 z" fill="#101820"/><circle cx="1134" cy="392" r="10" fill="#101820"/>
+<line x1="1126" y1="440" x2="1106" y2="342" stroke="#1f6f69" stroke-width="13" stroke-linecap="round"/>
+<circle cx="1106" cy="342" r="7" fill="#5c3a24"/>
+<g transform="rotate(10 1106 310.0)">
+<rect x="1074.0" y="276" width="64" height="64" rx="5" fill="#fff" stroke="#c2d3ce"/>
+<rect x="1084.0" y="286.0" width="44.0" height="44.0" fill="#101820"/><rect x="1106.0" y="293.3" width="7.6" height="7.6" fill="#fff"/><rect x="1113.3" y="293.3" width="7.6" height="7.6" fill="#fff"/><rect x="1091.3" y="300.7" width="7.6" height="7.6" fill="#fff"/><rect x="1106.0" y="300.7" width="7.6" height="7.6" fill="#fff"/><rect x="1091.3" y="308.0" width="7.6" height="7.6" fill="#fff"/><rect x="1106.0" y="308.0" width="7.6" height="7.6" fill="#fff"/><rect x="1098.7" y="315.3" width="7.6" height="7.6" fill="#fff"/>
+<text x="1106" y="284" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="7" fill="#8a857a">B</text>
+<rect x="1068.0" y="270" width="76" height="76" rx="8" fill="none" stroke="#9c6a00" stroke-width="2.5" stroke-dasharray="6 5"/>
+</g>
+<rect x="318" y="154" width="104" height="26" rx="13" fill="#101820"/>
+<text x="370" y="172" text-anchor="middle" font-family="'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', Inter, Arial, sans-serif" font-weight="700" font-size="13" fill="#fff">18/20 ✓</text>
+</svg>
