@@ -74,7 +74,15 @@ export const App: React.FC = () => {
       />
 
       <main className="flex-1">
-        {activeTab === 'home' && <LandingPage onOpenLibrary={() => handleSelectTab('library')} />}
+        {activeTab === 'home' && (
+          <LandingPage
+            onOpenLibrary={() => handleSelectTab('library')}
+            onOpenScript={(id) => {
+              setActiveScriptId(id);
+              handleSelectTab('script');
+            }}
+          />
+        )}
 
         {activeTab === 'library' && (
           <LibraryPage

@@ -66,6 +66,16 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* Entrada das seções da landing: aparecem subindo ao chegar na tela */
+  .reveal {
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal[data-shown='false'] {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
   .book {
     transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
