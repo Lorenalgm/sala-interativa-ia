@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Exercise, PoseFeedbackResult, PoseLandmark } from '../../types';
 import { PoseFeedback } from './PoseFeedback';
+import { PoseFigure } from './PoseFigure';
 import {
   evaluatePose,
   POSE_CONNECTIONS,
@@ -426,13 +427,19 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
       {/* Conteúdo projetado: instruções à esquerda, câmera e retorno à direita */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-start flex-1 min-h-0">
         <section className="lg:col-span-5 bg-base-100 border border-base-300 rounded-box p-6 lg:p-8 space-y-5">
-          <div className="space-y-3">
-            <h1 className="text-3xl sm:text-4xl xl:text-5xl font-extrabold text-base-content tracking-tight leading-tight">
-              {currentExercise.title}
-            </h1>
-            <p className="text-lg lg:text-xl text-base-content/80 leading-relaxed">
-              {currentExercise.description}
-            </p>
+          <div className="flex items-start gap-5">
+            <PoseFigure
+              type={currentExercise.type}
+              className="h-32 lg:h-40 w-auto flex-shrink-0 text-amber-700"
+            />
+            <div className="space-y-3">
+              <h1 className="text-3xl sm:text-4xl xl:text-5xl font-extrabold text-base-content tracking-tight leading-tight">
+                {currentExercise.title}
+              </h1>
+              <p className="text-lg lg:text-xl text-base-content/80 leading-relaxed">
+                {currentExercise.description}
+              </p>
+            </div>
           </div>
 
           <div className="space-y-4 border-t border-base-300 pt-5">
