@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-zinc-900 antialiased font-sans selection:bg-amber-300 selection:text-zinc-950;
+  }
+}
+
+@media print {
+  html, body, #root, main, div, section, article {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  @page {
+    margin: 1cm;
+    size: A4 portrait;
+  }
+}
