@@ -23,7 +23,12 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
     e.preventDefault();
     if (!newStudentName.trim()) return;
 
-    addStudent(newStudentName.trim());
+    try {
+      addStudent(newStudentName.trim());
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Não foi possível adicionar o aluno.');
+      return;
+    }
     setNewStudentName('');
     onRefresh();
   };

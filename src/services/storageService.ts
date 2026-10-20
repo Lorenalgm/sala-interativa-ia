@@ -7,6 +7,7 @@ import {
   RoundSession,
   Student,
 } from '../types';
+import { STUDENT_MARKERS } from './markerRanges';
 import { defaultStudents } from '../data/defaultStudents';
 import { defaultQuestions } from '../data/defaultQuestions';
 
@@ -60,10 +61,13 @@ export function updateStudents(students: Student[]): void {
 // Adiciona um novo aluno
 export function addStudent(name: string): Student {
   const current = loadClassroom();
-  const nextId =
-    current.students.length > 0
-      ? Math.max(...current.students.map((s) => s.id)) + 1
-      : 1;
+  // Menor número livre na faixa dos cartões de aluno (1 a 199)
+  const used = new Set(current.students.map((s) => s.id));
+  let nextId = STUDENT_MARKERS.min;
+  while (used.has(nextId) && nextId <= STUDENT_MARKERS.max) nextId++;
+  if (nextId > STUDENT_MARKERS.max) {
+    throw new Error(`A turma já tem ${STUDENT_MARKERS.max} alunos, o limite de cartões.`);
+  }
 
   const newStudent: Student = { id: nextId, name };
   current.students.push(newStudent);

@@ -1,136 +1,12 @@
+import aruco from 'js-aruco2/src/aruco.js';
+import 'js-aruco2/src/dictionaries/aruco_4x4_1000.js';
 import { Alternative, DetectedMarker } from '../types';
+import { isStudentMarker } from './markerRanges';
 
-// Matriz de bits 4x4 para marcadores dos alunos (IDs 1 a 24).
-// Cada marcador é assimétrico sob rotações de 90°, 180° e 270°,
-// garantindo identificação única do aluno e da alternativa selecionada.
-export const MARKER_PATTERNS_4X4: Record<number, number[][]> = {
-  1: [
-    [1, 0, 0, 0],
-    [1, 1, 0, 1],
-    [0, 1, 0, 0],
-    [1, 0, 1, 1],
-  ],
-  2: [
-    [0, 1, 0, 0],
-    [1, 0, 1, 1],
-    [1, 1, 0, 0],
-    [0, 0, 1, 1],
-  ],
-  3: [
-    [1, 1, 0, 0],
-    [0, 1, 1, 0],
-    [1, 0, 0, 1],
-    [0, 0, 1, 0],
-  ],
-  4: [
-    [0, 0, 1, 0],
-    [1, 1, 0, 1],
-    [0, 1, 1, 0],
-    [1, 0, 0, 0],
-  ],
-  5: [
-    [1, 0, 1, 0],
-    [0, 1, 0, 1],
-    [1, 1, 0, 0],
-    [0, 0, 0, 1],
-  ],
-  6: [
-    [0, 1, 1, 0],
-    [1, 0, 0, 1],
-    [0, 0, 1, 1],
-    [1, 0, 0, 0],
-  ],
-  7: [
-    [1, 0, 0, 1],
-    [0, 1, 1, 0],
-    [1, 1, 0, 0],
-    [0, 1, 0, 1],
-  ],
-  8: [
-    [0, 0, 1, 1],
-    [1, 1, 0, 0],
-    [0, 1, 0, 1],
-    [1, 0, 0, 1],
-  ],
-  9: [
-    [1, 1, 0, 1],
-    [0, 0, 1, 0],
-    [1, 0, 0, 0],
-    [0, 1, 1, 1],
-  ],
-  10: [
-    [0, 1, 0, 1],
-    [1, 0, 0, 0],
-    [0, 1, 1, 1],
-    [1, 1, 0, 0],
-  ],
-  11: [
-    [1, 0, 1, 1],
-    [0, 1, 0, 0],
-    [0, 0, 1, 0],
-    [1, 1, 0, 1],
-  ],
-  12: [
-    [0, 0, 0, 1],
-    [1, 1, 1, 0],
-    [1, 0, 1, 0],
-    [0, 1, 0, 0],
-  ],
-  13: [
-    [1, 1, 1, 0],
-    [0, 1, 0, 1],
-    [0, 0, 1, 1],
-    [1, 0, 0, 0],
-  ],
-  14: [
-    [0, 1, 1, 1],
-    [1, 0, 1, 0],
-    [0, 0, 0, 1],
-    [1, 1, 0, 0],
-  ],
-  15: [
-    [1, 0, 0, 1],
-    [1, 1, 1, 0],
-    [0, 1, 0, 0],
-    [0, 0, 1, 1],
-  ],
-  16: [
-    [0, 1, 0, 0],
-    [0, 0, 1, 1],
-    [1, 1, 0, 1],
-    [1, 0, 1, 0],
-  ],
-  17: [
-    [1, 1, 0, 0],
-    [1, 0, 1, 1],
-    [0, 0, 1, 0],
-    [0, 1, 1, 0],
-  ],
-  18: [
-    [0, 0, 1, 0],
-    [0, 1, 0, 1],
-    [1, 1, 1, 0],
-    [1, 0, 0, 1],
-  ],
-  19: [
-    [1, 0, 1, 0],
-    [1, 1, 0, 0],
-    [0, 0, 0, 1],
-    [0, 1, 1, 1],
-  ],
-  20: [
-    [0, 1, 1, 0],
-    [0, 0, 1, 1],
-    [1, 0, 0, 1],
-    [1, 1, 0, 0],
-  ],
-};
+export const DICTIONARY_NAME = 'ARUCO_4X4_1000';
 
-// Mapeamento de rotação para alternativa conforme o lado voltado para cima:
-// Rotação 0: lado superior voltado para cima = A
-// Rotação 1: lado esquerdo voltado para cima (giro de 90° horário do cartão) = D
-// Rotação 2: lado inferior voltado para cima (giro de 180° do cartão) = C
-// Rotação 3: lado direito voltado para cima (giro de 270° horário do cartão) = B
+// Rotação do cartão (sentido horário, visto pela câmera) para a letra voltada para cima:
+// 0: A em cima, 1: D em cima (cartão girado 90°), 2: C em cima (180°), 3: B em cima (270°)
 export const ROTATION_TO_ALTERNATIVE: Record<number, Alternative> = {
   0: 'A',
   1: 'D',
@@ -138,246 +14,88 @@ export const ROTATION_TO_ALTERNATIVE: Record<number, Alternative> = {
   3: 'B',
 };
 
-// Função para rotacionar matriz 4x4 em 90 graus no sentido horário
-function rotateMatrix(mat: number[][]): number[][] {
-  const n = mat.length;
-  const res: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
-  for (let r = 0; r < n; r++) {
-    for (let c = 0; c < n; c++) {
-      res[c][n - 1 - r] = mat[r][c];
-    }
-  }
-  return res;
+// A biblioteca devolve os cantos começando pelo canto superior esquerdo do marcador
+// (já corrigida a rotação). O ângulo da aresta superior diz qual lado do cartão está em cima.
+export function rotationFromCorners(corners: { x: number; y: number }[]): number {
+  const [c0, c1, c2, c3] = corners;
+  const dx = c1.x - c0.x + (c2.x - c3.x);
+  const dy = c1.y - c0.y + (c2.y - c3.y);
+  const angle = (Math.atan2(dy, dx) * 180) / Math.PI; // eixo y da imagem aponta para baixo
+  return ((Math.round(angle / 90) % 4) + 4) % 4;
 }
 
-// Compara duas matrizes 4x4 e retorna a quantidade de bits divergentes (distância de Hamming)
-function matrixDistance(m1: number[][], m2: number[][]): number {
-  let dist = 0;
-  for (let r = 0; r < 4; r++) {
-    for (let c = 0; c < 4; c++) {
-      if (m1[r][c] !== m2[r][c]) dist++;
-    }
-  }
-  return dist;
+export interface DetectorStats {
+  fps: number;
+  detectMs: number;
+  width: number;
+  height: number;
 }
 
-export interface MarkerMatch {
-  id: number;
-  rotation: number;
-  option: Alternative;
-  confidence: number;
-}
-
-// Identifica um padrão 4x4 extraído contra o dicionário de marcadores
-export function matchMarkerPattern(extracted: number[][]): MarkerMatch | null {
-  let bestId = -1;
-  let bestRot = -1;
-  let minDistance = 999;
-
-  for (const [idStr, basePattern] of Object.entries(MARKER_PATTERNS_4X4)) {
-    const id = parseInt(idStr, 10);
-    let currentPattern = basePattern;
-
-    for (let rot = 0; rot < 4; rot++) {
-      const dist = matrixDistance(extracted, currentPattern);
-      if (dist < minDistance) {
-        minDistance = dist;
-        bestId = id;
-        bestRot = rot;
-      }
-      currentPattern = rotateMatrix(currentPattern);
-    }
-  }
-
-  // Tolerância máxima de 1 bit para ruído de imagem
-  if (minDistance <= 1 && bestId !== -1) {
-    return {
-      id: bestId,
-      rotation: bestRot,
-      option: ROTATION_TO_ALTERNATIVE[bestRot],
-      confidence: 1 - minDistance / 16,
-    };
-  }
-
-  return null;
-}
-
-// Algoritmo de visão computacional em tempo real para detecção de marcadores em canvas
+// Leitor de cartões ArUco 4x4 (js-aruco2): limiar adaptativo, contornos e perspectiva
 export class ArucoCardDetector {
-  private tempCanvas: HTMLCanvasElement;
-  private tempCtx: CanvasRenderingContext2D | null;
+  private detector = new aruco.AR.Detector({ dictionaryName: DICTIONARY_NAME });
+  private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D | null;
+  private lastFrameAt = 0;
+  public stats: DetectorStats = { fps: 0, detectMs: 0, width: 0, height: 0 };
 
-  constructor() {
-    this.tempCanvas = document.createElement('canvas');
-    this.tempCtx = this.tempCanvas.getContext('2d', { willReadFrequently: true });
+  // maxWidth: lê na resolução máxima da câmera (1920 px com a StreamCam)
+  constructor(private maxWidth = 1920) {
+    this.canvas = document.createElement('canvas');
+    this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
   }
 
   public detect(video: HTMLVideoElement): DetectedMarker[] {
-    if (!video.videoWidth || !video.videoHeight || !this.tempCtx) {
-      return [];
+    if (!video.videoWidth || !video.videoHeight || !this.ctx) return [];
+
+    const scale = Math.min(1, this.maxWidth / video.videoWidth);
+    const width = Math.round(video.videoWidth * scale);
+    const height = Math.round(video.videoHeight * scale);
+    if (this.canvas.width !== width || this.canvas.height !== height) {
+      this.canvas.width = width;
+      this.canvas.height = height;
     }
 
-    const width = 640;
-    const height = Math.round((video.videoHeight / video.videoWidth) * 640);
+    const start = performance.now();
+    this.ctx.drawImage(video, 0, 0, width, height);
+    const image = this.ctx.getImageData(0, 0, width, height);
+    const found = this.detector.detect(image);
 
-    if (this.tempCanvas.width !== width || this.tempCanvas.height !== height) {
-      this.tempCanvas.width = width;
-      this.tempCanvas.height = height;
+    const markers: DetectedMarker[] = [];
+    const seen = new Set<number>();
+    for (const m of found) {
+      if (seen.has(m.id)) continue;
+      seen.add(m.id);
+      const rotation = rotationFromCorners(m.corners);
+      markers.push({
+        id: m.id,
+        // Devolve as coordenadas na resolução original do vídeo
+        corners: m.corners.map((c) => ({ x: c.x / scale, y: c.y / scale })),
+        rotation,
+        option: ROTATION_TO_ALTERNATIVE[rotation],
+      });
     }
 
-    // Desenha o quadro atual da câmera
-    this.tempCtx.drawImage(video, 0, 0, width, height);
-    const imageData = this.tempCtx.getImageData(0, 0, width, height);
-    const { data } = imageData;
-
-    // Converte para escala de cinza e calcula limiar médio
-    const gray = new Uint8Array(width * height);
-    let sumLum = 0;
-    for (let i = 0, j = 0; i < data.length; i += 4, j++) {
-      // Y = 0.299R + 0.587G + 0.114B
-      const lum = (data[i] * 77 + data[i + 1] * 150 + data[i + 2] * 29) >> 8;
-      gray[j] = lum;
-      sumLum += lum;
-    }
-    const avgLum = sumLum / (width * height);
-    const threshold = Math.max(60, Math.min(190, avgLum * 0.9));
-
-    // Binarização
-    const binary = new Uint8Array(width * height);
-    for (let i = 0; i < gray.length; i++) {
-      binary[i] = gray[i] < threshold ? 0 : 255;
-    }
-
-    // Localização de regiões candidatas a marcadores quadrangulares
-    const candidates = this.findQuadrilateralCandidates(binary, width, height);
-    const detected: DetectedMarker[] = [];
-    const seenIds = new Set<number>();
-
-    for (const quad of candidates) {
-      const pattern = this.sampleMarkerBits(gray, width, quad);
-      if (!pattern) continue;
-
-      const match = matchMarkerPattern(pattern);
-      if (match && !seenIds.has(match.id)) {
-        seenIds.add(match.id);
-        detected.push({
-          id: match.id,
-          corners: quad,
-          rotation: match.rotation,
-          option: match.option,
-        });
-      }
-    }
-
-    return detected;
-  }
-
-  // Amostra a grade 6x6 (borda preta de 1 bit + dados 4x4)
-  private sampleMarkerBits(
-    gray: Uint8Array,
-    width: number,
-    quad: { x: number; y: number }[]
-  ): number[][] | null {
-    const [c0, c1, c2, c3] = quad;
-
-    // Verifica integridade da borda preta externa
-    const borderSamples = 6;
-    let blackBorderCount = 0;
-    let totalBorderSamples = 0;
-
-    // Mapeamento bilinear do quadrilátero para coordenada canônica
-    const samplePoint = (u: number, v: number): number => {
-      const topX = c0.x + (c1.x - c0.x) * u;
-      const topY = c0.y + (c1.y - c0.y) * u;
-      const botX = c3.x + (c2.x - c3.x) * u;
-      const botY = c3.y + (c2.y - c3.y) * u;
-      const x = Math.round(topX + (botX - topX) * v);
-      const y = Math.round(topY + (botY - topY) * v);
-      if (x < 0 || x >= width || y < 0) return 255;
-      return gray[y * width + x] || 255;
+    const now = performance.now();
+    const frameMs = this.lastFrameAt ? now - this.lastFrameAt : 0;
+    this.lastFrameAt = now;
+    // Média móvel para o número não ficar pulando na tela de teste
+    this.stats = {
+      fps: frameMs > 0 ? Math.round((this.stats.fps * 0.8 + (1000 / frameMs) * 0.2) * 10) / 10 : this.stats.fps,
+      detectMs: Math.round(now - start),
+      width,
+      height,
     };
-
-    // Testa a borda externa
-    for (let i = 0; i < borderSamples; i++) {
-      const t = (i + 0.5) / borderSamples;
-      if (samplePoint(t, 0.08) < 110) blackBorderCount++;
-      if (samplePoint(t, 0.92) < 110) blackBorderCount++;
-      if (samplePoint(0.08, t) < 110) blackBorderCount++;
-      if (samplePoint(0.92, t) < 110) blackBorderCount++;
-      totalBorderSamples += 4;
-    }
-
-    // Se a borda não for predominantemente preta, não é um cartão ArUco
-    if (blackBorderCount / totalBorderSamples < 0.65) {
-      return null;
-    }
-
-    // Amostra a matriz interna 4x4
-    const matrix: number[][] = [];
-    const cellStep = 1 / 6;
-
-    for (let r = 0; r < 4; r++) {
-      const row: number[] = [];
-      const v = (r + 1.5) * cellStep;
-      for (let c = 0; c < 4; c++) {
-        const u = (c + 1.5) * cellStep;
-        const lum = samplePoint(u, v);
-        row.push(lum > 128 ? 1 : 0);
-      }
-      matrix.push(row);
-    }
-
-    return matrix;
+    return markers;
   }
 
-  // Busca regiões fechadas com dimensões e proporções condizentes com cartões
-  private findQuadrilateralCandidates(
-    binary: Uint8Array,
-    width: number,
-    height: number
-  ): { x: number; y: number }[][] {
-    const candidates: { x: number; y: number }[][] = [];
-    const step = 8;
-    const minCardSize = 40;
-    const maxCardSize = Math.min(width, height) * 0.8;
-
-    // Varredura por blocos de borda preta
-    for (let y = minCardSize; y < height - minCardSize; y += step * 2) {
-      for (let x = minCardSize; x < width - minCardSize; x += step * 2) {
-        const idx = y * width + x;
-        if (binary[idx] === 0) {
-          // Mede a extensão horizontal e vertical da região escura
-          let left = x;
-          while (left > 0 && binary[y * width + left] === 0 && x - left < maxCardSize) left--;
-          let right = x;
-          while (right < width - 1 && binary[y * width + right] === 0 && right - x < maxCardSize) right++;
-          let top = y;
-          while (top > 0 && binary[top * width + x] === 0 && y - top < maxCardSize) top--;
-          let bottom = y;
-          while (bottom < height - 1 && binary[bottom * width + x] === 0 && bottom - y < maxCardSize) bottom++;
-
-          const spanW = right - left;
-          const spanH = bottom - top;
-
-          if (
-            spanW >= minCardSize &&
-            spanH >= minCardSize &&
-            spanW <= maxCardSize &&
-            spanH <= maxCardSize &&
-            Math.abs(spanW - spanH) / Math.max(spanW, spanH) < 0.4
-          ) {
-            candidates.push([
-              { x: left, y: top },
-              { x: right, y: top },
-              { x: right, y: bottom },
-              { x: left, y: bottom },
-            ]);
-            x += spanW;
-          }
-        }
-      }
-    }
-
-    return candidates.slice(0, 15);
+  // Marcadores que não são de aluno (quadro, calibração) ficam de fora das respostas
+  public static studentsOnly(markers: DetectedMarker[]): DetectedMarker[] {
+    return markers.filter((m) => isStudentMarker(m.id));
   }
+}
+
+// SVG de um marcador, para imprimir nos cartões
+export function markerSvg(id: number): string {
+  return new aruco.AR.Dictionary(DICTIONARY_NAME).generateSVG(id);
 }
