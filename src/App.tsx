@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Navbar, ActiveTab } from './components/Navbar';
-import { HomeDashboard } from './components/Home/HomeDashboard';
-import { QuestionFlow } from './components/QuestionsMode/QuestionFlow';
-import { ExerciseFlow } from './components/ExercisesMode/ExerciseFlow';
+import { LibraryPage } from './components/Library/LibraryPage';
+import { ScriptPage } from './components/Library/ScriptPage';
+import { QuestionFlow } from './components/Conduct/QuestionFlow';
 import { CardPrintView } from './components/CardGenerator/CardPrintView';
 import { ClassroomManager } from './components/Classroom/ClassroomManager';
 import { PerformanceSummary } from './components/Reports/PerformanceSummary';
-import { defaultExercises } from './data/defaultExercises';
+import { getScript } from './data/scripts';
 import {
   loadClassroom,
   loadQuestionHistory,
   loadQuestions,
   loadRoundHistory,
 } from './services/storageService';
-import { Classroom, Question, QuestionSessionRecord } from './types';
+import { Classroom, Question, QuestionSessionRecord, ScriptId } from './types';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('home');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('library');
+  const [activeScriptId, setActiveScriptId] = useState<ScriptId>('quick-question');
   const [classroom, setClassroom] = useState<Classroom>(() => loadClassroom());
   const [questions, setQuestions] = useState<Question[]>(() => loadQuestions());
   const [history, setHistory] = useState<QuestionSessionRecord[]>(() =>
@@ -58,18 +59,29 @@ export const App: React.FC = () => {
       />
 
       <main className="flex-1">
-        {activeTab === 'home' && (
-          <HomeDashboard
+        {activeTab === 'library' && (
+          <LibraryPage
             onNavigate={handleSelectTab}
+            onOpenScript={(id) => {
+              setActiveScriptId(id);
+              setActiveTab('script');
+            }}
             studentsCount={classroom.students.length}
-            questionsCount={questions.length}
-            exercisesCount={defaultExercises.length}
             roundsCount={loadRoundHistory().length}
           />
         )}
 
-        {activeTab === 'questions' && (
+        {activeTab === 'script' && (
+          <ScriptPage
+            script={getScript(activeScriptId)}
+            onBack={() => setActiveTab('library')}
+            onPrepare={() => setActiveTab('prepare')}
+          />
+        )}
+
+        {activeTab === 'prepare' && (
           <QuestionFlow
+            scriptId={activeScriptId}
             questions={questions}
             students={classroom.students}
             onRefreshQuestions={refreshData}
@@ -77,13 +89,6 @@ export const App: React.FC = () => {
             onCameraStatusChange={setCameraActive}
             onNavigateToReports={() => handleSelectTab('reports')}
             onRoundProgressChange={setIsRoundInProgress}
-          />
-        )}
-
-        {activeTab === 'exercises' && (
-          <ExerciseFlow
-            exercises={defaultExercises}
-            onCameraStatusChange={setCameraActive}
           />
         )}
 

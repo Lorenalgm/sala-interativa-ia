@@ -1,11 +1,12 @@
 # ClassPlay: sala interativa com IA
 
-Aplicação web para aulas interativas com um datashow e uma webcam. Os alunos respondem perguntas levantando cartões impressos e fazem exercícios enquanto a câmera avalia a postura. A visão computacional roda no navegador do professor, sem servidor.
+Acervo de roteiros de aprendizagem ativa para professores. Cada roteiro usa só cartões de papel, um datashow comum e uma webcam virada para a turma. A leitura dos cartões roda no navegador do professor, sem servidor.
 
 ## Funcionalidades
 
-- Modo Perguntas: o professor projeta uma pergunta de múltipla escolha e a câmera lê os cartões. O marcador identifica o aluno, e a rotação do cartão indica a alternativa (A, B, C ou D).
-- Modo Exercícios: o MediaPipe Pose detecta a postura de quem está na frente da câmera e diz se o movimento está certo.
+- Biblioteca: página inicial com os roteiros. Pergunta rápida e Grupo com sorteio estão prontos; Instrução por pares e Lousa interativa aparecem como "em breve".
+- Pergunta rápida: o professor projeta uma pergunta de múltipla escolha e a câmera lê os cartões. O marcador identifica o aluno, e a rotação do cartão indica a alternativa (A, B, C ou D).
+- Grupo com sorteio: os grupos discutem, o sistema sorteia um aluno de cada grupo e só os cartões dos sorteados são lidos.
 - Cartões: gera os cartões de cada aluno para imprimir.
 - Turma: cadastro e edição dos alunos.
 - Relatórios: histórico das rodadas e acertos por aluno.
@@ -18,7 +19,6 @@ Os dados (turma, perguntas e histórico) ficam salvos no `localStorage` do naveg
 - [Vite](https://vitejs.dev/)
 - [Tailwind CSS](https://tailwindcss.com/) e [daisyUI](https://daisyui.com/), com o tema `classplay` definido em `tailwind.config.js`
 - Fonte [Atkinson Hyperlegible Next](https://fonts.google.com/specimen/Atkinson+Hyperlegible+Next)
-- [MediaPipe Pose](https://developers.google.com/mediapipe) (via CDN)
 - [lucide-react](https://lucide.dev/) e [canvas-confetti](https://github.com/catdad/canvas-confetti)
 
 ## Como rodar

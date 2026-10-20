@@ -1,15 +1,13 @@
 import React from 'react';
 import {
-  HelpCircle,
-  Activity,
+  Library,
   Printer,
   BarChart2,
   Users,
   Camera,
-  Home,
 } from 'lucide-react';
 
-export type ActiveTab = 'home' | 'questions' | 'exercises' | 'cards' | 'classroom' | 'reports';
+export type ActiveTab = 'library' | 'script' | 'prepare' | 'cards' | 'classroom' | 'reports';
 
 interface NavbarProps {
   activeTab: ActiveTab;
@@ -23,9 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   cameraActive,
 }) => {
   const navItems = [
-    { id: 'home' as ActiveTab, label: 'Início', icon: Home },
-    { id: 'questions' as ActiveTab, label: 'Perguntas', icon: HelpCircle },
-    { id: 'exercises' as ActiveTab, label: 'Exercícios', icon: Activity },
+    { id: 'library' as ActiveTab, label: 'Biblioteca', icon: Library },
     { id: 'cards' as ActiveTab, label: 'Cartões', icon: Printer },
     { id: 'classroom' as ActiveTab, label: 'Turma', icon: Users },
     { id: 'reports' as ActiveTab, label: 'Desempenho', icon: BarChart2 },
@@ -35,7 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="no-print navbar sticky top-0 z-50 bg-base-100/95 backdrop-blur-md border-b border-base-300 px-0">
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         <button
-          onClick={() => onSelectTab('home')}
+          onClick={() => onSelectTab('library')}
           className="btn btn-ghost px-2 gap-1.5 text-2xl font-extrabold tracking-tight group"
         >
           ClassPlay
@@ -45,7 +41,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         <nav className="flex items-center gap-1 overflow-x-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            // A página de um roteiro e a preparação da aula pertencem à Biblioteca
+            const isActive =
+              activeTab === item.id ||
+              (item.id === 'library' && (activeTab === 'script' || activeTab === 'prepare'));
 
             return (
               <button
