@@ -245,7 +245,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
             disabled={activeQuestions.length === 0}
             className="btn btn-sm btn-primary"
           >
-            <Play className="w-4 h-4 fill-zinc-950" />
+            <Play className="w-4 h-4 fill-current" />
             <span>{isGroupScript ? 'Montar grupos' : 'Iniciar no datashow'} ({activeQuestions.length})</span>
           </button>
         </div>
@@ -403,7 +403,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
       </div>
 
       {/* Lista de perguntas (exibindo por padrão apenas o enunciado) */}
-      <div className="grid grid-cols-1 gap-3.5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
         {questions.map((q, idx) => {
           const isSelected = selectedIds.includes(q.id);
           const isExpanded = expandedIds.has(q.id);
@@ -412,7 +412,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
             <div
               key={q.id}
               onClick={() => toggleSelect(q.id)}
-              className={`p-5 rounded-2xl border transition-all cursor-pointer space-y-3 ${
+              className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-3 ${
                 isSelected
                   ? 'bg-base-100 border-amber-400 shadow-sm ring-1 ring-amber-400/30'
                   : 'bg-base-100/70 border-base-300 opacity-70 hover:opacity-100'
