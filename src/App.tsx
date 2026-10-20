@@ -11,6 +11,7 @@ import {
   loadClassroom,
   loadQuestionHistory,
   loadQuestions,
+  loadRoundHistory,
 } from './services/storageService';
 import { Classroom, Question, QuestionSessionRecord } from './types';
 
@@ -63,7 +64,7 @@ export const App: React.FC = () => {
             studentsCount={classroom.students.length}
             questionsCount={questions.length}
             exercisesCount={defaultExercises.length}
-            completedSessionsCount={history.length}
+            roundsCount={loadRoundHistory().length}
           />
         )}
 
