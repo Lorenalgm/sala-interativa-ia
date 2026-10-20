@@ -77,12 +77,12 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
       </section>
 
       {/* Distribuição dos votos da turma */}
-      <section className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 flex-1 flex flex-col gap-4 min-h-0">
+      <section className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 flex flex-col gap-4">
         <h2 className="text-xl lg:text-2xl font-bold text-base-content">
           Como a turma votou
         </h2>
 
-        <div className="grid grid-cols-4 gap-4 sm:gap-8 flex-1 min-h-[16rem]">
+        <div className="grid grid-cols-4 gap-4 sm:gap-8 items-start">
           {optionsList.map((opt) => {
             const count = counts[opt];
             const percent =
@@ -103,15 +103,15 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
                 </p>
 
                 {/* Barra vertical proporcional aos votos */}
-                <div className="w-full max-w-[96px] flex-1 min-h-[8rem] bg-base-200 rounded-t-btn flex items-end overflow-hidden">
+                <div className="w-full max-w-[96px] h-32 lg:h-44 bg-base-200 rounded-t-btn flex items-end overflow-hidden">
                   <div
-                    className={`w-full rounded-t-btn transition-[height] duration-700 ease-out flex items-start justify-center pt-2 ${
+                    className={`w-full rounded-t-btn transition-[height] duration-700 ease-out flex items-start justify-center ${
                       isCorrect ? 'bg-success' : 'bg-base-content/25'
                     }`}
                     style={{ height: count > 0 ? `${Math.max(4, percent)}%` : '0%' }}
                   >
                     {isCorrect && percent >= 20 && (
-                      <CheckCircle2 className="w-6 h-6 text-success-content" />
+                      <CheckCircle2 className="w-6 h-6 mt-2 text-success-content" />
                     )}
                   </div>
                 </div>
