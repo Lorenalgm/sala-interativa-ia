@@ -21,7 +21,7 @@ export const PoseFeedback: React.FC<PoseFeedbackProps> = ({
   );
 
   return (
-    <div className="bg-base-100 border border-base-300 rounded-box p-6 shadow-sm space-y-4">
+    <div className="bg-base-100 border border-base-300 rounded-box p-5 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3" role="status" aria-live="polite">
           {feedback.isMatch ? (
@@ -75,7 +75,7 @@ export const PoseFeedback: React.FC<PoseFeedbackProps> = ({
       {/* Ângulos detectados */}
       {feedback.activeAngles && (
         <div className="flex items-center gap-3 pt-1 text-xs text-base-content/60">
-          <span>Ângulos articulares calculados:</span>
+          <span>Ângulos medidos:</span>
           {Object.entries(feedback.activeAngles).map(([name, val]) => (
             <span
               key={name}

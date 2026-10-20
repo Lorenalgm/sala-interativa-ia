@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Maximize2,
-  Minimize2,
   Sparkles,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -318,135 +317,146 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
     if (!containerRef.current) return;
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
     } else {
       document.exitFullscreen().catch(() => {});
-      setIsFullscreen(false);
     }
   };
 
+  const goPrev = () => setCurrentIndex((p) => Math.max(0, p - 1));
+  const goNext = () => setCurrentIndex((p) => Math.min(exercises.length - 1, p + 1));
+
+  // Mantém o estado de tela cheia em sincronia quando o professor sai com Esc
+  useEffect(() => {
+    const onFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
+
+  // Mesmos atalhos do modo perguntas: setas trocam de exercício, F projeta
+  const shortcutsRef = useRef({ goPrev, goNext, toggleFullscreen });
+  shortcutsRef.current = { goPrev, goNext, toggleFullscreen };
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('input, textarea, select, button, [contenteditable="true"]')) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      const actions = shortcutsRef.current;
+      if (e.key === 'ArrowRight') actions.goNext();
+      else if (e.key === 'ArrowLeft') actions.goPrev();
+      else if (e.key === 'f' || e.key === 'F') actions.toggleFullscreen();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   return (
-    <div ref={containerRef} className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div
+      ref={containerRef}
+      className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-4 ${
+        isFullscreen ? 'h-screen py-6 bg-base-200 overflow-hidden' : 'pb-6'
+      }`}
+    >
       <video ref={videoRef} className="hidden" playsInline muted autoPlay />
 
-      {/* Barra superior de controle clean */}
-      <div className="no-print bg-base-100 border border-base-300 rounded-2xl p-3 sm:p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setCurrentIndex((p) => Math.max(0, p - 1))}
-            disabled={currentIndex === 0}
-            className="btn btn-sm btn-square"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+      {/* Barra de controle do professor: some na tela cheia */}
+      {!isFullscreen && (
+        <div className="no-print bg-base-100 border border-base-300 rounded-box px-3 py-2.5 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={goPrev}
+              disabled={currentIndex === 0}
+              className="btn btn-sm btn-square"
+              aria-label="Exercício anterior"
+              title="Exercício anterior (←)"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
 
-          <span className="text-xs sm:text-sm font-semibold text-base-content px-2">
-            Exercício {currentIndex + 1} de {exercises.length}
-          </span>
-
-          <button
-            onClick={() =>
-              setCurrentIndex((p) => Math.min(exercises.length - 1, p + 1))
-            }
-            disabled={currentIndex === exercises.length - 1}
-            className="btn btn-sm btn-square"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-
-          <span className="badge badge-secondary font-semibold">
-            Nível {currentExercise.difficulty}
-          </span>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleSimulatePose}
-            disabled={isSimulating}
-            className="btn btn-sm btn-ghost"
-            title="Simula uma pose correta sem ninguém se mexer"
-          >
-            <Sparkles className="w-4 h-4 text-amber-600" />
-            <span>Simular pose</span>
-          </button>
-
-          <button
-            onClick={toggleFullscreen}
-            className="btn btn-sm btn-square"
-            title="Alternar tela cheia"
-          >
-            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Conteúdo principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Painel esquerdo */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 shadow-sm space-y-4">
-            <span className="badge badge-secondary font-semibold">
-              Desafio corporal ativo
+            <span className="text-base font-bold text-base-content px-1 whitespace-nowrap">
+              Exercício {currentIndex + 1} de {exercises.length}
             </span>
 
+            <button
+              onClick={goNext}
+              disabled={currentIndex === exercises.length - 1}
+              className="btn btn-sm btn-square"
+              aria-label="Próximo exercício"
+              title="Próximo exercício (→)"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+
+            <span className="badge badge-secondary font-semibold">
+              Nível {currentExercise.difficulty}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={handleSimulatePose}
+              disabled={isSimulating}
+              className="btn btn-sm btn-ghost"
+              title="Simula uma pose correta sem ninguém se mexer"
+            >
+              <Sparkles className="w-4 h-4 text-amber-600" />
+              <span>Simular pose</span>
+            </button>
+
+            {isCameraActive && (
+              <button onClick={stopCamera} className="btn btn-sm btn-ghost text-error">
+                <CameraOff className="w-4 h-4" />
+                <span className="hidden sm:inline">Desligar câmera</span>
+              </button>
+            )}
+
+            <button
+              onClick={toggleFullscreen}
+              className="btn btn-sm"
+              title="Tela cheia para projetar (F)"
+            >
+              <Maximize2 className="w-4 h-4" />
+              <span className="hidden md:inline">Projetar</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Conteúdo projetado: instruções à esquerda, câmera e retorno à direita */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-start flex-1 min-h-0">
+        <section className="lg:col-span-5 bg-base-100 border border-base-300 rounded-box p-6 lg:p-8 space-y-5">
+          <div className="space-y-3">
             <h1 className="text-3xl sm:text-4xl xl:text-5xl font-extrabold text-base-content tracking-tight leading-tight">
               {currentExercise.title}
             </h1>
-
-            <p className="text-xl lg:text-2xl text-base-content/80 leading-relaxed">
+            <p className="text-lg lg:text-xl text-base-content/80 leading-relaxed">
               {currentExercise.description}
             </p>
-
-            <div className="space-y-4 border-t border-base-300 pt-5">
-              <h2 className="text-xl lg:text-2xl font-bold text-base-content">
-                Como fazer
-              </h2>
-              <ol className="space-y-4 text-xl lg:text-2xl text-base-content leading-snug">
-                {currentExercise.instructions.map((step, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <span className="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-extrabold text-lg flex-shrink-0">
-                      {idx + 1}
-                    </span>
-                    <span>{step}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
           </div>
 
-          <PoseFeedback
-            feedback={feedback}
-            holdTimeSeconds={holdTime}
-            targetDurationSeconds={currentExercise.targetDurationSeconds}
-            completedReps={completedReps}
-          />
-        </div>
-
-        {/* Painel direito com visualização */}
-        <div className="lg:col-span-7 bg-base-100 border border-base-300 rounded-box p-5 shadow-sm flex flex-col items-center">
-          <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-base-300/60 text-xs">
-            <span className="font-bold text-base-content">
-              Câmera e pontos do corpo
-            </span>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-base-content/70 font-medium">
-                Segurar por {currentExercise.targetDurationSeconds} segundos
-              </span>
-              {isCameraActive && (
-                <button onClick={stopCamera} className="btn btn-xs btn-ghost text-error">
-                  <CameraOff className="w-3.5 h-3.5" />
-                  Desligar câmera
-                </button>
-              )}
-            </div>
+          <div className="space-y-4 border-t border-base-300 pt-5">
+            <h2 className="text-xl lg:text-2xl font-bold text-base-content">Como fazer</h2>
+            <ol className="space-y-4 text-xl lg:text-2xl text-base-content leading-snug">
+              {currentExercise.instructions.map((step, idx) => (
+                <li key={idx} className="flex items-start gap-3">
+                  <span className="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-extrabold text-lg flex-shrink-0">
+                    {idx + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
           </div>
+        </section>
 
-          <div className="w-full aspect-video bg-neutral rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
+        <div className="lg:col-span-7 flex flex-col gap-4">
+          <div className="w-full aspect-video bg-neutral rounded-box overflow-hidden relative flex items-center justify-center">
             <canvas ref={canvasRef} className="w-full h-full object-contain" />
 
             {!isCameraActive && !isSimulating && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral/80 p-6 text-center space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-neutral-content/10 flex items-center justify-center text-neutral-content/70">
+                <div className="w-12 h-12 rounded-btn bg-neutral-content/10 flex items-center justify-center text-neutral-content/70">
                   <Camera className="w-6 h-6" />
                 </div>
                 <div>
@@ -459,15 +469,26 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
                       : 'Ligue a câmera ou use a simulação para ver como a pose é avaliada.'}
                   </p>
                 </div>
-                <button
-                  onClick={startCamera}
-                  className="btn btn-sm btn-primary"
-                >
+                <button onClick={startCamera} className="btn btn-sm btn-primary">
                   {cameraError ? 'Tentar de novo' : 'Ligar câmera'}
                 </button>
               </div>
             )}
           </div>
+
+          <PoseFeedback
+            feedback={feedback}
+            holdTimeSeconds={holdTime}
+            targetDurationSeconds={currentExercise.targetDurationSeconds}
+            completedReps={completedReps}
+          />
+
+          {isFullscreen && (
+            <p className="text-sm text-base-content/70 text-center">
+              <kbd className="kbd kbd-sm">←</kbd> <kbd className="kbd kbd-sm">→</kbd> trocar exercício ·{' '}
+              <kbd className="kbd kbd-sm">Esc</kbd> sair
+            </p>
+          )}
         </div>
       </div>
     </div>

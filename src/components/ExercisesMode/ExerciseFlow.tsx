@@ -22,8 +22,8 @@ export const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
 
   if (stage === 'presenting') {
     return (
-      <div className="space-y-4">
-        <div className="no-print max-w-7xl mx-auto px-4 sm:px-6 pt-4 flex items-center justify-between">
+      <div className="space-y-2">
+        <div className="no-print max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 flex items-center justify-between">
           <button
             onClick={() => setStage('catalog')}
             className="btn btn-sm rounded-full"
