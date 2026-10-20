@@ -3,7 +3,7 @@ import { Camera, CameraOff, Lock, Unlock } from 'lucide-react';
 import { Student } from '../../types';
 import { ArucoCardDetector, DetectorStats } from '../../services/arucoDetector';
 import { openClassroomCamera, setFocusLocked, stopStream } from '../../services/camera';
-import { isStudentMarker } from '../../services/markerRanges';
+import { isCalibrationMarker, isStudentMarker } from '../../services/markerRanges';
 
 interface CameraTestProps {
   students: Student[];
@@ -17,6 +17,7 @@ const TIPS = [
   'Sem janela atrás dos alunos. Papel fosco, sem plástico.',
   'Ligue a StreamCam numa porta USB 3 ou USB-C: em USB 2.0 ela fica limitada a 720p.',
   'Regra prática: cerca de 2,2 cm de marcador para cada metro até o aluno mais longe.',
+  'Lousa: câmera ao lado do datashow, virada para o quadro, a uns 2,5 m ou mais para um quadro de 3 m.',
 ];
 
 export const CameraTest: React.FC<CameraTestProps> = ({ students, onCameraStatusChange }) => {
@@ -34,6 +35,7 @@ export const CameraTest: React.FC<CameraTestProps> = ({ students, onCameraStatus
   const [lockFailed, setLockFailed] = useState(false);
   const [readIds, setReadIds] = useState<number[]>([]);
   const [unknownIds, setUnknownIds] = useState<number[]>([]);
+  const [calibrationSeen, setCalibrationSeen] = useState(0);
   const [stats, setStats] = useState<DetectorStats | null>(null);
   // Quem já foi visto desde que a câmera ligou (o professor passeia pela sala)
   const seenRef = useRef<Set<number>>(new Set());
@@ -97,6 +99,9 @@ export const CameraTest: React.FC<CameraTestProps> = ({ students, onCameraStatus
             ctx.fillText(`#${m.id} ${m.option}`, m.corners[0].x, m.corners[0].y - 8);
           });
         }
+
+        const calibration = markers.filter((m) => isCalibrationMarker(m.id)).length;
+        setCalibrationSeen((prev) => (prev === calibration ? prev : calibration));
 
         const before = seenRef.current.size;
         const unknown: number[] = [];
@@ -218,6 +223,11 @@ export const CameraTest: React.FC<CameraTestProps> = ({ students, onCameraStatus
                 </li>
               ))}
             </ul>
+            {calibrationSeen > 0 && (
+              <p role="status" className="text-sm text-base-content/80">
+                Marcadores de calibração da lousa vistos: {calibrationSeen} de 4.
+              </p>
+            )}
             {unknownIds.length > 0 && (
               <p role="status" className="text-sm text-red-800">
                 Cartões sem aluno na turma: {unknownIds.map((id) => `#${id}`).join(', ')}.

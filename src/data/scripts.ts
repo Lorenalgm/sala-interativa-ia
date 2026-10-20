@@ -56,12 +56,18 @@ export const scripts: ActiveScript[] = [
   {
     id: 'interactive-board',
     name: 'Lousa interativa no quadro',
-    goal: 'Arrastar e clicar na projeção usando a mão ou uma paleta de papel.',
+    goal: 'O grupo move uma paleta de papel sobre a projeção para responder, sem tocar na tela.',
     format: 'Em grupo',
     minutes: '10 a 20 min',
-    materials: ['Datashow', 'Câmera ao lado do datashow', 'Paleta de papel'],
-    steps: [],
-    status: 'soon',
+    materials: ['Datashow', 'Câmera ao lado do datashow, virada para o quadro', 'Paleta de papel (uma por grupo)'],
+    steps: [
+      'Você escolhe as perguntas e monta os grupos, com uma paleta para cada um.',
+      'O datashow mostra 4 marcadores e a câmera se ajusta ao quadro.',
+      'Na vez do grupo, ele leva a paleta até a resposta e espera o anel encher.',
+      'Errou? A zona fica vermelha e o grupo tenta de novo; no segundo erro a tela mostra a certa.',
+      'A tela mostra os acertos por grupo e por pergunta.',
+    ],
+    status: 'available',
   },
 ];
 

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { QuestionBank } from './components/Questions/QuestionBank';
 import { Navbar, ActiveTab } from './components/Navbar';
 import { LandingPage } from './components/Landing/LandingPage';
 import { LibraryPage } from './components/Library/LibraryPage';
 import { ScriptPage } from './components/Library/ScriptPage';
+import { BoardFlow } from './components/Board/BoardFlow';
 import { QuestionFlow } from './components/Conduct/QuestionFlow';
 import { CameraTest } from './components/Camera/CameraTest';
 import { CardPrintView } from './components/CardGenerator/CardPrintView';
@@ -103,7 +105,17 @@ export const App: React.FC = () => {
           />
         )}
 
-        {activeTab === 'prepare' && (
+        {activeTab === 'prepare' && activeScriptId === 'interactive-board' && (
+          <BoardFlow
+            questions={questions}
+            students={classroom.students}
+            onBack={() => setActiveTab('script')}
+            onCameraStatusChange={setCameraActive}
+            onRoundProgressChange={setIsRoundInProgress}
+          />
+        )}
+
+        {activeTab === 'prepare' && activeScriptId !== 'interactive-board' && (
           <QuestionFlow
             scriptId={activeScriptId}
             questions={questions}
@@ -114,6 +126,10 @@ export const App: React.FC = () => {
             onNavigateToReports={() => handleSelectTab('reports')}
             onRoundProgressChange={setIsRoundInProgress}
           />
+        )}
+
+        {activeTab === 'questions' && (
+          <QuestionBank questions={questions} onChange={refreshData} />
         )}
 
         {activeTab === 'camera' && (

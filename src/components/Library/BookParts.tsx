@@ -50,6 +50,28 @@ export const Emblem: React.FC<{ id: ScriptId; size?: 'sm' | 'lg' }> = ({ id, siz
       </span>
     );
   }
+  if (id === 'interactive-board') {
+    // Três zonas na projeção e uma paleta sobre a do meio
+    return (
+      <span
+        className={`relative flex gap-2 ${size === 'lg' ? 'w-56 h-36 gap-3' : 'w-28 h-[4.5rem]'}`}
+        aria-hidden="true"
+      >
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className={`flex-1 rounded-md border-2 border-white/60 ${i === 1 ? 'bg-white/35' : 'bg-white/10'}`}
+          />
+        ))}
+        <AnswerCard
+          letter="B"
+          className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/4 rotate-6 ${
+            size === 'lg' ? 'w-20' : 'w-10'
+          } drop-shadow-[0_8px_6px_rgb(0_0_0/0.35)]`}
+        />
+      </span>
+    );
+  }
   return (
     <AnswerCard
       letter="C"
