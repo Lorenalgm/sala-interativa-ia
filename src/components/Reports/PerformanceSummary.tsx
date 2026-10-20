@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Classroom, RoundSession } from '../../types';
+import { Classroom, RoundSession, ScriptId } from '../../types';
+import { getScript } from '../../data/scripts';
 import {
   clearRoundHistory,
   loadRoundHistory,
@@ -25,9 +26,14 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
   classroom,
   onRefresh,
 }) => {
-  const [rounds, setRounds] = useState<RoundSession[]>(() => loadRoundHistory());
+  const [allRounds, setRounds] = useState<RoundSession[]>(() => loadRoundHistory());
+  const [scriptFilter, setScriptFilter] = useState<'all' | ScriptId>('all');
+  // Registros antigos não têm roteiro: contam como pergunta rápida
+  const scriptOf = (r: RoundSession): ScriptId => r.scriptId ?? 'quick-question';
+  const rounds =
+    scriptFilter === 'all' ? allRounds : allRounds.filter((r) => scriptOf(r) === scriptFilter);
   const [expandedRoundIds, setExpandedRoundIds] = useState<Set<string>>(
-    new Set(rounds.length > 0 ? [rounds[0].id] : [])
+    new Set(allRounds.length > 0 ? [allRounds[0].id] : [])
   );
 
   const toggleRound = (roundId: string) => {
@@ -56,7 +62,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
       return;
     }
 
-    let csv = 'Rodada,Data,Pergunta,Resposta certa,Respostas,Acertos (%)\n';
+    let csv = 'Rodada,Roteiro,Data,Pergunta,Resposta certa,Respostas,Acertos (%)\n';
     rounds.forEach((round, rIdx) => {
       const roundName = round.name || `Rodada ${rIdx + 1}`;
       const date = new Date(round.timestamp).toLocaleString('pt-BR');
@@ -66,7 +72,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
           (ans) => ans === q.correctOption
         ).length;
         const acc = votes > 0 ? Math.round((correct / votes) * 100) : 0;
-        csv += `"${roundName}","${date}","${q.questionPrompt.replace(/"/g, '""')}","${q.correctOption}",${votes},${acc}%\n`;
+        csv += `"${roundName}","${getScript(scriptOf(round)).name}","${date}","${q.questionPrompt.replace(/"/g, '""')}","${q.correctOption}",${votes},${acc}%\n`;
       });
     });
 
@@ -154,6 +160,25 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
         </div>
       </div>
 
+      {/* Histórico separado por roteiro */}
+      <div role="tablist" aria-label="Filtrar por roteiro" className="flex flex-wrap gap-2">
+        {([
+          ['all', 'Todos'],
+          ['quick-question', 'Pergunta rápida'],
+          ['group-draw', 'Grupo com sorteio'],
+        ] as [('all' | ScriptId), string][]).map(([id, label]) => (
+          <button
+            key={id}
+            role="tab"
+            aria-selected={scriptFilter === id}
+            onClick={() => setScriptFilter(id)}
+            className={`btn btn-sm rounded-full ${scriptFilter === id ? 'btn-neutral' : 'btn-ghost'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {/* Listagem agrupada por rodadas */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -172,7 +197,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
               Nenhuma rodada foi concluída ainda
             </h3>
             <p className="text-sm text-base-content/70 max-w-sm mx-auto">
-              Escolha as perguntas no modo Perguntas e encerre a rodada. O resultado aparece aqui.
+              Conduza um roteiro da Biblioteca e encerre a rodada. O resultado aparece aqui.
             </p>
           </div>
         ) : (

@@ -1,5 +1,6 @@
 import {
   Classroom,
+  GroupFormation,
   PerformanceStats,
   Question,
   QuestionSessionRecord,
@@ -17,6 +18,7 @@ const STORAGE_KEYS = {
   QUESTIONS: 'classplay_perguntas_v2',
   HISTORY: 'classplay_historico_v2',
   ROUNDS: 'classplay_rodadas_v2',
+  FORMATION: 'classplay_grupos_v1',
 };
 
 // Recupera a turma atual configurada ou retorna os alunos pré-carregados
@@ -211,4 +213,23 @@ export function calculateRoundStats(round: RoundSession, students: Student[]): P
     accuracyRate,
     byStudent,
   };
+}
+
+// Última formação de grupos, para reaproveitar na próxima aula
+export function loadFormation(): GroupFormation | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.FORMATION);
+    if (raw) return JSON.parse(raw);
+  } catch (err) {
+    console.error('Falha ao carregar grupos:', err);
+  }
+  return null;
+}
+
+export function saveFormation(formation: GroupFormation): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.FORMATION, JSON.stringify(formation));
+  } catch (err) {
+    console.error('Falha ao salvar grupos:', err);
+  }
 }

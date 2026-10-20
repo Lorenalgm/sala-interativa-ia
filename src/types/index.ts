@@ -1,5 +1,7 @@
 export type Alternative = 'A' | 'B' | 'C' | 'D';
 
+export type ScriptId = 'quick-question' | 'group-draw' | 'peer-instruction' | 'interactive-board';
+
 export interface Student {
   id: number; // corresponde ao identificador do marcador fiducial do cartão
   name: string;
@@ -40,6 +42,7 @@ export interface QuestionSessionRecord {
   timestamp: number;
   responses: Record<number, Alternative>; // studentId -> resposta
   totalClassStudents: number;
+  groupResults?: GroupResult[]; // só no roteiro de grupo com sorteio
 }
 
 export interface RoundSession {
@@ -50,37 +53,7 @@ export interface RoundSession {
   questions: QuestionSessionRecord[];
   overallAccuracy: number;
   totalResponses: number;
-}
-
-export type PoseType = 
-  | 'arms_raised'
-  | 't_pose'
-  | 'squat'
-  | 'star_pose'
-  | 'right_hand_up';
-
-export interface Exercise {
-  id: string;
-  type: PoseType;
-  title: string;
-  description: string;
-  targetDurationSeconds: number;
-  difficulty: 'fácil' | 'médio' | 'avançado';
-  instructions: string[];
-}
-
-export interface PoseLandmark {
-  x: number;
-  y: number;
-  z?: number;
-  visibility?: number;
-}
-
-export interface PoseFeedbackResult {
-  isMatch: boolean;
-  score: number; // 0 a 100
-  feedback: string;
-  activeAngles?: Record<string, number>;
+  scriptId?: ScriptId; // ausente nos registros antigos: contam como pergunta rápida
 }
 
 export interface DetectedMarker {
@@ -95,4 +68,26 @@ export interface PerformanceStats {
   totalResponses: number;
   accuracyRate: number;
   byStudent: Record<number, { total: number; correct: number }>;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  studentIds: number[];
+}
+
+export interface GroupFormation {
+  classroomId: string;
+  absentIds: number[];
+  groups: Group[];
+  // Por grupo, quem já foi sorteado no ciclo atual do rodízio
+  rotation: Record<string, number[]>;
+}
+
+export interface GroupResult {
+  groupId: string;
+  groupName: string;
+  studentId: number;
+  answer?: Alternative;
+  correct: boolean;
 }
