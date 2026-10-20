@@ -100,9 +100,11 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
         {printable.map((student, index) => {
           const pageBreak = cardsPerPage === 1 || (index + 1) % 2 === 0;
           const number = String(student.id).padStart(2, '0');
-          const letterStyle = (extra: React.CSSProperties): React.CSSProperties => ({
+          // D e B ficam nas margens laterais, mais estreitas: a letra precisa caber nelas
+          const sideLetter = Math.min(layout.letter, (100 - layout.markerW) * 0.75);
+          const letterStyle = (extra: React.CSSProperties, size = layout.letter): React.CSSProperties => ({
             position: 'absolute',
-            fontSize: `${layout.letter}cqw`,
+            fontSize: `${size}cqw`,
             fontWeight: 800,
             lineHeight: 1,
             color: '#3f3f46',
@@ -133,8 +135,8 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
 
               <span style={letterStyle({ top: gap, left: '50%', transform: 'translateX(-50%)' })}>A</span>
               <span style={letterStyle({ bottom: gap, left: '50%', transform: 'translateX(-50%) rotate(180deg)' })}>C</span>
-              <span style={letterStyle({ left: `${(100 - layout.markerW) / 4}cqw`, top: '50%', transform: 'translate(-50%, -50%) rotate(-90deg)' })}>D</span>
-              <span style={letterStyle({ right: `${(100 - layout.markerW) / 4}cqw`, top: '50%', transform: 'translate(50%, -50%) rotate(90deg)' })}>B</span>
+              <span style={letterStyle({ left: `${(100 - layout.markerW) / 4}cqw`, top: '50%', transform: 'translate(-50%, -50%) rotate(-90deg)' }, sideLetter)}>D</span>
+              <span style={letterStyle({ right: `${(100 - layout.markerW) / 4}cqw`, top: '50%', transform: 'translate(50%, -50%) rotate(90deg)' }, sideLetter)}>B</span>
 
               <span
                 style={{ position: 'absolute', top: '2cqw', left: '2.5cqw', fontSize: `${layout.small}cqw`, color: '#71717a' }}
