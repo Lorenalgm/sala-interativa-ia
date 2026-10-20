@@ -96,6 +96,11 @@ export class ArucoCardDetector {
 }
 
 // SVG de um marcador, para imprimir nos cartões
+// O dicionário monta 1.000 códigos ao ser criado: cria uma vez só
+let dictionary: ReturnType<typeof createDictionary> | null = null;
+const createDictionary = () => new aruco.AR.Dictionary(DICTIONARY_NAME);
+
 export function markerSvg(id: number): string {
-  return new aruco.AR.Dictionary(DICTIONARY_NAME).generateSVG(id);
+  dictionary = dictionary ?? createDictionary();
+  return dictionary.generateSVG(id);
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Suit } from './Library/Suit';
 import {
   Library,
   Printer,
@@ -29,14 +30,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header className="no-print navbar sticky top-0 z-50 bg-base-100/95 backdrop-blur-md border-b border-base-300 px-0">
+    <header className="no-print navbar sticky top-0 z-50 bg-primary text-primary-content border-b border-white/15 px-0">
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         <button
           onClick={() => onSelectTab('library')}
-          className="btn btn-ghost px-2 gap-1.5 text-2xl font-extrabold tracking-tight group"
+          className="btn btn-ghost px-2 gap-2 text-2xl font-display font-extrabold tracking-tight text-primary-content hover:bg-white/10 group"
         >
+          <span className="flex items-center gap-0.5 text-secondary" aria-hidden="true">
+            <Suit shape="circle" className="w-2.5 h-2.5" />
+            <Suit shape="diamond" className="w-3 h-3 text-accent-content/90 group-hover:rotate-45 transition-transform" />
+          </span>
           ClassPlay
-          <span className="w-2 h-2 rounded-full bg-primary group-hover:scale-125 transition-transform" />
         </button>
 
         <nav className="flex items-center gap-1 overflow-x-auto">
@@ -54,7 +58,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 aria-current={isActive ? 'page' : undefined}
                 aria-label={item.label}
                 className={`btn btn-sm rounded-full font-medium ${
-                  isActive ? 'btn-neutral' : 'btn-ghost text-base-content/70'
+                  isActive
+                    ? 'bg-white text-primary border-white hover:bg-white'
+                    : 'btn-ghost text-primary-content/85 hover:bg-white/10'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -66,7 +72,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         <div
           className={`hidden md:inline-flex badge gap-1.5 py-3 font-medium ${
-            cameraActive ? 'badge-success' : 'badge-ghost text-base-content/70'
+            cameraActive
+              ? 'badge-secondary'
+              : 'bg-white/10 border-white/20 text-primary-content/85'
           }`}
         >
           <Camera className="w-3.5 h-3.5" />

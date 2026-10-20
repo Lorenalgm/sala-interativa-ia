@@ -6,22 +6,33 @@ import { Printer, Info, AlertTriangle } from 'lucide-react';
 
 interface CardPrintViewProps {
   students: Student[];
+  initialPerPage?: 1 | 2;
 }
 
-// Só o quadrado preto do marcador: a folha branca já faz o papel da margem clara
-const cropMarker = (svg: string) => svg.replace(/viewBox="[^"]*"/, 'viewBox="1 1 6 6"');
+// Só o quadrado preto do marcador: a folha branca já faz o papel da margem clara.
+// As células brancas viram um único traçado, para a impressão não mostrar fios entre elas.
+const cropMarker = (svg: string) => {
+  const cells = [...svg.matchAll(/<rect x="(\d+)" y="(\d+)" width="1" height="1" fill="white"\/>/g)];
+  const path = cells.map((m) => `M${m[1]} ${m[2]}h1v1h-1z`).join('');
+  return (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="1 1 6 6" shape-rendering="crispEdges">' +
+    '<rect x="1" y="1" width="6" height="6" fill="black"/>' +
+    `<path d="${path}" fill="white"/></svg>`
+  );
+};
 
-export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
-  const [cardsPerPage, setCardsPerPage] = useState<1 | 2>(1);
+export const CardPrintView: React.FC<CardPrintViewProps> = ({ students, initialPerPage = 1 }) => {
+  const [cardsPerPage, setCardsPerPage] = useState<1 | 2>(initialPerPage);
 
   const printable = students.filter((s) => isStudentMarker(s.id));
   const skipped = students.filter((s) => !isStudentMarker(s.id));
 
-  // Marcador de ~18 cm (1 por folha, até ~8 m) ou ~12 cm (2 por folha, até ~5,5 m)
+  // Marcador de ~17 cm (1 por folha, até ~8 m) ou ~12 cm (2 por folha, até ~5,5 m).
+  // As letras são pequenas de propósito: o colega do lado não deve conseguir ler o voto.
   const layout =
     cardsPerPage === 1
-      ? { aspect: '210 / 297', markerW: 85.7, markerH: undefined as number | undefined, letter: 12, small: 3.4 }
-      : { aspect: '210 / 148.5', markerW: 57.1, markerH: 80.8, letter: 5.5, small: 2.2 };
+      ? { aspect: '190 / 276', markerW: 89.5, letter: 2.6, small: 2.2 }
+      : { aspect: '190 / 138', markerW: 59, letter: 2.6, small: 2.2 };
 
   const svgs = useMemo(
     () => Object.fromEntries(printable.map((s) => [s.id, cropMarker(markerSvg(s.id))])),
@@ -30,9 +41,9 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Folha A4 sem margem de impressão: o cartão ocupa a página inteira */}
-      <style>{`@media print { @page { margin: 0; size: A4 portrait; } }`}</style>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 print:max-w-none print:m-0 print:p-0 print:space-y-0">
+      {/* Área útil da folha: 190 x 277 mm. O cartão cabe nela, senão cada cartão vira duas páginas */}
+      <style>{`@page { size: A4 portrait; margin: 10mm; }`}</style>
 
       <div className="no-print bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 shadow-sm space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -75,7 +86,6 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
           <span className="leading-relaxed">
             O aluno gira o cartão até a letra escolhida ficar em cima e levanta acima da cabeça.
             Use papel fosco, sem plástico, e imprima em escala 100% (sem "ajustar à página").
-            Os cartões antigos não funcionam mais: reimprima todos.
           </span>
         </div>
 
@@ -98,25 +108,25 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
         }`}
       >
         {printable.map((student, index) => {
-          const pageBreak = cardsPerPage === 1 || (index + 1) % 2 === 0;
+          // Sem quebra depois do último cartão: evita uma página em branco no fim
+          const pageBreak =
+            index < printable.length - 1 && (cardsPerPage === 1 || (index + 1) % 2 === 0);
           const number = String(student.id).padStart(2, '0');
-          // D e B ficam nas margens laterais, mais estreitas: a letra precisa caber nelas
-          const sideLetter = Math.min(layout.letter, (100 - layout.markerW) * 0.75);
-          const letterStyle = (extra: React.CSSProperties, size = layout.letter): React.CSSProperties => ({
+          const letterStyle = (extra: React.CSSProperties): React.CSSProperties => ({
             position: 'absolute',
-            fontSize: `${size}cqw`,
-            fontWeight: 800,
+            fontSize: `${layout.letter}cqw`,
+            fontWeight: 600,
             lineHeight: 1,
-            color: '#3f3f46',
+            color: '#71717a',
             ...extra,
           });
-          const gap = `${(layout.letter * 0.7).toFixed(2)}cqw`;
+          const gap = '3cqw';
 
           return (
             <div
               key={student.id}
-              className={`bg-white text-zinc-900 border border-dashed border-zinc-300 select-none relative overflow-hidden print:border-0 print:w-[210mm] ${
-                cardsPerPage === 1 ? 'print:h-[297mm]' : 'print:h-[148.5mm]'
+              className={`bg-white text-zinc-900 border border-dashed border-zinc-300 select-none relative overflow-hidden print:border-0 print:w-[190mm] ${
+                cardsPerPage === 1 ? 'print:h-[276mm]' : 'print:h-[138mm]'
               } ${pageBreak ? 'print-page-break' : ''}`}
               style={{ aspectRatio: layout.aspect, containerType: 'inline-size', backgroundColor: '#ffffff' }}
             >
@@ -127,7 +137,7 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
                   left: '50%',
                   top: '50%',
                   width: `${layout.markerW}cqw`,
-                  aspectRatio: '1',
+                  height: `${layout.markerW}cqw`,
                   transform: 'translate(-50%, -50%)',
                 }}
                 dangerouslySetInnerHTML={{ __html: svgs[student.id] }}
@@ -135,8 +145,8 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
 
               <span style={letterStyle({ top: gap, left: '50%', transform: 'translateX(-50%)' })}>A</span>
               <span style={letterStyle({ bottom: gap, left: '50%', transform: 'translateX(-50%) rotate(180deg)' })}>C</span>
-              <span style={letterStyle({ left: `${(100 - layout.markerW) / 4}cqw`, top: '50%', transform: 'translate(-50%, -50%) rotate(-90deg)' }, sideLetter)}>D</span>
-              <span style={letterStyle({ right: `${(100 - layout.markerW) / 4}cqw`, top: '50%', transform: 'translate(50%, -50%) rotate(90deg)' }, sideLetter)}>B</span>
+              <span style={letterStyle({ left: `${(100 - layout.markerW) / 4}cqw`, top: '50%', transform: 'translate(-50%, -50%) rotate(-90deg)' })}>D</span>
+              <span style={letterStyle({ right: `${(100 - layout.markerW) / 4}cqw`, top: '50%', transform: 'translate(50%, -50%) rotate(90deg)' })}>B</span>
 
               <span
                 style={{ position: 'absolute', top: '2cqw', left: '2.5cqw', fontSize: `${layout.small}cqw`, color: '#71717a' }}
