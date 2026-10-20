@@ -37,7 +37,7 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
   }, [accuracyRate, totalResponses]);
 
   return (
-    <div className="h-full flex flex-col gap-4">
+    <div className="flex-1 min-h-0 flex flex-col gap-4">
       {/* Resposta certa e explicação */}
       <section className="bg-base-100 border-2 border-success rounded-box p-6 sm:p-8 space-y-5">
         <div className="flex flex-wrap items-start justify-between gap-6">

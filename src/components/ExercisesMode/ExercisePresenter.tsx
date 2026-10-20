@@ -29,6 +29,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [cameraError, setCameraError] = useState(false);
   const [completedReps, setCompletedReps] = useState(0);
   const [holdTime, setHoldTime] = useState(0);
   const [feedback, setFeedback] = useState<PoseFeedbackResult>({
@@ -78,13 +79,14 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
         setIsCameraActive(true);
+        setCameraError(false);
         if (onCameraStatusChange) onCameraStatusChange(true);
 
         initMediaPipe();
       }
     } catch (err) {
       console.error('Falha ao abrir câmera:', err);
-      alert('Não foi possível acessar a câmera. Verifique as permissões.');
+      setCameraError(true);
     }
   };
 
@@ -454,18 +456,20 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
                   <Camera className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-neutral-content">
-                    Câmera desconectada
+                  <h3 className="text-lg font-bold text-neutral-content">
+                    {cameraError ? 'Não foi possível abrir a câmera' : 'Câmera desligada'}
                   </h3>
-                  <p className="text-xs text-neutral-content/75 max-w-sm mt-1">
-                    Conecte a câmera ou use a simulação para ver como a pose é avaliada.
+                  <p role={cameraError ? 'alert' : undefined} className="text-sm text-neutral-content/80 max-w-sm mt-1">
+                    {cameraError
+                      ? 'Confira se o navegador tem permissão para usar a câmera e tente de novo.'
+                      : 'Ligue a câmera ou use a simulação para ver como a pose é avaliada.'}
                   </p>
                 </div>
                 <button
                   onClick={startCamera}
                   className="btn btn-sm btn-primary"
                 >
-                  Ativar câmera
+                  {cameraError ? 'Tentar de novo' : 'Ligar câmera'}
                 </button>
               </div>
             )}

@@ -154,7 +154,11 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
       <div className="space-y-2">
         <div className="no-print max-w-7xl mx-auto px-4 sm:px-6 pt-2 flex items-center justify-between">
           <button
-            onClick={() => setStage('setup')}
+            onClick={() => {
+              if (confirm('Voltar para a lista de perguntas? A rodada atual não será salva.')) {
+                setStage('setup');
+              }
+            }}
             className="btn btn-sm rounded-full"
           >
             <ArrowLeft className="w-3.5 h-3.5" />

@@ -39,12 +39,18 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [lastDetectedStudent, setLastDetectedStudent] = useState<string | null>(null);
+  const [cameraError, setCameraError] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const detectorRef = useRef<ArucoCardDetector | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // O loop da câmera roda fora do ciclo do React: lê sempre os valores atuais por ref
+  const isAnswerRevealedRef = useRef(isAnswerRevealed);
+  const studentsRef = useRef(students);
+  isAnswerRevealedRef.current = isAnswerRevealed;
+  studentsRef.current = students;
 
   const currentQuestion = questions[currentIndex] || questions[0];
   const isLastQuestion = currentIndex === questions.length - 1;
@@ -74,12 +80,14 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
         setIsCameraActive(true);
+        setCameraError(false);
         if (onCameraStatusChange) onCameraStatusChange(true);
         startDetectionLoop();
       }
     } catch (err) {
       console.warn('Câmera não iniciada automaticamente ou permissão pendente:', err);
       setIsCameraActive(false);
+      setCameraError(true);
     }
   };
 
@@ -104,13 +112,13 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
         videoRef.current &&
         videoRef.current.readyState === 4 &&
         detectorRef.current &&
-        !isAnswerRevealed
+        !isAnswerRevealedRef.current
       ) {
         const detected = detectorRef.current.detect(videoRef.current);
 
         if (detected.length > 0) {
           detected.forEach((marker) => {
-            const student = students.find((s) => s.id === marker.id);
+            const student = studentsRef.current.find((s) => s.id === marker.id);
             if (student) {
               setResponses((prev) => {
                 if (prev[marker.id] === marker.option) return prev;
@@ -151,8 +159,9 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
       animationFrameRef.current = requestAnimationFrame(processFrame);
     };
 
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     animationFrameRef.current = requestAnimationFrame(processFrame);
-  }, [isAnswerRevealed, students]);
+  }, []);
 
   // Revela o gabarito e armazena a resposta
   const handleRevealAnswer = () => {
@@ -248,6 +257,8 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
   };
 
   const handleReset = () => {
+    const hasAnswers = Object.keys(responses).length > 0;
+    if (hasAnswers && !confirm('Repetir a pergunta? As respostas da turma serão apagadas.')) return;
     setIsAnswerRevealed(false);
     setResponses({});
     setLastDetectedStudent(null);
@@ -466,7 +477,11 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
               </ol>
             </div>
           ) : (
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 flex flex-col gap-4">
+              {/* A pergunta continua visível para a turma conferir a resposta */}
+              <p className="text-2xl lg:text-3xl font-bold text-base-content leading-snug px-1">
+                {currentQuestion.prompt}
+              </p>
               <QuestionResults
                 question={currentQuestion}
                 responses={responses}
@@ -505,14 +520,16 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
               {!isCameraActive && (
                 <div className="flex flex-col items-center justify-center text-center p-3 space-y-2">
                   <Camera className="w-6 h-6 text-neutral-content/60" />
-                  <p className="text-xs text-neutral-content/75">
-                    A câmera detecta os cartões da turma.
+                  <p role={cameraError ? 'alert' : undefined} className="text-sm text-neutral-content/80">
+                    {cameraError
+                      ? 'Não foi possível abrir a câmera. Confira a permissão do navegador.'
+                      : 'A câmera lê os cartões da turma.'}
                   </p>
                   <button
                     onClick={startCamera}
                     className="btn btn-sm btn-primary"
                   >
-                    Ativar câmera
+                    {cameraError ? 'Tentar de novo' : 'Ligar câmera'}
                   </button>
                 </div>
               )}
