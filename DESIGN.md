@@ -151,6 +151,38 @@ components:
     backgroundColor: "{colors.teal}"
     textColor: "{colors.page-white}"
     size: "48px"
+  demo-projection:
+    backgroundColor: "{colors.teal}"
+    textColor: "{colors.page-white}"
+    rounded: "{rounded.band}"
+    padding: "36px"
+  demo-option-letter-correct:
+    backgroundColor: "{colors.cover-mustard}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.btn}"
+    size: "44px"
+  demo-card-pick:
+    backgroundColor: "{colors.page-white}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.tile}"
+    width: "64px"
+    height: "80px"
+  demo-card-picked:
+    backgroundColor: "{colors.cover-mustard}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.tile}"
+    width: "64px"
+    height: "80px"
+  demo-panel:
+    backgroundColor: "{colors.page-white}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.band}"
+    padding: "36px"
+  practice-row:
+    backgroundColor: "{colors.page-white}"
+    textColor: "{colors.ink}"
+    rounded: "16px"
+    padding: "20px"
   camera-status:
     backgroundColor: "{colors.teal}"
     textColor: "{colors.page-white}"
@@ -174,6 +206,7 @@ O tom é de ferramenta séria e legível de longe. Superfícies são chapadas, s
 - Capa em coluna: título, emblema do cartão de resposta no meio (mostra a atividade), objetivo e metadados embaixo. Na página do roteiro, a mesma capa vira o lado esquerdo de um livro aberto.
 - Coluna lateral discreta: painel branco "Antes da aula" e lista quieta "Em breve".
 - Contraste alto e alvos grandes, pensados para projeção e para crianças.
+- Landing: seções que sobem e aparecem uma vez ao entrar na tela, e uma simulação interativa ("Experimente") em que o visitante levanta um cartão e vê a turma de exemplo ser lida.
 
 ## Colors
 
@@ -227,7 +260,7 @@ Abaixo, uma grade de duas partes (lacuna 2rem, alinhada ao topo): a estante e um
 
 A página do roteiro é um livro aberto de até 72rem (`max-w-6xl`): duas colunas iguais a partir de `lg`, altura mínima `min(34rem, 100dvh - 11rem)` para caber numa viewport de desktop; empilhada abaixo de `lg`, capa em cima. À esquerda a capa de tecido (nome, objetivo, minutos, formato, etapas e emblema grande centralizado); à direita a folha branca com Etapas, Material e a ação "Preparar aula" alinhada à direita no pé. A barra de navegação é fixa no topo (4rem), com rótulos ocultos abaixo de `sm`.
 
-A landing (exibida só na primeira visita; a marca na barra volta a ela) usa o mesmo contêiner de 80rem, com 5rem entre seções. Abertura em 12 colunas a partir de `lg`: título, frase de apoio e botão em 5 colunas à esquerda, cena em 7 à direita, alinhadas ao centro; abaixo, três legendas numeradas em linha a partir de `md`. Depois, "O que muda na sua aula" (título em 4 colunas, lista de definição em 8, separada por filetes de névoa), "Aprendizagem ativa, em poucas palavras" (mesma divisão 4/8, com mini-livros fechados) e "O que você precisa" (três colunas), e por fim a faixa de fechamento.
+A landing (exibida só na primeira visita; a marca na barra volta a ela) usa o mesmo contêiner de 80rem, com 7rem entre seções (`space-y-28`). Abertura em 12 colunas a partir de `lg`: título, frase de apoio e botão em 5 colunas à esquerda, cena em 7 à direita, alinhadas ao centro; abaixo, três legendas numeradas em linha a partir de `md`. Depois, "Experimente" (simulação em 12 colunas a partir de `lg`: projeção em 7, painel branco do visitante em 5, lacuna de 1.5rem a 2rem), "O que muda na sua aula" (título em 4 colunas, lista de definição em 8, separada por filetes de névoa, linhas de padding vertical 2rem), "Aprendizagem ativa, em poucas palavras" (mesma divisão 4/8, com roteiros em linhas clicáveis) e "O que você precisa" (três colunas), e por fim a faixa de fechamento.
 
 Na condução, a lista de perguntas (QuestionFlow) é uma grade de 1 coluna que passa a 2 a partir de `lg`, lacuna de 0.75rem, cartões de padding 1rem, alinhados ao topo.
 
@@ -241,7 +274,7 @@ Híbrido: superfícies chapadas, sem gradiente, e sombra só como apoio de objet
 - **Apoio do Cartão** (`drop-shadow(0 12px 8px rgb(0 0 0 / 0.35))` no cartão único; `0 8px 6px` em cada cartão da grade de quatro): cartões de resposta nos emblemas, que também são papel pousado.
 
 ### Named Rules
-**A Regra do Objeto Pousado.** Só objetos físicos (livros, o livro aberto da página do roteiro e cartões de resposta) têm sombra. O painel "Antes da aula", os itens "Em breve", as pílulas, os blocos de ícone, os selos e a barra de navegação ficam chapados, separados por borda de 1px.
+**A Regra do Objeto Pousado.** Só objetos físicos (livros, o livro aberto da página do roteiro e cartões de resposta, inclusive o cartão levantado na simulação) têm sombra. O painel "Antes da aula", os itens "Em breve", as pílulas, os blocos de ícone, os selos e a barra de navegação ficam chapados, separados por borda de 1px.
 
 **A Regra da Profundidade Real.** A espessura do livro vem de camadas em `translateZ` com `transform-style: preserve-3d`, nunca de sombras duras deslocadas nem de bordas grossas.
 
@@ -281,10 +314,19 @@ Ilustração SVG fornecida pela equipe (`src/assets/sala-classplay.svg`, viewBox
 
 ### Landing: seções de apoio
 - **Legendas numeradas:** círculo petróleo de 2rem com número em Bricolage, texto em 1.125rem.
-- **O que muda:** lista de definição entre filetes de 1px na névoa; termo em Bricolage 800 (1.25rem), descrição em Atkinson 1.125rem a 85%. Sem cartões.
+- **O que muda:** lista de definição entre filetes de 1px na névoa; termo em Bricolage 800 (1.25rem), descrição em Atkinson 1.125rem a 85%. Linhas de padding vertical 2rem (`py-8`) que ganham fundo branco no hover (raio 16px, transição de cor só com movimento permitido). Sem cartões.
+- **Roteiros (linhas clicáveis):** cada prática é uma linha de largura inteira, papel branco com borda de névoa (raio 16px, padding 1.25rem), mini-livro, título em Bricolage, texto e seta petróleo à direita. Hover: borda petróleo, o mini-livro sobe e inclina (-0.25rem, -3 graus) e a seta desliza 0.25rem; foco-visível com contorno petróleo de 4px. Abre a página do roteiro. A linha "em breve" não é interativa: sem borda nem fundo, a 60% de opacidade.
 - **Mini-livro:** livro fechado de 3.5rem x 4.75rem com capa de tecido na cor do roteiro, lombada de 0.5rem e apoio próprio; a 70% de opacidade quando o roteiro é "em breve". Ao lado, título em Bricolage e texto.
+- **Entrada das seções (`Reveal`):** cada seção abaixo da abertura sobe 28px e aparece (opacidade) uma única vez ao entrar na tela (limiar 15%), 0.8s `cubic-bezier(0.16, 1, 0.3, 1)`. Sem efeito sob `prefers-reduced-motion: reduce`, e sem `IntersectionObserver` aparece direto.
 - **O que você precisa:** três blocos de ícone petróleo de 3rem (raio 12px, ícone branco de 1.5rem) com título e linha de apoio, sem cartão.
 - **Faixa de fechamento:** única faixa petróleo da página, raio 28px, título em Display e botão mostarda "Abrir a biblioteca" com seta. O botão do topo é petróleo.
+
+### Landing: simulação "Experimente" (componente assinatura)
+Duas metades, rotuladas como simulação com turma de exemplo ("Na aula, a câmera lê os cartões de papel de verdade").
+- **Projeção (esquerda):** a tela do datashow como objeto: painel petróleo, raio 28px, padding 1.75rem a 2.25rem, chapado. Pergunta em Bricolage 800 (1.5rem a 1.875rem), quatro linhas de alternativa (`aria-live="polite"`): pílula de letra de 2.75rem (raio 12px, branco a 15%, letra branca em Bricolage 800), rótulo em 1.125rem 600, trilho de barra de 1rem (branco a 15%) com preenchimento branco a 70% que cresce em largura (0.5s, só com movimento permitido) e contagem tabular. Quando todos foram lidos, a alternativa certa vira mostarda: letra em mostarda com texto tinta e barra mostarda. Linha de estado embaixo em 1.125rem 600 ("Esperando os cartões da turma." / "A câmera leu N de 8 cartões…" / "Resposta certa: B. N de 8 acertaram.").
+- **Visitante (direita):** painel branco com borda de névoa, raio 28px, padding 1.75rem a 2.25rem. "Levante o seu cartão": quatro cartões A-D (4rem x 5rem, raio 8px, borda de 2px tinta, letra em Bricolage 800 de 1.875rem); no hover sobem 0.375rem e a borda vira petróleo. O escolhido sobe 0.5rem, vira mostarda (texto tinta) e leva apoio de objeto (`0 12px 14px -8px rgb(16 24 32 / 0.5)`); os outros esmaecem para névoa com texto a 40% e ficam desabilitados.
+- **A turma:** grade de 4 colunas, oito alunos (Você, #02 a #08); cada um é um quadro de proporção 5:4 que vira petróleo ao ser lido, com busto de cor de pele e o cartão branco lido (letra em tinta, 0.75rem 800) no canto; ainda não lido é névoa com borda tracejada. Os sete alunos de exemplo são lidos um a um a cada ~420ms (o primeiro após 500ms).
+- **Reiniciar:** depois da escolha aparece o botão ghost pequeno "Jogar de novo" com ícone de seta circular.
 
 ### Livro Aberto (página do roteiro)
 Duas metades sob uma única sombra de apoio. Esquerda: capa de tecido (cor e moldura do `bindingFor`, lombada, padding 2.5rem com 3.5rem à esquerda) com nome em Display, objetivo em 1.25rem, minutos, formato e número de etapas, e o emblema `lg` centralizado no espaço restante. Direita: folha branca de padding 2.25rem a 2.5rem com "Etapas" (círculos petróleo de 2rem numerando cada passo, texto 1.125rem), "Material" (selos de fundo névoa com borda de névoa) e o botão petróleo grande "Preparar aula" no pé. Botão "Biblioteca" de volta acima, em pílula pequena.
@@ -307,10 +349,13 @@ Cartões de padding 1rem, raio 16px, borda de névoa; selecionado fica opaco com
 - **Do** usar como emblema de capa o cartão de resposta que a atividade realmente usa; destacar só o cartão em jogo e esmaecer os ignorados.
 - **Do** deixar etapas e material para a página do roteiro; a biblioteca só mostra título, objetivo, minutos, formato e abertura por clique.
 - **Do** deixar a grade crescer com o acervo (colunas `auto-fill` de 17rem) e manter o cabeçalho compacto.
+- **Do** deixar a landing mostrar o fluxo funcionando (levantar o cartão, a câmera ler, a projeção contar) em simulação rotulada como exemplo.
+- **Do** fazer cada seção da landing subir uma única vez ao entrar na tela, e desligar o movimento sob `prefers-reduced-motion`.
+- **Do** tornar roteiros disponíveis linhas inteiras clicáveis (borda de névoa, hover petróleo) e manter o "em breve" sem interação.
 - **Do** manter itens futuros pequenos, tracejados e na lateral, abaixo do painel de preparo.
 
 ### Don't:
-- **Don't** repetir a faixa petróleo ou o botão mostarda fora do fechamento da landing, nem usar grade de cartões com ícone para benefícios: a landing usa lista de definição entre filetes.
+- **Don't** repetir a faixa petróleo ou o botão mostarda fora do fechamento da landing (a única exceção é a projeção da simulação, que é a tela do datashow e não uma faixa de seção), nem usar grade de cartões com ícone para benefícios: a landing usa lista de definição entre filetes.
 - **Don't** pôr sombra na cena da landing; só os mini-livros e os cartões pousados têm apoio.
 - **Don't** usar simbologia de jogo de azar (ficha, feltro, bingo, dado, baralho); o tom é de ferramenta séria. O cartão de resposta de papel é o próprio instrumento da aula e pode aparecer, sempre como cartão branco com marcador e letra.
 - **Don't** voltar ao campo petróleo escuro, à classe `.desk`, ao cabeçalho com parágrafo de apresentação nem à tábua da estante.
@@ -318,5 +363,5 @@ Cartões de padding 1rem, raio 16px, borda de névoa; selecionado fica opaco com
 - **Don't** abrir o livro na biblioteca nem reintroduzir a guarda "Material" ou a capa que gira 180°; a página dupla pertence só à página do roteiro.
 - **Don't** colorir seções inteiras de mostarda ou vermelho nem pôr texto branco sobre mostarda.
 - **Don't** pôr sombra em botões, pílulas, selos, blocos de ícone, painéis ou na barra de navegação.
-- **Don't** introduzir um segundo movimento de destaque além do livro que vira e da subida dos livros.
+- **Don't** introduzir um segundo movimento de destaque além do livro que vira e da subida (livros na biblioteca, seções na landing); a resposta da simulação (cartão que sobe, barra que enche) é reação a um clique, não decoração.
 - **Don't** reintroduzir o mundo anterior de blocos de brinquedo (amarelo vivo, azul de bloco, bordas grossas).
