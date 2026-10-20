@@ -88,7 +88,7 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
               <h2 className="text-base font-bold text-base-content">
                 Novo aluno
               </h2>
-              <span className="text-xs text-base-content/60">
+              <span className="text-sm text-base-content/70">
                 Próximo cartão: #{String(classroom.students.length + 1).padStart(2, '0')}
               </span>
             </div>
@@ -96,7 +96,7 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
 
           <form onSubmit={handleAddStudent} className="space-y-4">
             <div>
-              <label className="text-xs font-medium text-base-content/80 block mb-1.5">
+              <label className="text-sm font-medium text-base-content/80 block mb-1.5">
                 Nome completo
               </label>
               <input
@@ -117,7 +117,7 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
             </button>
           </form>
 
-          <div className="p-3.5 rounded-xl bg-base-200 border border-base-300 text-xs text-base-content/70 leading-relaxed">
+          <div className="text-sm text-base-content/70 leading-relaxed border-t border-base-300 pt-4">
             Quem entra na turma recebe o próximo código livre, e os cartões já impressos continuam valendo.
           </div>
         </div>
@@ -146,7 +146,7 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
 
           <div className="divide-y divide-base-300/60 max-h-[520px] overflow-y-auto pr-1">
             {filteredStudents.length === 0 ? (
-              <p className="text-center py-8 text-xs text-base-content/60">
+              <p className="text-center py-8 text-sm text-base-content/70">
                 Nenhum aluno encontrado para a busca.
               </p>
             ) : (

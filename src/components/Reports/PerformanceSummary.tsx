@@ -160,7 +160,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
           <h2 className="text-lg font-bold text-base-content">
             Rodadas registradas
           </h2>
-          <span className="text-xs text-base-content/60">
+          <span className="text-sm text-base-content/70">
             Clique em uma rodada para ver as perguntas e os alunos
           </span>
         </div>
@@ -171,7 +171,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
             <h3 className="text-base font-bold text-base-content">
               Nenhuma rodada foi concluída ainda
             </h3>
-            <p className="text-xs text-base-content/60 max-w-sm mx-auto">
+            <p className="text-sm text-base-content/70 max-w-sm mx-auto">
               Escolha as perguntas no modo Perguntas e encerre a rodada. O resultado aparece aqui.
             </p>
           </div>
@@ -192,7 +192,16 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                   {/* Cabeçalho da rodada */}
                   <div
                     onClick={() => toggleRound(round.id)}
-                    className="p-6 cursor-pointer hover:bg-base-200 transition-colors flex flex-wrap items-center justify-between gap-4"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleRound(round.id);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={isExpanded}
+                    className="p-6 cursor-pointer hover:bg-base-200 transition-colors flex flex-wrap items-center justify-between gap-4 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-neutral"
                   >
                     <div className="flex items-center gap-3.5">
                       <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 text-amber-900 flex items-center justify-center font-bold text-sm">
@@ -204,11 +213,11 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                           <h3 className="text-base font-bold text-base-content">
                             {round.name || `Rodada ${rounds.length - rIndex}`}
                           </h3>
-                          <span className="text-xs text-base-content/60">
+                          <span className="text-sm text-base-content/70">
                             • {dateStr}
                           </span>
                         </div>
-                        <span className="text-xs text-base-content/60">
+                        <span className="text-sm text-base-content/70">
                           {round.questions.length} {round.questions.length === 1 ? 'pergunta' : 'perguntas'} • {round.totalResponses} respostas
                         </span>
                       </div>
@@ -237,9 +246,9 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                     <div className="p-6 pt-0 border-t border-base-300/60 space-y-6">
                       {/* Questões da rodada */}
                       <div className="space-y-3 pt-4">
-                        <h4 className="text-xs font-bold text-base-content uppercase tracking-wide">
+                        <h3 className="text-base font-bold text-base-content">
                           Perguntas desta rodada
-                        </h4>
+                        </h3>
 
                         <ol className="divide-y divide-base-300/60">
                           {round.questions.map((q, qIdx) => {
@@ -290,9 +299,9 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
 
                       {/* Respostas individuais dos alunos nesta rodada */}
                       <div className="space-y-3">
-                        <h4 className="text-xs font-bold text-base-content uppercase tracking-wide">
+                        <h3 className="text-base font-bold text-base-content">
                           Resultado por aluno
-                        </h4>
+                        </h3>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-48 overflow-y-auto pr-1">
                           {classroom.students.map((student) => {

@@ -90,13 +90,13 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
             >
               {/* Borda superior: Letra A (leitura normal ao segurar com A para cima) */}
               <div className="w-full flex items-center justify-between px-2">
-                <span className="text-xs font-mono text-zinc-400">
+                <span className="text-sm font-bold text-zinc-500">
                   #{String(student.id).padStart(2, '0')}
                 </span>
-                <span className="text-xs sm:text-sm font-bold text-zinc-400 hover:text-zinc-600 transition-colors">
+                <span className="text-base sm:text-lg font-bold text-zinc-500 ">
                   A
                 </span>
-                <span className="text-xs text-zinc-400 truncate max-w-[110px]">
+                <span className="text-sm text-zinc-500 truncate max-w-[110px]">
                   {student.name.split(' ')[0]}
                 </span>
               </div>
@@ -104,7 +104,7 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
               {/* Meio: Letra D na esquerda e Letra B na direita */}
               <div className="w-full flex items-center justify-between my-auto px-1 py-1">
                 {/* Letra D: rotacionada -90 graus para ficar de pé quando o lado D for girado para cima */}
-                <span className="text-xs sm:text-sm font-bold text-zinc-400 -rotate-90 origin-center">
+                <span className="text-base sm:text-lg font-bold text-zinc-500 -rotate-90 origin-center">
                   D
                 </span>
 
@@ -132,21 +132,21 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
                 </div>
 
                 {/* Letra B: rotacionada 90 graus para ficar de pé quando o lado B for girado para cima */}
-                <span className="text-xs sm:text-sm font-bold text-zinc-400 rotate-90 origin-center">
+                <span className="text-base sm:text-lg font-bold text-zinc-500 rotate-90 origin-center">
                   B
                 </span>
               </div>
 
               {/* Borda inferior: Letra C (rotacionada 180 graus para ficar de pé quando o lado C for girado para cima) */}
               <div className="w-full flex items-center justify-between px-2">
-                <span className="text-xs text-zinc-300">
+                <span className="text-xs text-zinc-400">
                   ClassPlay
                 </span>
                 {/* Letra C rotacionada 180 graus */}
-                <span className="text-xs sm:text-sm font-bold text-zinc-400 rotate-180 origin-center">
+                <span className="text-base sm:text-lg font-bold text-zinc-500 rotate-180 origin-center">
                   C
                 </span>
-                <span className="text-xs text-zinc-300">
+                <span className="text-xs text-zinc-400">
                   Cartão #{String(student.id).padStart(2, '0')}
                 </span>
               </div>

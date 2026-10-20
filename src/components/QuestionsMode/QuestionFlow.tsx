@@ -172,7 +172,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
             <span>Voltar para seleção de perguntas</span>
           </button>
 
-          <span className="text-xs text-base-content/60 font-medium">
+          <span className="text-sm text-base-content/70 font-medium">
             Rodada com {activeQuestions.length} {activeQuestions.length === 1 ? 'pergunta' : 'perguntas'}
           </span>
         </div>
@@ -246,7 +246,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
           <form onSubmit={handleCreateQuestion} className="space-y-4">
             <div>
-              <label className="text-xs font-semibold text-base-content/80 block mb-1">
+              <label className="text-sm font-semibold text-base-content/80 block mb-1">
                 Enunciado da pergunta
               </label>
               <textarea
@@ -260,7 +260,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-medium text-base-content/80 block mb-1">
+                <label className="text-sm font-medium text-base-content/80 block mb-1">
                   Categoria
                 </label>
                 <input
@@ -273,7 +273,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
               </div>
 
               <div>
-                <label className="text-xs font-medium text-base-content/80 block mb-1">
+                <label className="text-sm font-medium text-base-content/80 block mb-1">
                   Resposta certa
                 </label>
                 <select
@@ -290,7 +290,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
             </div>
 
             <div className="space-y-2">
-              <span className="text-xs font-semibold text-base-content/80 block">
+              <span className="text-sm font-semibold text-base-content/80 block">
                 Alternativas de resposta
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -326,7 +326,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
             </div>
 
             <div>
-              <label className="text-xs font-medium text-base-content/80 block mb-1">
+              <label className="text-sm font-medium text-base-content/80 block mb-1">
                 Explicação da resposta (opcional)
               </label>
               <input
@@ -359,7 +359,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
       {/* Controles de seleção rápida */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-base-300">
-        <div className="flex items-center gap-3 text-xs text-base-content/70">
+        <div className="flex items-center gap-3 text-sm text-base-content/70">
           <span className="font-semibold text-base-content">
             {activeQuestions.length} de {questions.length} selecionadas
           </span>
@@ -409,7 +409,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-base-content/60">
+                      <span className="text-sm font-bold text-base-content/70">
                         Pergunta {idx + 1}
                       </span>
                       <span className="badge badge-ghost badge-sm">
@@ -463,7 +463,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                       <strong className="mr-1">{opt}:</strong>
                       <span>{q.options[opt]}</span>
                       {opt === q.correctOption && (
-                        <span className="ml-1 text-xs text-emerald-700 font-bold uppercase">
+                        <span className="ml-1 text-xs text-emerald-800 font-bold">
                           (resposta certa)
                         </span>
                       )}
