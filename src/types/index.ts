@@ -38,6 +38,7 @@ export interface QuestionSessionRecord {
   id: string;
   questionId: string;
   questionPrompt: string;
+  skill: string; // habilidade da pergunta (categoria), usada na estimativa de domínio
   correctOption: Alternative;
   timestamp: number;
   responses: Record<number, Alternative>; // studentId -> resposta
