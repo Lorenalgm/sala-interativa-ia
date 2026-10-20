@@ -1,9 +1,9 @@
-import React from 'react';
-import { ArrowRight, Camera, Clock, Printer, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { Camera, Clock, Printer, Users } from 'lucide-react';
 import { ActiveTab } from '../Navbar';
 import { ActiveScript, scripts } from '../../data/scripts';
 import { ScriptId } from '../../types';
-import { Suit, suitFor } from './Suit';
+import { Emblem, Spine, bindingFor } from './BookParts';
 
 interface LibraryPageProps {
   onNavigate: (tab: ActiveTab) => void;
@@ -11,109 +11,75 @@ interface LibraryPageProps {
   studentsCount: number;
 }
 
-// Inclinação de cada carta na mesa; a carta endireita ao receber foco
-const tilts = ['-2.5deg', '2deg', '-1.5deg', '2.5deg'];
-
-const SuitCorner: React.FC<{ script: ActiveScript; flip?: boolean }> = ({ script, flip }) => (
-  <span
-    className={`absolute flex flex-col items-center gap-1 text-accent ${
-      flip ? 'bottom-4 right-4 rotate-180' : 'top-4 left-4'
-    }`}
-    aria-hidden="true"
-  >
-    <span className="font-display text-2xl font-extrabold leading-none text-neutral">
-      {script.steps.length}
-    </span>
-    <Suit shape={suitFor(script.id)} className="w-5 h-5" />
-  </span>
-);
-
-const PlayableCard: React.FC<{
+// Livro de roteiro: camadas em profundidade; vira na lombada ao receber foco
+const ScriptBook: React.FC<{
   script: ActiveScript;
   index: number;
   onOpen: () => void;
-}> = ({ script, index, onOpen }) => (
-  <button
-    onClick={onOpen}
-    style={{ '--tilt': tilts[index % tilts.length], '--i': index } as React.CSSProperties}
-    className="play-card deal group relative text-left bg-white text-neutral rounded-[1.75rem] px-8 pt-20 pb-20 sm:px-10 flex flex-col gap-6 min-h-[26rem]"
-  >
-    <SuitCorner script={script} />
-    <SuitCorner script={script} flip />
+}> = ({ script, index, onOpen }) => {
+  const binding = bindingFor(script.id);
 
-    <div className="space-y-3">
-      <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.02]">
-        {script.name}
-      </h2>
-      <p className="text-lg leading-relaxed text-neutral/85">{script.goal}</p>
-    </div>
+  return (
+    <button
+      onClick={onOpen}
+      style={{ '--i': index } as React.CSSProperties}
+      className="book-btn shelve group w-[17rem] h-[25rem] text-left rounded-xl"
+    >
+      <span className="book-stage block h-full">
+        <span className="book relative block w-full h-full">
+          {/* Contracapa e bloco de páginas, recuados em profundidade */}
+          <span
+            className={`book-layer absolute inset-0 rounded-r-xl rounded-l-sm ${binding.back}`}
+            style={{ transform: 'translateZ(-16px)' }}
+            aria-hidden="true"
+          />
+          <span
+            className="book-layer page-edge absolute inset-y-1 left-3 right-0 rounded-r-lg bg-white"
+            style={{ transform: 'translateZ(-8px)' }}
+            aria-hidden="true"
+          />
 
-    <ol className="flex flex-wrap items-center gap-2" aria-label={`${script.steps.length} etapas`}>
-      {script.steps.map((_, i) => (
-        <li
-          key={i}
-          className={`w-9 h-9 rounded-full flex items-center justify-center font-display font-bold text-base ${
-            i === 0 ? 'bg-secondary text-neutral' : 'bg-base-200 text-neutral'
-          }`}
-        >
-          {i + 1}
-        </li>
-      ))}
-      <li className="ml-1 text-sm font-medium text-neutral/70 list-none">
-        {script.steps.length} etapas
-      </li>
-    </ol>
-
-    <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2">
-      <span className="inline-flex items-center gap-1.5 font-semibold">
-        <Clock className="w-4 h-4" aria-hidden="true" />
-        {script.minutes}
+          {/* Capa */}
+          <span
+            className={`book-layer cloth absolute inset-0 rounded-r-xl rounded-l-sm ${binding.cover}`}
+          >
+            <Spine />
+            {/* Moldura estampada na capa, como em encadernação de tecido */}
+            <span
+              className={`absolute inset-y-3 right-3 left-8 border-2 rounded-md pointer-events-none ${binding.frame}`}
+              aria-hidden="true"
+            />
+            <span className="relative flex flex-col h-full gap-2.5 pl-11 pr-8 py-8">
+              <span className="block font-display text-[1.8rem] font-extrabold tracking-tight leading-[1.02]">
+                {script.name}
+              </span>
+              <span className="flex flex-1 items-center justify-center min-h-0">
+                <Emblem id={script.id} />
+              </span>
+              <span className="block text-sm leading-snug">{script.goal}</span>
+              <span className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm font-bold">
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+                  {script.minutes}
+                </span>
+                <span>{script.format}</span>
+              </span>
+            </span>
+          </span>
+        </span>
       </span>
-      <span className="text-neutral/70">{script.format}</span>
-      <span className="ml-auto inline-flex items-center gap-1 font-bold text-primary">
-        Jogar esta carta
-        <ArrowRight
-          className="w-4 h-4 transition-transform group-hover:translate-x-1"
-          aria-hidden="true"
-        />
-      </span>
-    </div>
-  </button>
-);
-
-// Carta virada para baixo: o nome continua legível numa etiqueta, só não abre ainda
-const FaceDownCard: React.FC<{ script: ActiveScript; index: number }> = ({ script, index }) => (
-  <article
-    style={{ '--tilt': tilts[index % tilts.length], '--i': index } as React.CSSProperties}
-    className="play-card deal card-back relative rounded-[1.5rem] p-4 min-h-[12rem] flex items-center"
-  >
-    <div className="w-full bg-white text-neutral rounded-2xl px-5 py-4 space-y-1">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="font-display text-2xl font-extrabold tracking-tight leading-tight">
-          {script.name}
-        </h2>
-        <Suit shape={suitFor(script.id)} className="w-5 h-5 text-accent shrink-0" />
-      </div>
-      <p className="text-base leading-snug text-neutral/80">{script.goal}</p>
-      <p className="text-sm font-bold text-primary pt-1">Em breve · {script.minutes}</p>
-    </div>
-  </article>
-);
+    </button>
+  );
+};
 
 const prepSteps: {
   id: ActiveTab;
   icon: typeof Users;
   title: string;
-  text: string;
 }[] = [
-  { id: 'classroom', icon: Users, title: 'Confira a turma', text: 'Cada aluno precisa ter um número de cartão.' },
-  { id: 'cards', icon: Printer, title: 'Imprima os cartões', text: 'Um por aluno, em papel A4.' },
-  {
-    id: 'camera',
-    icon: Camera,
-    title: 'Posicione a câmera',
-    text: 'Ela precisa enxergar a turma toda, de frente e com a sala iluminada.',
-  },
+  { id: 'classroom', icon: Users, title: 'Confira a turma' },
+  { id: 'cards', icon: Printer, title: 'Imprima os cartões' },
+  { id: 'camera', icon: Camera, title: 'Posicione a câmera' },
 ];
 
 export const LibraryPage: React.FC<LibraryPageProps> = ({
@@ -124,73 +90,118 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({
   const available = scripts.filter((s) => s.status === 'available');
   const soon = scripts.filter((s) => s.status === 'soon');
 
+  // Filtro por formato: só aparecem os formatos que já têm roteiro disponível
+  const formats = Array.from(new Set(available.map((s) => s.format)));
+  const [format, setFormat] = useState<string>('Todos');
+  const visible = format === 'Todos' ? available : available.filter((s) => s.format === format);
+
   return (
-    <div className="felt text-white min-h-[calc(100vh-4rem)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-16 space-y-14">
-        <header className="max-w-3xl space-y-4">
-          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[0.98]">
-            Qual carta você joga hoje?
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-10 space-y-6">
+      <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+        <div className="space-y-1">
+          <h1 className="font-display text-3xl lg:text-4xl font-extrabold tracking-tight">
+            Biblioteca de roteiros
           </h1>
-          <p className="text-xl text-white/90 leading-relaxed max-w-2xl">
-            Cada roteiro é uma atividade pronta. Os alunos participam com cartões de papel, sem
-            celular nem tablet. Você só precisa do datashow e de uma câmera.
+          <p className="text-base text-base-content/75">
+            Escolha uma atividade. Os alunos usam cartões de papel; você precisa do datashow e de
+            uma câmera.
           </p>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-start">
-          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-8">
-            {available.map((script, i) => (
-              <PlayableCard
-                key={script.id}
-                script={script}
-                index={i}
-                onOpen={() => onOpenScript(script.id)}
-              />
-            ))}
-          </div>
-
-          <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
-            {soon.map((script, i) => (
-              <FaceDownCard key={script.id} script={script} index={i + available.length} />
-            ))}
-          </div>
         </div>
 
-        <section aria-labelledby="antes-da-aula" className="space-y-6">
-          <h2 id="antes-da-aula" className="font-display text-3xl font-extrabold tracking-tight">
-            Antes da aula
-          </h2>
-          <ul className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {prepSteps.map((step) => {
-              const Icon = step.icon;
-              return (
-                <li key={step.id}>
-                  <button
-                    onClick={() => onNavigate(step.id)}
-                    className="group w-full flex items-center gap-4 text-left rounded-2xl p-2 -m-2 focus-visible:outline focus-visible:outline-4 focus-visible:outline-secondary"
-                  >
-                    <span className="relative shrink-0 w-20 h-20 rounded-full bg-secondary text-neutral flex items-center justify-center shadow-[0_8px_14px_-6px_rgb(0_0_0/0.5)] motion-safe:transition-transform group-hover:-translate-y-1">
-                      <span
-                        className="absolute inset-1.5 rounded-full border-2 border-dashed border-neutral/60"
-                        aria-hidden="true"
-                      />
-                      <Icon className="w-7 h-7" aria-hidden="true" />
-                    </span>
-                    <span className="space-y-0.5">
-                      <span className="block text-lg font-bold">
+        <div role="group" aria-label="Filtrar por formato" className="flex flex-wrap gap-2">
+          {['Todos', ...formats].map((f) => {
+            const active = f === format;
+            const count = f === 'Todos' ? available.length : available.filter((s) => s.format === f).length;
+            return (
+              <button
+                key={f}
+                onClick={() => setFormat(f)}
+                aria-pressed={active}
+                className={`rounded-full px-4 py-1.5 text-sm font-bold border transition-colors ${
+                  active
+                    ? 'bg-primary text-primary-content border-primary'
+                    : 'bg-base-100 text-base-content border-base-300 hover:border-primary'
+                }`}
+              >
+                {f} <span className="font-medium opacity-75">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+      </header>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_18rem] gap-8 items-start">
+        {/* Estante: cresce com a biblioteca */}
+        <div className="grid grid-cols-[repeat(auto-fill,17rem)] justify-center sm:justify-start gap-x-8 gap-y-10 pb-4">
+          {visible.map((script, i) => (
+            <ScriptBook
+              key={script.id}
+              script={script}
+              index={i}
+              onOpen={() => onOpenScript(script.id)}
+            />
+          ))}
+        </div>
+
+        <aside className="space-y-4 lg:sticky lg:top-20">
+          <section
+            aria-labelledby="antes-da-aula"
+            className="bg-base-100 border border-base-300 rounded-box p-5 space-y-3"
+          >
+            <h2 id="antes-da-aula" className="font-display text-lg font-extrabold">
+              Antes da aula
+            </h2>
+            <ul className="space-y-1">
+              {prepSteps.map((step) => {
+                const Icon = step.icon;
+                return (
+                  <li key={step.id}>
+                    <button
+                      onClick={() => onNavigate(step.id)}
+                      className="w-full flex items-center gap-3 text-left rounded-lg px-2 py-2 -mx-2 hover:bg-base-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                    >
+                      <span className="shrink-0 w-9 h-9 rounded-lg bg-primary text-primary-content flex items-center justify-center">
+                        <Icon className="w-4.5 h-4.5" aria-hidden="true" />
+                      </span>
+                      <span className="font-semibold text-base">
                         {step.title}
                         {step.id === 'classroom' && (
-                          <span className="font-medium text-white/80"> · {studentsCount} alunos</span>
+                          <span className="font-medium text-base-content/70"> · {studentsCount}</span>
                         )}
                       </span>
-                      <span className="block text-base text-white/85 leading-snug">{step.text}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+
+          {soon.length > 0 && (
+            <section aria-labelledby="em-breve" className="px-1 space-y-2">
+              <h2 id="em-breve" className="text-sm font-bold text-base-content/70">
+                Em breve
+              </h2>
+              <ul className="space-y-2">
+                {soon.map((script) => (
+                  <li
+                    key={script.id}
+                    className="flex items-center gap-3 rounded-lg border border-dashed border-base-300 px-3 py-2"
+                    title={script.goal}
+                  >
+                    <span
+                      className="shrink-0 w-6 h-8 rounded-sm border-2 border-dashed border-base-content/35"
+                      aria-hidden="true"
+                    />
+                    <span className="text-sm leading-tight">
+                      <span className="block font-semibold">{script.name}</span>
+                      <span className="text-base-content/65">{script.minutes}</span>
                     </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </aside>
       </div>
     </div>
   );
