@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowLeft, Clock, Package, Play } from 'lucide-react';
 import { ActiveScript } from '../../data/scripts';
-import { Suit, suitFor } from './Suit';
+import { Emblem, Spine, bindingFor } from './BookParts';
 
 interface ScriptPageProps {
   script: ActiveScript;
@@ -9,76 +9,87 @@ interface ScriptPageProps {
   onPrepare: () => void;
 }
 
+// O roteiro aberto como um livro: capa à esquerda, página com as etapas à direita
 export const ScriptPage: React.FC<ScriptPageProps> = ({ script, onBack, onPrepare }) => {
-  const suit = suitFor(script.id);
+  const binding = bindingFor(script.id);
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8 space-y-5">
       <button onClick={onBack} className="btn btn-sm rounded-full">
         <ArrowLeft className="w-3.5 h-3.5" />
         Biblioteca
       </button>
 
-      <header className="relative bg-white rounded-[1.75rem] px-10 sm:px-20 py-12 space-y-4 shadow-[0_18px_30px_-14px_rgb(16_24_32/0.35)]">
-        <span className="absolute top-5 left-5 flex flex-col items-center gap-1 text-accent" aria-hidden="true">
-          <span className="font-display text-2xl font-extrabold leading-none text-neutral">
-            {script.steps.length}
-          </span>
-          <Suit shape={suit} className="w-5 h-5" />
-        </span>
-        <span className="absolute bottom-5 right-5 flex flex-col items-center gap-1 text-accent rotate-180" aria-hidden="true">
-          <span className="font-display text-2xl font-extrabold leading-none text-neutral">
-            {script.steps.length}
-          </span>
-          <Suit shape={suit} className="w-5 h-5" />
-        </span>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="badge badge-secondary font-semibold">{script.format}</span>
-          <span className="inline-flex items-center gap-1 text-base text-base-content/80">
-            <Clock className="w-4 h-4" />
-            {script.minutes}
-          </span>
-        </div>
-        <h1 className="font-display text-4xl sm:text-5xl font-extrabold text-base-content tracking-tight leading-[1.02]">
-          {script.name}
-        </h1>
-        <p className="text-xl text-base-content/85 leading-relaxed">{script.goal}</p>
-      </header>
-
-      <section className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 space-y-5">
-        <h2 className="font-display text-2xl font-extrabold">Etapas</h2>
-        <ol className="space-y-4">
-          {script.steps.map((step, i) => (
-            <li key={step} className="flex items-start gap-4">
-              <span className="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-display font-bold text-lg flex-shrink-0">
-                {i + 1}
+      <div className="grid grid-cols-1 lg:grid-cols-2 lg:min-h-[min(34rem,calc(100dvh-11rem))] shadow-[0_24px_34px_-18px_rgb(16_24_32/0.45)] rounded-2xl">
+        {/* Capa */}
+        <section
+          aria-label={script.name}
+          className={`cloth relative overflow-hidden rounded-t-2xl lg:rounded-tr-none lg:rounded-l-2xl ${binding.cover}`}
+        >
+          <Spine />
+          <span
+            className={`absolute inset-y-4 right-4 left-9 border-2 rounded-md pointer-events-none ${binding.frame}`}
+            aria-hidden="true"
+          />
+          <div className="relative flex flex-col h-full gap-5 pl-14 pr-10 py-10">
+            <h1 className="font-display text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.02]">
+              {script.name}
+            </h1>
+            <p className="text-xl leading-snug">{script.goal}</p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-semibold">
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="w-4 h-4" />
+                {script.minutes}
               </span>
-              <p className="text-lg pt-1.5">{step}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+              <span>{script.format}</span>
+              <span>{script.steps.length} etapas</span>
+            </div>
+            <div className="flex flex-1 items-center justify-center pt-2">
+              <Emblem id={script.id} size="lg" />
+            </div>
+          </div>
+        </section>
 
-      <section className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 space-y-4">
-        <h2 className="font-display text-2xl font-extrabold flex items-center gap-2">
-          <Package className="w-5 h-5 text-primary" />
-          Material
-        </h2>
-        <ul className="flex flex-wrap gap-2">
-          {script.materials.map((m) => (
-            <li key={m} className="badge badge-lg bg-base-200 border-base-300 text-base-content">
-              {m}
-            </li>
-          ))}
-        </ul>
-      </section>
+        {/* Página: etapas, material e ação */}
+        <section className="relative bg-white rounded-b-2xl lg:rounded-bl-none lg:rounded-r-2xl px-8 sm:px-10 py-9 flex flex-col gap-6">
+          <div className="space-y-4">
+            <h2 className="font-display text-2xl font-extrabold">Etapas</h2>
+            <ol className="space-y-3.5">
+              {script.steps.map((step, i) => (
+                <li key={step} className="flex items-start gap-3.5">
+                  <span className="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center font-display font-bold flex-shrink-0">
+                    {i + 1}
+                  </span>
+                  <p className="text-lg leading-snug pt-0.5">{step}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
 
-      <div className="flex justify-end">
-        <button onClick={onPrepare} className="btn btn-primary btn-lg">
-          <Play className="w-5 h-5" />
-          Preparar aula
-        </button>
+          <div className="space-y-2.5">
+            <h2 className="font-display text-lg font-extrabold flex items-center gap-2">
+              <Package className="w-4 h-4 text-primary" />
+              Material
+            </h2>
+            <ul className="flex flex-wrap gap-2">
+              {script.materials.map((m) => (
+                <li
+                  key={m}
+                  className="rounded-full bg-base-200 border border-base-300 px-3 py-1 text-base"
+                >
+                  {m}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-auto flex justify-end">
+            <button onClick={onPrepare} className="btn btn-primary btn-lg">
+              <Play className="w-5 h-5" />
+              Preparar aula
+            </button>
+          </div>
+        </section>
       </div>
     </div>
   );
