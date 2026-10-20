@@ -287,36 +287,36 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
     <div
       ref={containerRef}
       className={`max-w-7xl mx-auto px-4 sm:px-6 flex flex-col justify-between ${
-        isFullscreen ? 'h-screen p-4 bg-stone-50 overflow-hidden' : 'min-h-[calc(100vh-120px)] pb-4'
+        isFullscreen ? 'h-screen p-4 bg-base-200 overflow-hidden' : 'min-h-[calc(100vh-120px)] pb-4'
       }`}
     >
       {/* Barra superior de controle completa (todos os botões no topo) */}
-      <div className="no-print bg-white border border-zinc-200 rounded-2xl p-3 shadow-xs flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div className="no-print bg-base-100 border border-base-300 rounded-2xl p-3 shadow-sm flex flex-wrap items-center justify-between gap-3 mb-4">
         {/* Navegação entre perguntas */}
         <div className="flex items-center gap-2">
           <button
             onClick={handlePrev}
             disabled={currentIndex === 0}
-            className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 disabled:opacity-30 text-zinc-700 transition-colors"
+            className="btn btn-sm btn-square"
             title="Pergunta anterior"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
 
-          <span className="text-xs sm:text-sm font-bold text-zinc-950 px-2 whitespace-nowrap">
+          <span className="text-xs sm:text-sm font-bold text-base-content px-2 whitespace-nowrap">
             Pergunta {currentIndex + 1} de {questions.length}
           </span>
 
           <button
             onClick={handleNext}
             disabled={isLastQuestion && !isAnswerRevealed}
-            className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 disabled:opacity-30 text-zinc-700 transition-colors"
+            className="btn btn-sm btn-square"
             title="Próxima pergunta"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
 
-          <span className="hidden sm:inline-block text-xs px-2.5 py-1 rounded-full bg-stone-100 border border-zinc-200 text-zinc-600 font-medium">
+          <span className="hidden sm:inline-flex badge badge-ghost">
             {currentQuestion.category}
           </span>
         </div>
@@ -327,7 +327,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
           {!isAnswerRevealed ? (
             <button
               onClick={handleRevealAnswer}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 text-xs font-bold shadow-xs transition-all"
+              className="btn btn-sm btn-primary"
             >
               <Award className="w-4 h-4" />
               <span>Encerrar pergunta e ver gabarito</span>
@@ -336,7 +336,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={handleReset}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-zinc-200 text-zinc-700 text-xs font-semibold hover:bg-stone-50"
+                className="btn btn-sm"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Repetir</span>
@@ -345,7 +345,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
               {isLastQuestion ? (
                 <button
                   onClick={handleCompleteRound}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 text-xs font-bold shadow-xs transition-all"
+                  className="btn btn-sm btn-primary"
                 >
                   <Award className="w-4 h-4" />
                   <span>Finalizar rodada e ver resumo</span>
@@ -353,7 +353,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
               ) : (
                 <button
                   onClick={handleNext}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 text-xs font-bold shadow-xs transition-all"
+                  className="btn btn-sm btn-primary"
                 >
                   <span>Próxima pergunta</span>
                   <ChevronRight className="w-4 h-4" />
@@ -366,7 +366,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
           {isCameraActive ? (
             <button
               onClick={stopCamera}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold hover:bg-rose-100"
+              className="btn btn-sm btn-outline btn-error"
             >
               <CameraOff className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Desligar câmera</span>
@@ -374,7 +374,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
           ) : (
             <button
               onClick={startCamera}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold shadow-xs"
+              className="btn btn-sm btn-neutral"
             >
               <Camera className="w-3.5 h-3.5 text-amber-400" />
               <span>Conectar câmera</span>
@@ -384,7 +384,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
           {/* Simulação de respostas para testes rápidos */}
           <button
             onClick={handleSimulateQuickAnswers}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 border border-zinc-200 text-zinc-800 text-xs font-semibold"
+            className="btn btn-sm"
             title="Simula as respostas dos alunos"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
@@ -394,7 +394,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
           {/* Alternar tela cheia */}
           <button
             onClick={toggleFullscreen}
-            className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 border border-zinc-200 text-zinc-700"
+            className="btn btn-sm btn-square"
             title="Alternar tela cheia"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -407,10 +407,10 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
         {/* Painel Esquerdo: Pergunta e Alternativas ou Gabarito (ocupa 9 colunas) */}
         <div className="lg:col-span-9 flex flex-col justify-between space-y-4 min-h-0">
           {!isAnswerRevealed ? (
-            <div className="bg-white border border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-xs flex flex-col justify-between flex-1 min-h-0 space-y-6">
+            <div className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 shadow-sm flex flex-col justify-between flex-1 min-h-0 space-y-6">
               {/* Enunciado amplo e de fácil leitura de longe */}
               <div className="my-auto">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-zinc-950 tracking-tight leading-tight">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-base-content tracking-tight leading-tight">
                   {currentQuestion.prompt}
                 </h1>
               </div>
@@ -420,12 +420,12 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
                 {optionsKeys.map((opt) => (
                   <div
                     key={opt}
-                    className="flex items-start gap-3.5 p-4 sm:p-5 rounded-2xl border border-zinc-200 bg-stone-50/70 hover:bg-stone-50 transition-colors"
+                    className="flex items-start gap-3.5 p-4 sm:p-5 rounded-2xl border border-base-300 bg-base-200/70 hover:bg-base-200 transition-colors"
                   >
-                    <span className="w-10 h-10 rounded-xl bg-amber-400 text-zinc-950 flex items-center justify-center font-black text-lg flex-shrink-0 shadow-xs">
+                    <span className="w-10 h-10 rounded-xl bg-primary text-base-content flex items-center justify-center font-black text-lg flex-shrink-0 shadow-sm">
                       {opt}
                     </span>
-                    <p className="text-lg sm:text-xl font-bold text-zinc-900 pt-1 leading-snug">
+                    <p className="text-lg sm:text-xl font-bold text-base-content pt-1 leading-snug">
                       {currentQuestion.options[opt]}
                     </p>
                   </div>
@@ -445,17 +445,17 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
         {/* Painel Direito: Câmera no topo e Quadrante de Alunos embaixo (ocupa 3 colunas) */}
         <div className="lg:col-span-3 flex flex-col gap-3 min-h-0">
           {/* Câmera visível por padrão na lateral */}
-          <div className="bg-white border border-zinc-200 rounded-2xl p-2.5 shadow-xs flex flex-col space-y-2 flex-shrink-0">
+          <div className="bg-base-100 border border-base-300 rounded-2xl p-2.5 shadow-sm flex flex-col space-y-2 flex-shrink-0">
             <div className="flex items-center justify-between px-1 text-xs">
-              <span className="font-bold text-zinc-950">
+              <span className="font-bold text-base-content">
                 Câmera da sala
               </span>
-              <span className={`text-xs font-semibold ${isCameraActive ? 'text-emerald-700' : 'text-zinc-400'}`}>
+              <span className={`text-xs font-semibold ${isCameraActive ? 'text-emerald-700' : 'text-base-content/60'}`}>
                 {isCameraActive ? 'Leitura de cartões ativa' : 'Desconectada'}
               </span>
             </div>
 
-            <div className="w-full aspect-video bg-zinc-950 rounded-xl relative overflow-hidden flex items-center justify-center">
+            <div className="w-full aspect-video bg-neutral rounded-xl relative overflow-hidden flex items-center justify-center">
               {/* O elemento de vídeo está visível na página para decodificação imediata pelo navegador */}
               <video
                 ref={videoRef}
@@ -471,13 +471,13 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
               {!isCameraActive && (
                 <div className="flex flex-col items-center justify-center text-center p-3 space-y-2">
-                  <Camera className="w-6 h-6 text-zinc-500" />
-                  <p className="text-xs text-zinc-400">
+                  <Camera className="w-6 h-6 text-neutral-content/60" />
+                  <p className="text-xs text-neutral-content/75">
                     A câmera detecta os cartões da turma.
                   </p>
                   <button
                     onClick={startCamera}
-                    className="px-3 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-zinc-950 text-xs font-bold shadow-xs"
+                    className="btn btn-sm btn-primary"
                   >
                     Ativar câmera
                   </button>
@@ -487,8 +487,8 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
             {/* Indicação sutil de cartão reconhecido */}
             {lastDetectedStudent && (
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-50 text-emerald-900 text-xs font-medium truncate">
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+              <div role="status" className="alert alert-success py-1.5 px-2 gap-1.5 rounded-btn text-xs font-medium bg-emerald-50 border-emerald-200 text-emerald-900">
+                <CheckCircle className="w-3.5 h-3.5 text-success flex-shrink-0" />
                 <span className="truncate">{lastDetectedStudent}</span>
               </div>
             )}

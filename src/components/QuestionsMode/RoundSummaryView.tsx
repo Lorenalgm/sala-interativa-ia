@@ -27,19 +27,19 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Topo de encerramento */}
-      <div className="bg-white border-2 border-amber-300 rounded-3xl p-6 sm:p-8 shadow-sm flex flex-wrap items-center justify-between gap-6">
+      <div className="bg-base-100 border-2 border-amber-300 rounded-box p-6 sm:p-8 shadow-sm flex flex-wrap items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-amber-400 text-zinc-950 flex items-center justify-center font-black shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-primary text-base-content flex items-center justify-center font-black shadow-sm">
             <Award className="w-8 h-8" />
           </div>
           <div>
             <span className="text-xs font-bold text-amber-800 uppercase tracking-wider block">
               Rodada concluída
             </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content">
               Resumo da turma nesta rodada
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-600 mt-0.5">
+            <p className="text-xs sm:text-sm text-base-content/70 mt-0.5">
               Todas as perguntas selecionadas foram respondidas e registradas no histórico.
             </p>
           </div>
@@ -48,7 +48,7 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={onNewRound}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-zinc-200 bg-white hover:bg-stone-50 text-zinc-800 text-xs font-bold shadow-xs transition-all"
+            className="btn btn-sm"
           >
             <RotateCcw className="w-4 h-4" />
             <span>Iniciar nova rodada</span>
@@ -56,7 +56,7 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
 
           <button
             onClick={onGoToReports}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 text-xs font-bold shadow-sm transition-all"
+            className="btn btn-sm btn-primary"
           >
             <BarChart2 className="w-4 h-4" />
             <span>Ver histórico completo</span>
@@ -66,42 +66,30 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
       </div>
 
       {/* Indicadores gerais da rodada */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-white border border-zinc-200 rounded-3xl p-6 shadow-sm">
-          <span className="text-xs font-medium text-zinc-500 block">
-            Perguntas aplicadas
-          </span>
-          <span className="text-3xl font-extrabold text-zinc-950 mt-1 block">
-            {round.questions.length}
-          </span>
+      <div className="stats stats-vertical sm:stats-horizontal w-full bg-base-100 border border-base-300">
+        <div className="stat">
+          <div className="stat-title">Perguntas aplicadas</div>
+          <div className="stat-value font-extrabold">{round.questions.length}</div>
         </div>
 
-        <div className="bg-white border border-zinc-200 rounded-3xl p-6 shadow-sm">
-          <span className="text-xs font-medium text-zinc-500 block">
-            Votos computados
-          </span>
-          <span className="text-3xl font-extrabold text-zinc-950 mt-1 block">
-            {round.totalResponses}
-          </span>
+        <div className="stat">
+          <div className="stat-title">Votos computados</div>
+          <div className="stat-value font-extrabold">{round.totalResponses}</div>
         </div>
 
-        <div className="bg-white border border-zinc-200 rounded-3xl p-6 shadow-sm">
-          <span className="text-xs font-medium text-zinc-500 block">
-            Taxa média de acerto
-          </span>
-          <span className="text-3xl font-extrabold text-emerald-600 mt-1 block">
-            {round.overallAccuracy}%
-          </span>
+        <div className="stat">
+          <div className="stat-title">Taxa média de acerto</div>
+          <div className="stat-value font-extrabold text-success">{round.overallAccuracy}%</div>
         </div>
       </div>
 
       {/* Lista das perguntas da rodada */}
-      <div className="bg-white border border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
-        <h2 className="text-lg font-bold text-zinc-950">
+      <div className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 shadow-sm space-y-4">
+        <h2 className="text-lg font-bold text-base-content">
           Detalhamento por questão
         </h2>
 
-        <div className="divide-y divide-zinc-100">
+        <div className="divide-y divide-base-300/60">
           {round.questions.map((q, idx) => {
             const votes = Object.keys(q.responses).length;
             const correctCount = Object.values(q.responses).filter(
@@ -116,30 +104,30 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
               >
                 <div className="space-y-1 max-w-2xl">
                   <div className="flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-stone-100 text-zinc-700 flex items-center justify-center font-bold text-xs">
+                    <span className="badge badge-ghost badge-sm w-5 h-5 p-0 font-bold">
                       {idx + 1}
                     </span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-semibold">
+                    <span className="badge badge-success badge-sm font-semibold">
                       Gabarito {q.correctOption}
                     </span>
                   </div>
 
-                  <p className="text-sm font-semibold text-zinc-950">
+                  <p className="text-sm font-semibold text-base-content">
                     {q.questionPrompt}
                   </p>
                 </div>
 
                 <div className="text-right flex items-center gap-4">
                   <div>
-                    <span className="text-xs text-zinc-400 block">Acertos</span>
-                    <span className="text-base font-bold text-emerald-600">
+                    <span className="text-xs text-base-content/60 block">Acertos</span>
+                    <span className="text-base font-bold text-success">
                       {acc}%
                     </span>
                   </div>
 
-                  <div className="pl-3 border-l border-zinc-200">
-                    <span className="text-xs text-zinc-400 block">Votos</span>
-                    <span className="text-base font-bold text-zinc-900">
+                  <div className="pl-3 border-l border-base-300">
+                    <span className="text-xs text-base-content/60 block">Votos</span>
+                    <span className="text-base font-bold text-base-content">
                       {votes} / {round.totalClassStudents}
                     </span>
                   </div>
@@ -151,8 +139,8 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
       </div>
 
       {/* Aproveitamento dos alunos na rodada */}
-      <div className="bg-white border border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
-        <h2 className="text-lg font-bold text-zinc-950">
+      <div className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 shadow-sm space-y-4">
+        <h2 className="text-lg font-bold text-base-content">
           Aproveitamento individual dos alunos nesta rodada
         </h2>
 
@@ -176,7 +164,7 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
                 key={student.id}
                 className={`p-2.5 rounded-xl border text-xs flex items-center justify-between ${
                   total === 0
-                    ? 'bg-stone-50 border-zinc-200/60 text-zinc-400'
+                    ? 'bg-base-200 border-base-300 text-base-content/60'
                     : pct >= 50
                     ? 'bg-emerald-50 border-emerald-300 text-emerald-950 font-medium'
                     : 'bg-amber-50 border-amber-200 text-amber-950'

@@ -17,7 +17,7 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Controles para o professor (ocultos na impressão) */}
-      <div className="no-print bg-white border border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-5">
+      <div className="no-print bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 shadow-sm space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -25,33 +25,27 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
                 Material para a turma
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
               Impressão dos cartões de resposta
             </h1>
-            <p className="text-sm text-zinc-600 mt-1">
+            <p className="text-sm text-base-content/70 mt-1">
               As letras ficam pequenas nas bordas, assim quem está ao lado não vê o voto do colega.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-xl border border-zinc-200 text-xs text-zinc-700">
+            <div className="join" role="group" aria-label="Cartões por folha">
               <button
                 onClick={() => setCardsPerPage(2)}
-                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                  cardsPerPage === 2
-                    ? 'bg-white text-zinc-950 shadow-xs'
-                    : 'text-zinc-600 hover:text-zinc-950'
-                }`}
+                aria-pressed={cardsPerPage === 2}
+                className={`btn btn-sm join-item ${cardsPerPage === 2 ? 'btn-neutral' : ''}`}
               >
                 2 por folha
               </button>
               <button
                 onClick={() => setCardsPerPage(4)}
-                className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                  cardsPerPage === 4
-                    ? 'bg-white text-zinc-950 shadow-xs'
-                    : 'text-zinc-600 hover:text-zinc-950'
-                }`}
+                aria-pressed={cardsPerPage === 4}
+                className={`btn btn-sm join-item ${cardsPerPage === 4 ? 'btn-neutral' : ''}`}
               >
                 4 por folha
               </button>
@@ -59,7 +53,7 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
 
             <button
               onClick={handlePrint}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 text-xs font-bold shadow-xs transition-all"
+              className="btn btn-sm btn-primary"
             >
               <Printer className="w-4 h-4" />
               <span>Imprimir cartões em PDF</span>
@@ -67,8 +61,8 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
           </div>
         </div>
 
-        <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs text-amber-900">
-          <Info className="w-4 h-4 flex-shrink-0 text-amber-600 mt-0.5" />
+        <div role="note" className="alert items-start bg-amber-50 border-amber-200 text-amber-950 text-sm">
+          <Info className="w-5 h-5 flex-shrink-0 text-amber-700" />
           <span className="leading-relaxed">
             Cada borda tem uma letra (A, B, C ou D). O aluno gira o cartão até a letra escolhida ficar em cima, já na posição de leitura.
           </span>

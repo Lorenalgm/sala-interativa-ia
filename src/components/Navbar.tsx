@@ -32,56 +32,45 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header className="no-print bg-white/95 backdrop-blur-md border-b border-zinc-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo clean minimalista: somente ClassPlay */}
-          <button
-            onClick={() => onSelectTab('home')}
-            className="flex items-center gap-1.5 text-left focus:outline-none group"
-          >
-            <span className="font-extrabold text-2xl tracking-tight text-zinc-950">
-              ClassPlay
-            </span>
-            <span className="w-2 h-2 rounded-full bg-amber-400 group-hover:scale-125 transition-transform" />
-          </button>
+    <header className="no-print navbar sticky top-0 z-50 bg-base-100/95 backdrop-blur-md border-b border-base-300 px-0">
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+        <button
+          onClick={() => onSelectTab('home')}
+          className="btn btn-ghost px-2 gap-1.5 text-2xl font-extrabold tracking-tight group"
+        >
+          ClassPlay
+          <span className="w-2 h-2 rounded-full bg-primary group-hover:scale-125 transition-transform" />
+        </button>
 
-          {/* Navegação em abas no estilo clean da Apple / Vercel */}
-          <nav className="flex items-center space-x-1 sm:space-x-1.5">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
+        <nav className="flex items-center gap-1 overflow-x-auto">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
 
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onSelectTab(item.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
-                    isActive
-                      ? 'bg-zinc-900 text-white shadow-sm'
-                      : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
+            return (
+              <button
+                key={item.id}
+                onClick={() => onSelectTab(item.id)}
+                aria-current={isActive ? 'page' : undefined}
+                aria-label={item.label}
+                className={`btn btn-sm rounded-full font-medium ${
+                  isActive ? 'btn-neutral' : 'btn-ghost text-base-content/70'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="hidden sm:inline">{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
 
-          {/* Status sutil da câmera */}
-          <div className="hidden md:flex items-center">
-            <div
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
-                cameraActive
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                  : 'bg-zinc-100 border-zinc-200 text-zinc-500'
-              }`}
-            >
-              <Camera className="w-3.5 h-3.5" />
-              <span>{cameraActive ? 'Câmera ativa' : 'Câmera inativa'}</span>
-            </div>
-          </div>
+        <div
+          className={`hidden md:inline-flex badge gap-1.5 py-3 font-medium ${
+            cameraActive ? 'badge-success' : 'badge-ghost text-base-content/70'
+          }`}
+        >
+          <Camera className="w-3.5 h-3.5" />
+          {cameraActive ? 'Câmera ativa' : 'Câmera inativa'}
         </div>
       </div>
     </header>

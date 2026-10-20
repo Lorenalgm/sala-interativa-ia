@@ -26,13 +26,13 @@ export const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
         <div className="no-print max-w-7xl mx-auto px-4 sm:px-6 pt-4 flex items-center justify-between">
           <button
             onClick={() => setStage('catalog')}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-zinc-200 text-zinc-700 hover:text-zinc-950 text-xs font-medium shadow-sm transition-all"
+            className="btn btn-sm rounded-full"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Voltar ao catálogo de exercícios</span>
           </button>
 
-          <span className="text-xs text-zinc-500 font-medium">
+          <span className="text-xs text-base-content/60 font-medium">
             Atividade: {selectedExercise.title}
           </span>
         </div>
@@ -58,17 +58,17 @@ export const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
               Atividades corporais
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
             Catálogo de exercícios
           </h1>
-          <p className="text-sm text-zinc-600 mt-1">
+          <p className="text-sm text-base-content/70 mt-1">
             Escolha uma postura, projete no datashow e peça para a turma imitar.
           </p>
         </div>
 
         <button
           onClick={() => setStage('presenting')}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 text-xs font-bold shadow-sm transition-all"
+          className="btn btn-sm btn-primary"
         >
           <Play className="w-4 h-4 fill-zinc-950" />
           <span>Iniciar {selectedExercise.title} no datashow</span>
@@ -84,38 +84,38 @@ export const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
             <div
               key={item.id}
               onClick={() => setSelectedExerciseId(item.id)}
-              className={`p-6 rounded-3xl border transition-all cursor-pointer flex flex-col justify-between space-y-5 ${
+              className={`p-6 rounded-box border transition-all cursor-pointer flex flex-col justify-between space-y-5 ${
                 isSelected
-                  ? 'bg-white border-amber-400 shadow-md ring-2 ring-amber-400/30'
-                  : 'bg-white border-zinc-200/90 hover:border-zinc-300 shadow-sm'
+                  ? 'bg-base-100 border-amber-400 shadow-md ring-2 ring-amber-400/30'
+                  : 'bg-base-100 border-base-300 hover:border-zinc-300 shadow-sm'
               }`}
             >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800">
+                  <span className="badge badge-secondary font-semibold">
                     Nível {item.difficulty}
                   </span>
 
-                  <div className="flex items-center gap-1 text-xs text-zinc-500">
+                  <div className="flex items-center gap-1 text-xs text-base-content/60">
                     <Clock className="w-3.5 h-3.5" />
                     <span>{item.targetDurationSeconds}s de sustentação</span>
                   </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-zinc-950">
+                <h3 className="text-xl font-bold text-base-content">
                   {item.title}
                 </h3>
 
-                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-base-content/70 leading-relaxed">
                   {item.description}
                 </p>
               </div>
 
-              <div className="space-y-2 pt-3 border-t border-zinc-100 text-xs">
-                <span className="font-semibold text-zinc-700 block">
+              <div className="space-y-2 pt-3 border-t border-base-300/60 text-xs">
+                <span className="font-semibold text-base-content/80 block">
                   Instruções para a turma:
                 </span>
-                <ul className="space-y-1.5 text-zinc-500">
+                <ul className="space-y-1.5 text-base-content/60">
                   {item.instructions.map((inst, i) => (
                     <li key={i} className="flex items-start gap-1.5">
                       <span className="text-amber-500 font-bold">•</span>
@@ -131,11 +131,7 @@ export const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
                   setSelectedExerciseId(item.id);
                   setStage('presenting');
                 }}
-                className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                  isSelected
-                    ? 'bg-zinc-950 text-white hover:bg-zinc-800 shadow-sm'
-                    : 'bg-stone-100 text-zinc-700 hover:bg-stone-200'
-                }`}
+                className={`btn btn-sm w-full ${isSelected ? 'btn-neutral' : ''}`}
               >
                 <span>Projetar este exercício</span>
                 <Play className="w-3.5 h-3.5" />

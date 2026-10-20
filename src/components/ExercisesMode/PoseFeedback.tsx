@@ -21,7 +21,7 @@ export const PoseFeedback: React.FC<PoseFeedbackProps> = ({
   );
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-3xl p-6 shadow-sm space-y-4">
+    <div className="bg-base-100 border border-base-300 rounded-box p-6 shadow-sm space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           {feedback.isMatch ? (
@@ -34,7 +34,7 @@ export const PoseFeedback: React.FC<PoseFeedbackProps> = ({
             </div>
           )}
           <div>
-            <span className="text-xs text-zinc-500 block uppercase tracking-wide font-semibold">
+            <span className="text-xs text-base-content/60 block uppercase tracking-wide font-semibold">
               Status ao vivo
             </span>
             <span
@@ -49,8 +49,8 @@ export const PoseFeedback: React.FC<PoseFeedbackProps> = ({
 
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <span className="text-xs text-zinc-400 block font-medium">Repetições</span>
-            <div className="flex items-center gap-1 text-zinc-950 font-black text-xl">
+            <span className="text-xs text-base-content/60 block font-medium">Repetições</span>
+            <div className="flex items-center gap-1 text-base-content font-black text-xl">
               <Sparkles className="w-4 h-4 text-amber-500" />
               <span>{completedReps}</span>
             </div>
@@ -61,30 +61,28 @@ export const PoseFeedback: React.FC<PoseFeedbackProps> = ({
       {/* Barra de progresso da sustentação */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-zinc-600 font-medium">
+          <span className="text-base-content/70 font-medium">
             Sustentação da postura: {holdTimeSeconds.toFixed(1)}s / {targetDurationSeconds}s
           </span>
           <span className="text-amber-700 font-bold">{holdPercent}%</span>
         </div>
 
-        <div className="w-full bg-stone-100 h-3 rounded-full overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-150 ${
-              feedback.isMatch ? 'bg-amber-400' : 'bg-stone-300'
-            }`}
-            style={{ width: `${holdPercent}%` }}
-          />
-        </div>
+        <progress
+          className={`progress w-full h-3 ${feedback.isMatch ? 'progress-primary' : ''}`}
+          value={holdPercent}
+          max={100}
+          aria-label="Tempo de sustentação da postura"
+        />
       </div>
 
       {/* Ângulos detectados */}
       {feedback.activeAngles && (
-        <div className="flex items-center gap-3 pt-1 text-xs text-zinc-500">
+        <div className="flex items-center gap-3 pt-1 text-xs text-base-content/60">
           <span>Ângulos articulares calculados:</span>
           {Object.entries(feedback.activeAngles).map(([name, val]) => (
             <span
               key={name}
-              className="px-2 py-0.5 rounded-lg bg-stone-100 text-zinc-800 font-mono font-medium border border-zinc-200"
+              className="badge badge-ghost font-mono font-medium"
             >
               {name}: {val}°
             </span>

@@ -30,7 +30,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-stone-50 text-zinc-900">
+    <div className="min-h-screen flex flex-col bg-base-200 text-base-content">
       <Navbar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
@@ -87,7 +87,7 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      <footer className="no-print border-t border-zinc-200/80 bg-white py-6 px-6 text-center text-xs text-zinc-500">
+      <footer className="no-print border-t border-base-300 bg-base-100 py-6 px-6 text-center text-sm text-base-content/70">
         <p>
           ClassPlay. A visão computacional roda em tempo real no navegador do professor.
         </p>

@@ -102,10 +102,10 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
               Desempenho por rodadas
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
             Histórico das sessões de aula
           </h1>
-          <p className="text-sm text-zinc-600 mt-1">
+          <p className="text-sm text-base-content/70 mt-1">
             Acertos da turma em cada rodada de perguntas.
           </p>
         </div>
@@ -114,7 +114,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
           <button
             onClick={handleExportCSV}
             disabled={rounds.length === 0}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-zinc-200 hover:border-zinc-300 disabled:opacity-40 text-zinc-800 text-xs font-semibold shadow-xs transition-all"
+            className="btn btn-sm"
           >
             <Download className="w-4 h-4 text-amber-500" />
             <span>Exportar planilha CSV</span>
@@ -123,7 +123,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
           <button
             onClick={handleClear}
             disabled={rounds.length === 0}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 disabled:opacity-40 text-rose-700 text-xs font-semibold transition-all"
+            className="btn btn-sm btn-outline btn-error"
           >
             <Trash2 className="w-4 h-4" />
             <span>Limpar histórico</span>
@@ -132,71 +132,51 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
       </div>
 
       {/* Cartões de indicadores gerais */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-white border border-zinc-200 rounded-3xl p-6 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs text-zinc-500 font-medium block">
-              Rodadas finalizadas
-            </span>
-            <span className="text-3xl font-extrabold text-zinc-950">
-              {totalRounds}
-            </span>
+      <div className="stats stats-vertical sm:stats-horizontal w-full bg-base-100 border border-base-300">
+        <div className="stat">
+          <div className="stat-figure text-amber-700">
+            <Layers className="w-7 h-7" />
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
-            <Layers className="w-6 h-6" />
-          </div>
+          <div className="stat-title">Rodadas finalizadas</div>
+          <div className="stat-value font-extrabold">{totalRounds}</div>
         </div>
 
-        <div className="bg-white border border-zinc-200 rounded-3xl p-6 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs text-zinc-500 font-medium block">
-              Total de respostas computadas
-            </span>
-            <span className="text-3xl font-extrabold text-zinc-950">
-              {totalResponsesCollected}
-            </span>
-            <span className="text-xs text-zinc-400 block">
-              Distribuídas em {totalQuestionsApplied} questões
-            </span>
+        <div className="stat">
+          <div className="stat-figure text-amber-700">
+            <HelpCircle className="w-7 h-7" />
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
-            <HelpCircle className="w-6 h-6" />
-          </div>
+          <div className="stat-title">Total de respostas computadas</div>
+          <div className="stat-value font-extrabold">{totalResponsesCollected}</div>
+          <div className="stat-desc">Distribuídas em {totalQuestionsApplied} questões</div>
         </div>
 
-        <div className="bg-white border border-zinc-200 rounded-3xl p-6 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs text-zinc-500 font-medium block">
-              Taxa média de acerto
-            </span>
-            <span className="text-3xl font-extrabold text-emerald-600">
-              {overallAccuracy}%
-            </span>
+        <div className="stat">
+          <div className="stat-figure text-success">
+            <Award className="w-7 h-7" />
           </div>
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center">
-            <Award className="w-6 h-6" />
-          </div>
+          <div className="stat-title">Taxa média de acerto</div>
+          <div className="stat-value font-extrabold text-success">{overallAccuracy}%</div>
         </div>
       </div>
 
       {/* Listagem agrupada por rodadas */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-zinc-950">
+          <h2 className="text-lg font-bold text-base-content">
             Rodadas registradas
           </h2>
-          <span className="text-xs text-zinc-400">
+          <span className="text-xs text-base-content/60">
             Clique em uma rodada para expandir as questões e respostas individuais
           </span>
         </div>
 
         {rounds.length === 0 ? (
-          <div className="bg-white border border-zinc-200 rounded-3xl p-12 text-center space-y-3 shadow-xs">
-            <FileSpreadsheet className="w-10 h-10 text-zinc-300 mx-auto" />
-            <h3 className="text-base font-bold text-zinc-900">
+          <div className="bg-base-100 border border-base-300 rounded-box p-12 text-center space-y-3 shadow-sm">
+            <FileSpreadsheet className="w-10 h-10 text-base-content/40 mx-auto" />
+            <h3 className="text-base font-bold text-base-content">
               Nenhuma rodada foi concluída ainda
             </h3>
-            <p className="text-xs text-zinc-500 max-w-sm mx-auto">
+            <p className="text-xs text-base-content/60 max-w-sm mx-auto">
               Escolha as perguntas no modo Perguntas e encerre a rodada. O resultado aparece aqui.
             </p>
           </div>
@@ -212,12 +192,12 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
               return (
                 <div
                   key={round.id}
-                  className="bg-white border border-zinc-200 rounded-3xl shadow-xs overflow-hidden transition-all"
+                  className="bg-base-100 border border-base-300 rounded-box shadow-sm overflow-hidden transition-all"
                 >
                   {/* Cabeçalho da rodada */}
                   <div
                     onClick={() => toggleRound(round.id)}
-                    className="p-6 cursor-pointer hover:bg-stone-50/60 transition-colors flex flex-wrap items-center justify-between gap-4"
+                    className="p-6 cursor-pointer hover:bg-base-200 transition-colors flex flex-wrap items-center justify-between gap-4"
                   >
                     <div className="flex items-center gap-3.5">
                       <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 text-amber-900 flex items-center justify-center font-bold text-sm">
@@ -226,14 +206,14 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
 
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-base font-bold text-zinc-950">
+                          <h3 className="text-base font-bold text-base-content">
                             {round.name || `Rodada ${rounds.length - rIndex}`}
                           </h3>
-                          <span className="text-xs text-zinc-400">
+                          <span className="text-xs text-base-content/60">
                             • {dateStr}
                           </span>
                         </div>
-                        <span className="text-xs text-zinc-500">
+                        <span className="text-xs text-base-content/60">
                           {round.questions.length} {round.questions.length === 1 ? 'pergunta' : 'perguntas'} • {round.totalResponses} votos computados
                         </span>
                       </div>
@@ -241,13 +221,13 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
 
                     <div className="flex items-center gap-5">
                       <div className="text-right">
-                        <span className="text-xs text-zinc-400 block font-medium">Aproveitamento</span>
-                        <span className="text-lg font-black text-emerald-600">
+                        <span className="text-xs text-base-content/60 block font-medium">Aproveitamento</span>
+                        <span className="text-lg font-black text-success">
                           {round.overallAccuracy}%
                         </span>
                       </div>
 
-                      <div className="p-2 rounded-xl bg-stone-100 text-zinc-600">
+                      <div className="p-2 rounded-xl bg-base-200 text-base-content/70">
                         {isExpanded ? (
                           <ChevronUp className="w-4 h-4" />
                         ) : (
@@ -259,10 +239,10 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
 
                   {/* Conteúdo expandido da rodada */}
                   {isExpanded && (
-                    <div className="p-6 pt-0 border-t border-zinc-100 space-y-6">
+                    <div className="p-6 pt-0 border-t border-base-300/60 space-y-6">
                       {/* Questões da rodada */}
                       <div className="space-y-3 pt-4">
-                        <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wide">
+                        <h4 className="text-xs font-bold text-base-content uppercase tracking-wide">
                           Perguntas desta rodada
                         </h4>
 
@@ -277,32 +257,32 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                             return (
                               <div
                                 key={q.id || qIdx}
-                                className="p-3.5 rounded-2xl bg-stone-50 border border-zinc-200/80 flex flex-wrap items-center justify-between gap-3 text-xs"
+                                className="p-3.5 rounded-2xl bg-base-200 border border-base-300 flex flex-wrap items-center justify-between gap-3 text-xs"
                               >
                                 <div className="space-y-1 max-w-xl">
                                   <div className="flex items-center gap-2">
-                                    <span className="font-bold text-zinc-700">
+                                    <span className="font-bold text-base-content/80">
                                       Questão {qIdx + 1}
                                     </span>
-                                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-semibold text-xs">
+                                    <span className="badge badge-success badge-sm font-semibold">
                                       Gabarito {q.correctOption}
                                     </span>
                                   </div>
-                                  <p className="font-medium text-zinc-900">
+                                  <p className="font-medium text-base-content">
                                     {q.questionPrompt}
                                   </p>
                                 </div>
 
                                 <div className="flex items-center gap-4 text-right">
                                   <div>
-                                    <span className="text-xs text-zinc-400 block">Acertos</span>
-                                    <span className="text-sm font-bold text-emerald-600">
+                                    <span className="text-xs text-base-content/60 block">Acertos</span>
+                                    <span className="text-sm font-bold text-success">
                                       {acc}%
                                     </span>
                                   </div>
-                                  <div className="pl-3 border-l border-zinc-200">
-                                    <span className="text-xs text-zinc-400 block">Votos</span>
-                                    <span className="text-sm font-bold text-zinc-900">
+                                  <div className="pl-3 border-l border-base-300">
+                                    <span className="text-xs text-base-content/60 block">Votos</span>
+                                    <span className="text-sm font-bold text-base-content">
                                       {votes}
                                     </span>
                                   </div>
@@ -315,7 +295,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
 
                       {/* Respostas individuais dos alunos nesta rodada */}
                       <div className="space-y-3">
-                        <h4 className="text-xs font-bold text-zinc-950 uppercase tracking-wide">
+                        <h4 className="text-xs font-bold text-base-content uppercase tracking-wide">
                           Aproveitamento dos alunos nesta rodada
                         </h4>
 
@@ -342,7 +322,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                                 key={student.id}
                                 className={`p-2 rounded-xl border text-xs flex items-center justify-between ${
                                   studentTotal === 0
-                                    ? 'bg-stone-50 border-zinc-200/60 text-zinc-400'
+                                    ? 'bg-base-200 border-base-300 text-base-content/60'
                                     : pct >= 50
                                     ? 'bg-emerald-50 border-emerald-200 text-emerald-950'
                                     : 'bg-amber-50 border-amber-200 text-amber-950'

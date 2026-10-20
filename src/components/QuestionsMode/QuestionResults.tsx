@@ -39,7 +39,7 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
   return (
     <div className="space-y-5 h-full flex flex-col justify-between">
       {/* Banner de gabarito e explicação */}
-      <div className="bg-white border-2 border-emerald-300 rounded-3xl p-6 sm:p-7 shadow-xs space-y-3">
+      <div className="bg-base-100 border-2 border-emerald-300 rounded-box p-6 sm:p-7 shadow-sm space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center flex-shrink-0">
@@ -49,7 +49,7 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
               <span className="text-xs uppercase tracking-wider text-emerald-700 font-bold block">
                 Gabarito oficial
               </span>
-              <h2 className="text-xl sm:text-2xl font-black text-zinc-950">
+              <h2 className="text-xl sm:text-2xl font-black text-base-content">
                 Alternativa {question.correctOption}: {question.options[question.correctOption]}
               </h2>
             </div>
@@ -57,39 +57,39 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
 
           <div className="flex items-center gap-5">
             <div className="text-right">
-              <span className="text-xs text-zinc-400 block font-medium">Taxa de acerto</span>
-              <span className="text-2xl sm:text-3xl font-black text-emerald-600">
+              <span className="text-xs text-base-content/60 block font-medium">Taxa de acerto</span>
+              <span className="text-2xl sm:text-3xl font-black text-success">
                 {accuracyRate}%
               </span>
             </div>
-            <div className="text-right pl-4 border-l border-zinc-200">
-              <span className="text-xs text-zinc-400 block font-medium">Total de respostas</span>
-              <span className="text-2xl sm:text-3xl font-black text-zinc-950">
+            <div className="text-right pl-4 border-l border-base-300">
+              <span className="text-xs text-base-content/60 block font-medium">Total de respostas</span>
+              <span className="text-2xl sm:text-3xl font-black text-base-content">
                 {totalResponses}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-stone-50 border border-zinc-200/80 text-xs sm:text-sm text-zinc-700 leading-relaxed">
-          <strong className="text-zinc-950 font-semibold mr-1">Explicação:</strong>
+        <div className="p-3.5 rounded-2xl bg-base-200 border border-base-300 text-xs sm:text-sm text-base-content/80 leading-relaxed">
+          <strong className="text-base-content font-semibold mr-1">Explicação:</strong>
           {question.explanation}
         </div>
       </div>
 
       {/* Gráfico de barras verticais com a distribuição dos votos da turma */}
-      <div className="bg-white border border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-5 flex-1 flex flex-col justify-between">
+      <div className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 shadow-sm space-y-5 flex-1 flex flex-col justify-between">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold text-zinc-950 uppercase tracking-wide">
+          <h3 className="text-xs font-bold text-base-content uppercase tracking-wide">
             Distribuição dos votos da turma
           </h3>
-          <span className="text-xs text-zinc-400">
+          <span className="text-xs text-base-content/60">
             {totalResponses} respostas registradas no datashow
           </span>
         </div>
 
         {/* Gráfico de barras verticais */}
-        <div className="grid grid-cols-4 gap-4 sm:gap-6 items-end h-60 pt-6 pb-2 border-b border-zinc-200">
+        <div className="grid grid-cols-4 gap-4 sm:gap-6 items-end h-60 pt-6 pb-2 border-b border-base-300">
           {optionsList.map((opt) => {
             const count = counts[opt];
             const percent =
@@ -105,30 +105,30 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
                 <div className="text-center space-y-0.5">
                   <span
                     className={`text-xs sm:text-sm font-black block ${
-                      isCorrect ? 'text-emerald-700' : 'text-zinc-700'
+                      isCorrect ? 'text-emerald-700' : 'text-base-content/80'
                     }`}
                   >
                     {percent}%
                   </span>
-                  <span className="text-xs text-zinc-400 block font-medium">
+                  <span className="text-xs text-base-content/60 block font-medium">
                     {count} {count === 1 ? 'voto' : 'votos'}
                   </span>
                 </div>
 
                 {/* Coluna da barra vertical com transição */}
-                <div className="w-full max-w-[72px] bg-stone-100 rounded-t-2xl flex items-end justify-center h-44 p-1 overflow-hidden">
+                <div className="w-full max-w-[72px] bg-base-200 rounded-t-2xl flex items-end justify-center h-44 p-1 overflow-hidden">
                   <div
                     className={`w-full rounded-t-xl transition-all duration-700 ease-out flex items-center justify-center ${
                       isCorrect
                         ? 'bg-emerald-500 shadow-sm'
-                        : 'bg-zinc-300 group-hover:bg-zinc-400'
+                        : 'bg-base-content/20 group-hover:bg-base-content/30'
                     }`}
                     style={{
                       height: `${Math.max(6, percent)}%`,
                     }}
                   >
                     {isCorrect && percent > 20 && (
-                      <CheckCircle2 className="w-4 h-4 text-white opacity-90" />
+                      <CheckCircle2 className="w-4 h-4 text-success-content opacity-90" />
                     )}
                   </div>
                 </div>
@@ -136,10 +136,10 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
                 {/* Letra da alternativa */}
                 <div className="text-center pt-1">
                   <span
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm mx-auto shadow-xs ${
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm mx-auto shadow-sm ${
                       isCorrect
-                        ? 'bg-emerald-600 text-white ring-2 ring-emerald-300'
-                        : 'bg-stone-100 text-zinc-700 border border-zinc-200'
+                        ? 'bg-success text-success-content ring-2 ring-emerald-300'
+                        : 'bg-base-200 text-base-content/80 border border-base-300'
                     }`}
                   >
                     {opt}
@@ -161,7 +161,7 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
                 className={`p-2.5 rounded-xl border truncate ${
                   isCorrect
                     ? 'bg-emerald-50/70 border-emerald-300 text-emerald-950 font-semibold'
-                    : 'bg-stone-50 border-zinc-200/70 text-zinc-600'
+                    : 'bg-base-200 border-base-300 text-base-content/70'
                 }`}
               >
                 <div className="flex items-center gap-1.5 truncate">

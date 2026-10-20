@@ -7,8 +7,6 @@ import {
   Plus,
   Play,
   Trash2,
-  CheckSquare,
-  Square,
   ArrowLeft,
   ChevronDown,
   ChevronUp,
@@ -157,13 +155,13 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
         <div className="no-print max-w-7xl mx-auto px-4 sm:px-6 pt-2 flex items-center justify-between">
           <button
             onClick={() => setStage('setup')}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-200 text-zinc-700 hover:text-zinc-950 text-xs font-semibold shadow-2xs transition-all"
+            className="btn btn-sm rounded-full"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Voltar para seleção de perguntas</span>
           </button>
 
-          <span className="text-xs text-zinc-500 font-medium">
+          <span className="text-xs text-base-content/60 font-medium">
             Sessão com {activeQuestions.length} {activeQuestions.length === 1 ? 'questão' : 'questões'}
           </span>
         </div>
@@ -190,10 +188,10 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
               Fluxo da aula
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
             Preparação das perguntas
           </h1>
-          <p className="text-sm text-zinc-600 mt-1">
+          <p className="text-sm text-base-content/70 mt-1">
             Selecione as perguntas que farão parte desta rodada ou adicione novas questões.
           </p>
         </div>
@@ -201,7 +199,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsCreatingQuestion(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-zinc-200 hover:border-zinc-300 text-zinc-800 text-xs font-semibold shadow-xs transition-all"
+            className="btn btn-sm"
           >
             <Plus className="w-4 h-4 text-amber-500" />
             <span>Criar nova pergunta</span>
@@ -216,7 +214,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
               setStage('presenting');
             }}
             disabled={activeQuestions.length === 0}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 disabled:opacity-50 text-zinc-950 text-xs font-bold shadow-xs transition-all"
+            className="btn btn-sm btn-primary"
           >
             <Play className="w-4 h-4 fill-zinc-950" />
             <span>Iniciar no datashow ({activeQuestions.length})</span>
@@ -226,14 +224,14 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
       {/* Modal de criação de pergunta simples */}
       {isCreatingQuestion && (
-        <div className="bg-white border-2 border-amber-300 rounded-3xl p-6 sm:p-8 shadow-sm space-y-5">
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-            <h2 className="text-lg font-bold text-zinc-950">
+        <div className="bg-base-100 border-2 border-amber-300 rounded-box p-6 sm:p-8 shadow-sm space-y-5">
+          <div className="flex items-center justify-between pb-3 border-b border-base-300/60">
+            <h2 className="text-lg font-bold text-base-content">
               Cadastrar pergunta para a turma
             </h2>
             <button
               onClick={() => setIsCreatingQuestion(false)}
-              className="text-xs text-zinc-400 hover:text-zinc-700"
+              className="btn btn-sm btn-ghost"
             >
               Cancelar
             </button>
@@ -241,7 +239,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
           <form onSubmit={handleCreateQuestion} className="space-y-4">
             <div>
-              <label className="text-xs font-semibold text-zinc-700 block mb-1">
+              <label className="text-xs font-semibold text-base-content/80 block mb-1">
                 Enunciado da pergunta
               </label>
               <textarea
@@ -249,13 +247,13 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                 onChange={(e) => setNewPrompt(e.target.value)}
                 rows={2}
                 placeholder="Exemplo: Qual é o papel da função de ativação?"
-                className="w-full px-3.5 py-2 bg-stone-50 border border-zinc-200 rounded-xl text-sm text-zinc-900 focus:outline-none focus:border-zinc-950"
+                className="textarea textarea-bordered text-base w-full"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-medium text-zinc-700 block mb-1">
+                <label className="text-xs font-medium text-base-content/80 block mb-1">
                   Categoria
                 </label>
                 <input
@@ -263,18 +261,18 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                   value={newCat}
                   onChange={(e) => setNewCat(e.target.value)}
                   placeholder="Exemplo: Visão computacional"
-                  className="w-full px-3 py-2 bg-stone-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-950"
+                  className="input input-bordered input-sm w-full"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-zinc-700 block mb-1">
+                <label className="text-xs font-medium text-base-content/80 block mb-1">
                   Alternativa correta (gabarito)
                 </label>
                 <select
                   value={correct}
                   onChange={(e) => setCorrect(e.target.value as Alternative)}
-                  className="w-full px-3 py-2 bg-stone-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-950"
+                  className="select select-bordered select-sm w-full"
                 >
                   <option value="A">Alternativa A</option>
                   <option value="B">Alternativa B</option>
@@ -285,7 +283,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
             </div>
 
             <div className="space-y-2">
-              <span className="text-xs font-semibold text-zinc-700 block">
+              <span className="text-xs font-semibold text-base-content/80 block">
                 Alternativas de resposta
               </span>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -294,34 +292,34 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                   value={optA}
                   onChange={(e) => setOptA(e.target.value)}
                   placeholder="Alternativa A"
-                  className="px-3 py-2 bg-stone-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-950"
+                  className="input input-bordered input-sm"
                 />
                 <input
                   type="text"
                   value={optB}
                   onChange={(e) => setOptB(e.target.value)}
                   placeholder="Alternativa B"
-                  className="px-3 py-2 bg-stone-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-950"
+                  className="input input-bordered input-sm"
                 />
                 <input
                   type="text"
                   value={optC}
                   onChange={(e) => setOptC(e.target.value)}
                   placeholder="Alternativa C"
-                  className="px-3 py-2 bg-stone-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-950"
+                  className="input input-bordered input-sm"
                 />
                 <input
                   type="text"
                   value={optD}
                   onChange={(e) => setOptD(e.target.value)}
                   placeholder="Alternativa D"
-                  className="px-3 py-2 bg-stone-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-950"
+                  className="input input-bordered input-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-medium text-zinc-700 block mb-1">
+              <label className="text-xs font-medium text-base-content/80 block mb-1">
                 Explicação do gabarito (opcional)
               </label>
               <input
@@ -329,7 +327,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                 value={explanation}
                 onChange={(e) => setExplanation(e.target.value)}
                 placeholder="Explicação da resposta (opcional)"
-                className="w-full px-3 py-2 bg-stone-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-950"
+                className="input input-bordered input-sm w-full"
               />
             </div>
 
@@ -337,13 +335,13 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
               <button
                 type="button"
                 onClick={() => setIsCreatingQuestion(false)}
-                className="px-4 py-2 rounded-xl text-xs text-zinc-600 hover:bg-zinc-100"
+                className="btn btn-sm btn-ghost"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold shadow-xs"
+                className="btn btn-sm btn-neutral"
               >
                 Salvar pergunta
               </button>
@@ -353,28 +351,28 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
       )}
 
       {/* Controles de seleção rápida */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-zinc-200">
-        <div className="flex items-center gap-3 text-xs text-zinc-600">
-          <span className="font-semibold text-zinc-900">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-base-300">
+        <div className="flex items-center gap-3 text-xs text-base-content/70">
+          <span className="font-semibold text-base-content">
             {activeQuestions.length} de {questions.length} selecionadas
           </span>
           <span>•</span>
           <button
             onClick={selectAll}
-            className="text-amber-700 font-semibold hover:underline"
+            className="btn btn-link btn-sm px-1 text-amber-800 font-semibold"
           >
             Selecionar todas
           </button>
           <span>•</span>
           <button
             onClick={deselectAll}
-            className="text-zinc-500 hover:underline"
+            className="btn btn-link btn-sm px-1 text-base-content/70 font-normal"
           >
             Limpar seleção
           </button>
         </div>
 
-        <span className="text-xs text-zinc-400">
+        <span className="text-xs text-base-content/60">
           Por padrão a lista mostra só os enunciados
         </span>
       </div>
@@ -391,31 +389,32 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
               onClick={() => toggleSelect(q.id)}
               className={`p-5 rounded-2xl border transition-all cursor-pointer space-y-3 ${
                 isSelected
-                  ? 'bg-white border-amber-400 shadow-xs ring-1 ring-amber-400/30'
-                  : 'bg-white/70 border-zinc-200 opacity-70 hover:opacity-100'
+                  ? 'bg-base-100 border-amber-400 shadow-sm ring-1 ring-amber-400/30'
+                  : 'bg-base-100/70 border-base-300 opacity-70 hover:opacity-100'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 min-w-0">
-                  <div className="pt-0.5 flex-shrink-0">
-                    {isSelected ? (
-                      <CheckSquare className="w-5 h-5 text-amber-500" />
-                    ) : (
-                      <Square className="w-5 h-5 text-zinc-400" />
-                    )}
-                  </div>
+                  <input
+                    type="checkbox"
+                    className="checkbox checkbox-primary mt-0.5 pointer-events-none"
+                    checked={isSelected}
+                    readOnly
+                    tabIndex={-1}
+                    aria-label={`Selecionar questão ${idx + 1}`}
+                  />
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-zinc-500">
+                      <span className="text-xs font-bold text-base-content/60">
                         Questão {idx + 1}
                       </span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-stone-100 text-zinc-600 border border-zinc-200">
+                      <span className="badge badge-ghost badge-sm">
                         {q.category}
                       </span>
                     </div>
 
-                    <p className="text-base font-bold text-zinc-950 leading-snug">
+                    <p className="text-base font-bold text-base-content leading-snug">
                       {q.prompt}
                     </p>
                   </div>
@@ -424,7 +423,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
                     onClick={(e) => toggleExpand(q.id, e)}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-stone-200 text-zinc-700 text-xs font-semibold transition-colors"
+                    className="btn btn-sm"
                     title={isExpanded ? 'Ocultar alternativas' : 'Ver alternativas e gabarito'}
                   >
                     <span>{isExpanded ? 'Ocultar' : 'Ver alternativas'}</span>
@@ -437,7 +436,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
                   <button
                     onClick={(e) => handleDelete(q.id, e)}
-                    className="p-1 text-zinc-400 hover:text-rose-600 rounded"
+                    className="btn btn-sm btn-ghost btn-square text-base-content/60 hover:text-error"
                     title="Excluir questão"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -447,14 +446,14 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
 
               {/* Bloco expandido de alternativas e gabarito (somente exibido se a professora clicar para expandir) */}
               {isExpanded && (
-                <div className="pt-3 mt-2 border-t border-zinc-100 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div className="pt-3 mt-2 border-t border-base-300/60 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   {(['A', 'B', 'C', 'D'] as Alternative[]).map((opt) => (
                     <div
                       key={opt}
                       className={`truncate px-3 py-1.5 rounded-xl border ${
                         opt === q.correctOption
                           ? 'bg-emerald-50 border-emerald-300 text-emerald-950 font-semibold'
-                          : 'bg-stone-50 border-zinc-200/60 text-zinc-600'
+                          : 'bg-base-200 border-base-300 text-base-content/70'
                       }`}
                     >
                       <strong className="mr-1">{opt}:</strong>

@@ -325,17 +325,17 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
       <video ref={videoRef} className="hidden" playsInline muted autoPlay />
 
       {/* Barra superior de controle clean */}
-      <div className="no-print bg-white border border-zinc-200 rounded-2xl p-3 sm:p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+      <div className="no-print bg-base-100 border border-base-300 rounded-2xl p-3 sm:p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentIndex((p) => Math.max(0, p - 1))}
             disabled={currentIndex === 0}
-            className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 disabled:opacity-40 text-zinc-700 transition-colors"
+            className="btn btn-sm btn-square"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
 
-          <span className="text-xs sm:text-sm font-semibold text-zinc-900 px-2">
+          <span className="text-xs sm:text-sm font-semibold text-base-content px-2">
             Exercício {currentIndex + 1} de {exercises.length}
           </span>
 
@@ -344,12 +344,12 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
               setCurrentIndex((p) => Math.min(exercises.length - 1, p + 1))
             }
             disabled={currentIndex === exercises.length - 1}
-            className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 disabled:opacity-40 text-zinc-700 transition-colors"
+            className="btn btn-sm btn-square"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
 
-          <span className="text-xs px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 font-semibold">
+          <span className="badge badge-secondary font-semibold">
             Nível {currentExercise.difficulty}
           </span>
         </div>
@@ -358,7 +358,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
           {isCameraActive ? (
             <button
               onClick={stopCamera}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold hover:bg-rose-100 transition-colors"
+              className="btn btn-sm btn-outline btn-error"
             >
               <CameraOff className="w-3.5 h-3.5" />
               <span>Desligar câmera</span>
@@ -366,7 +366,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
           ) : (
             <button
               onClick={startCamera}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold shadow-sm transition-all"
+              className="btn btn-sm btn-neutral"
             >
               <Camera className="w-3.5 h-3.5 text-amber-400" />
               <span>Conectar câmera</span>
@@ -375,7 +375,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
 
           <button
             onClick={handleSimulatePose}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-xs font-semibold transition-colors"
+            className="btn btn-sm btn-secondary"
             title="Simula uma pose correta sem ninguém se mexer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-600" />
@@ -384,7 +384,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
 
           <button
             onClick={toggleFullscreen}
-            className="p-2 rounded-xl bg-white hover:bg-stone-50 border border-zinc-200 text-zinc-700 shadow-xs"
+            className="btn btn-sm btn-square"
             title="Alternar tela cheia"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -396,27 +396,27 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Painel esquerdo */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white border border-zinc-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
-            <span className="text-xs uppercase tracking-wider text-amber-700 font-bold px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 inline-block">
+          <div className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 shadow-sm space-y-4">
+            <span className="badge badge-secondary font-semibold">
               Desafio corporal ativo
             </span>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content">
               {currentExercise.title}
             </h1>
 
-            <p className="text-zinc-600 text-sm leading-relaxed">
+            <p className="text-base-content/70 text-sm leading-relaxed">
               {currentExercise.description}
             </p>
 
-            <div className="space-y-3 bg-stone-50 p-4 rounded-2xl border border-zinc-200/80">
-              <span className="text-xs font-bold text-zinc-800 block uppercase tracking-wide">
+            <div className="space-y-3 bg-base-200 p-4 rounded-2xl border border-base-300">
+              <span className="text-xs font-bold text-base-content block uppercase tracking-wide">
                 Instruções para os alunos
               </span>
-              <ul className="space-y-2 text-xs sm:text-sm text-zinc-600">
+              <ul className="space-y-2 text-xs sm:text-sm text-base-content/70">
                 {currentExercise.instructions.map((step, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-950 flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                    <span className="badge badge-primary badge-sm w-5 h-5 p-0 font-bold flex-shrink-0 mt-0.5">
                       {idx + 1}
                     </span>
                     <span>{step}</span>
@@ -435,35 +435,35 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
         </div>
 
         {/* Painel direito com visualização */}
-        <div className="lg:col-span-7 bg-white border border-zinc-200 rounded-3xl p-5 shadow-sm flex flex-col items-center">
-          <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-zinc-100 text-xs">
-            <span className="font-bold text-zinc-950">
+        <div className="lg:col-span-7 bg-base-100 border border-base-300 rounded-box p-5 shadow-sm flex flex-col items-center">
+          <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-base-300/60 text-xs">
+            <span className="font-bold text-base-content">
               Câmera e pontos do corpo
             </span>
-            <span className="text-xs text-zinc-500 font-medium">
+            <span className="text-xs text-base-content/60 font-medium">
               Alvo: {currentExercise.targetDurationSeconds} segundos contínuos
             </span>
           </div>
 
-          <div className="w-full aspect-video bg-zinc-950 rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
+          <div className="w-full aspect-video bg-neutral rounded-2xl overflow-hidden relative flex items-center justify-center shadow-inner">
             <canvas ref={canvasRef} className="w-full h-full object-contain" />
 
             {!isCameraActive && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/80 p-6 text-center space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-zinc-400">
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-neutral/80 p-6 text-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-neutral-content/10 flex items-center justify-center text-neutral-content/70">
                   <Camera className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">
+                  <h3 className="text-base font-bold text-neutral-content">
                     Câmera desconectada
                   </h3>
-                  <p className="text-xs text-zinc-400 max-w-sm mt-1">
+                  <p className="text-xs text-neutral-content/75 max-w-sm mt-1">
                     Conecte a câmera ou use a simulação para ver como a pose é avaliada.
                   </p>
                 </div>
                 <button
                   onClick={startCamera}
-                  className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 text-xs font-bold shadow-sm"
+                  className="btn btn-sm btn-primary"
                 >
                   Ativar câmera
                 </button>
