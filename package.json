@@ -11,6 +11,7 @@
   "dependencies": {
     "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/literata": "^5.3.0",
     "canvas-confetti": "^1.9.4",
     "js-aruco2": "^2.0.0",
     "lucide-react": "^1.16.0",

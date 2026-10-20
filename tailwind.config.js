@@ -12,6 +12,7 @@ export default {
       fontFamily: {
         sans: ['"Atkinson Hyperlegible Next Variable"', ...defaultTheme.fontFamily.sans],
         display: ['"Bricolage Grotesque Variable"', ...defaultTheme.fontFamily.sans],
+        editorial: ['"Literata Variable"', 'Georgia', ...defaultTheme.fontFamily.serif],
       },
     },
   },

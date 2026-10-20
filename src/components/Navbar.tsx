@@ -1,5 +1,5 @@
 import React from 'react';
-import { Library, BarChart2, Users, Camera } from 'lucide-react';
+import { Home, Library, BarChart2, Users, Camera } from 'lucide-react';
 
 export type ActiveTab = 'home' | 'library' | 'script' | 'prepare' | 'cards' | 'camera' | 'classroom' | 'reports';
 
@@ -15,6 +15,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   cameraActive,
 }) => {
   const navItems = [
+    { id: 'home' as ActiveTab, label: 'Início', icon: Home },
     { id: 'library' as ActiveTab, label: 'Biblioteca', icon: Library },
     { id: 'classroom' as ActiveTab, label: 'Turma', icon: Users },
     { id: 'reports' as ActiveTab, label: 'Desempenho', icon: BarChart2 },
