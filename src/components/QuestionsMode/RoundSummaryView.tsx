@@ -24,16 +24,16 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
   ).length;
   const answeredQuestions = round.questions.length - unansweredQuestions;
 
-  // Comemora só quando a turma respondeu e acertou a maioria
+  // Comemora só quando todas as perguntas tiveram respostas e a turma acertou a maioria
   useEffect(() => {
-    if (round.totalResponses > 0 && round.overallAccuracy >= 50) {
+    if (unansweredQuestions === 0 && round.totalResponses > 0 && round.overallAccuracy >= 50) {
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.5 },
       });
     }
-  }, [round.totalResponses, round.overallAccuracy]);
+  }, [unansweredQuestions, round.totalResponses, round.overallAccuracy]);
 
   let statusMessage = 'Todas as perguntas tiveram respostas. O resultado foi salvo no histórico.';
   if (answeredQuestions === 0) {

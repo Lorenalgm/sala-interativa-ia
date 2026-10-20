@@ -65,7 +65,9 @@ export const PoseFeedback: React.FC<PoseFeedbackProps> = ({
         </div>
 
         <progress
-          className={`progress w-full h-5 ${feedback.isMatch ? 'progress-primary' : ''}`}
+          className={`progress w-full h-5 ${
+            holdPercent >= 100 ? 'progress-success' : feedback.isMatch ? 'progress-primary' : ''
+          }`}
           value={holdPercent}
           max={100}
           aria-label="Tempo de sustentação da postura"

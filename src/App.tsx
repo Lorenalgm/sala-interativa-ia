@@ -22,6 +22,20 @@ export const App: React.FC = () => {
     loadQuestionHistory()
   );
   const [cameraActive, setCameraActive] = useState(false);
+  const [isRoundInProgress, setIsRoundInProgress] = useState(false);
+
+  // Trocar de aba no meio de uma rodada descarta as respostas: pede confirmação
+  const handleSelectTab = (tab: ActiveTab) => {
+    if (tab === activeTab) return;
+    if (
+      isRoundInProgress &&
+      !confirm('Sair da rodada em andamento? As respostas desta rodada não serão salvas.')
+    ) {
+      return;
+    }
+    setIsRoundInProgress(false);
+    setActiveTab(tab);
+  };
 
   // Cada aba abre do topo, sem herdar a rolagem da anterior
   useEffect(() => {
@@ -38,14 +52,14 @@ export const App: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-base-200 text-base-content">
       <Navbar
         activeTab={activeTab}
-        onSelectTab={setActiveTab}
+        onSelectTab={handleSelectTab}
         cameraActive={cameraActive}
       />
 
       <main className="flex-1">
         {activeTab === 'home' && (
           <HomeDashboard
-            onNavigate={setActiveTab}
+            onNavigate={handleSelectTab}
             studentsCount={classroom.students.length}
             questionsCount={questions.length}
             exercisesCount={defaultExercises.length}
@@ -60,7 +74,8 @@ export const App: React.FC = () => {
             onRefreshQuestions={refreshData}
             onSessionComplete={refreshData}
             onCameraStatusChange={setCameraActive}
-            onNavigateToReports={() => setActiveTab('reports')}
+            onNavigateToReports={() => handleSelectTab('reports')}
+            onRoundProgressChange={setIsRoundInProgress}
           />
         )}
 

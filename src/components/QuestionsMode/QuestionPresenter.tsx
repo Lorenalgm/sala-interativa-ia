@@ -219,7 +219,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
     const roundRecord: RoundSession = {
       id: `rodada-${Date.now()}`,
-      name: `Rodada de ${questions.length} ${questions.length === 1 ? 'questão' : 'questões'}`,
+      name: `Rodada de ${questions.length} ${questions.length === 1 ? 'pergunta' : 'perguntas'}`,
       timestamp: Date.now(),
       totalClassStudents: students.length,
       questions: sessionQuestions,

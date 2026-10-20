@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alternative, Question, RoundSession, Student } from '../../types';
 import { QuestionPresenter } from './QuestionPresenter';
 import { RoundSummaryView } from './RoundSummaryView';
@@ -19,6 +19,7 @@ interface QuestionFlowProps {
   onSessionComplete: () => void;
   onCameraStatusChange: (active: boolean) => void;
   onNavigateToReports?: () => void;
+  onRoundProgressChange?: (inProgress: boolean) => void;
 }
 
 export const QuestionFlow: React.FC<QuestionFlowProps> = ({
@@ -28,6 +29,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
   onSessionComplete,
   onCameraStatusChange,
   onNavigateToReports,
+  onRoundProgressChange,
 }) => {
   // Estado do fluxo: 'setup' (seleção), 'presenting' (projeção), 'summary' (resumo da rodada)
   const [stage, setStage] = useState<'setup' | 'presenting' | 'summary'>('setup');
@@ -37,6 +39,11 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
   const [completedRound, setCompletedRound] = useState<RoundSession | null>(null);
+
+  // Avisa o App quando há uma rodada sendo projetada
+  useEffect(() => {
+    onRoundProgressChange?.(stage === 'presenting');
+  }, [stage, onRoundProgressChange]);
 
   // Campos do formulário de nova pergunta
   const [newPrompt, setNewPrompt] = useState('');

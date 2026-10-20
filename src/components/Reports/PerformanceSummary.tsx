@@ -241,7 +241,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                           Perguntas desta rodada
                         </h4>
 
-                        <div className="space-y-2">
+                        <ol className="divide-y divide-base-300/60">
                           {round.questions.map((q, qIdx) => {
                             const votes = Object.keys(q.responses).length;
                             const correct = Object.values(q.responses).filter(
@@ -250,42 +250,42 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                             const acc = votes > 0 ? Math.round((correct / votes) * 100) : 0;
 
                             return (
-                              <div
+                              <li
                                 key={q.id || qIdx}
-                                className="p-3.5 rounded-2xl bg-base-200 border border-base-300 flex flex-wrap items-center justify-between gap-3 text-xs"
+                                className="py-3 flex flex-wrap items-center justify-between gap-3"
                               >
                                 <div className="space-y-1 max-w-xl">
                                   <div className="flex items-center gap-2">
-                                    <span className="font-bold text-base-content/80">
-                                      Questão {qIdx + 1}
+                                    <span className="text-sm font-bold text-base-content/70">
+                                      {qIdx + 1}.
                                     </span>
                                     <span className="badge badge-success badge-sm font-semibold">
-                                      Gabarito {q.correctOption}
+                                      Resposta certa: {q.correctOption}
                                     </span>
                                   </div>
-                                  <p className="font-medium text-base-content">
+                                  <p className="text-sm font-medium text-base-content">
                                     {q.questionPrompt}
                                   </p>
                                 </div>
 
-                                <div className="flex items-center gap-4 text-right">
-                                  <div>
-                                    <span className="text-xs text-base-content/60 block">Acertos</span>
-                                    <span className="text-sm font-bold text-success">
-                                      {acc}%
-                                    </span>
+                                {votes > 0 ? (
+                                  <div className="flex items-center gap-4 text-right">
+                                    <div>
+                                      <span className="text-xs text-base-content/70 block">Acertos</span>
+                                      <span className="text-base font-bold text-success">{acc}%</span>
+                                    </div>
+                                    <div className="pl-3 border-l border-base-300">
+                                      <span className="text-xs text-base-content/70 block">Respostas</span>
+                                      <span className="text-base font-bold text-base-content">{votes}</span>
+                                    </div>
                                   </div>
-                                  <div className="pl-3 border-l border-base-300">
-                                    <span className="text-xs text-base-content/60 block">Votos</span>
-                                    <span className="text-sm font-bold text-base-content">
-                                      {votes}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
+                                ) : (
+                                  <span className="badge badge-ghost">Sem respostas</span>
+                                )}
+                              </li>
                             );
                           })}
-                        </div>
+                        </ol>
                       </div>
 
                       {/* Respostas individuais dos alunos nesta rodada */}
