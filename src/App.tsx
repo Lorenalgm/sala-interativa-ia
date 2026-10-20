@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navbar, ActiveTab } from './components/Navbar';
+import { LandingPage } from './components/Landing/LandingPage';
 import { LibraryPage } from './components/Library/LibraryPage';
 import { ScriptPage } from './components/Library/ScriptPage';
 import { QuestionFlow } from './components/Conduct/QuestionFlow';
@@ -16,7 +17,14 @@ import {
 import { Classroom, Question, QuestionSessionRecord, ScriptId } from './types';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('library');
+  // A apresentação aparece só na primeira visita; depois o app abre direto na biblioteca
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
+    try {
+      return localStorage.getItem('classplay:visitou') ? 'library' : 'home';
+    } catch {
+      return 'library';
+    }
+  });
   const [activeScriptId, setActiveScriptId] = useState<ScriptId>('quick-question');
   const [classroom, setClassroom] = useState<Classroom>(() => loadClassroom());
   const [questions, setQuestions] = useState<Question[]>(() => loadQuestions());
@@ -36,6 +44,13 @@ export const App: React.FC = () => {
       return;
     }
     setIsRoundInProgress(false);
+    if (activeTab === 'home') {
+      try {
+        localStorage.setItem('classplay:visitou', '1');
+      } catch {
+        // sem armazenamento: a apresentação volta a aparecer na próxima visita
+      }
+    }
     setActiveTab(tab);
   };
 
@@ -59,6 +74,8 @@ export const App: React.FC = () => {
       />
 
       <main className="flex-1">
+        {activeTab === 'home' && <LandingPage onOpenLibrary={() => handleSelectTab('library')} />}
+
         {activeTab === 'library' && (
           <LibraryPage
             onNavigate={handleSelectTab}

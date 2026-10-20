@@ -13,12 +13,12 @@ interface AnswerCardProps {
   className?: string;
 }
 
-// Cartão de resposta impresso: marcador em cima, letra grande embaixo
-export const AnswerCard: React.FC<AnswerCardProps> = ({ letter, className = '' }) => {
+// Corpo do cartão (para usar dentro de outros SVGs): marcador em cima, letra grande embaixo
+export const AnswerCardShape: React.FC<{ letter: 'A' | 'B' | 'C' | 'D' }> = ({ letter }) => {
   const bits = patterns[letter.toLowerCase()];
 
   return (
-    <svg viewBox="0 0 100 140" className={className} aria-hidden="true">
+    <>
       <rect width="100" height="140" rx="7" fill="#ffffff" />
       <g transform="translate(20 13)">
         <rect width="60" height="60" fill="#101820" />
@@ -46,6 +46,13 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ letter, className = '' }
       >
         {letter}
       </text>
-    </svg>
+    </>
   );
 };
+
+// Cartão de resposta impresso, como imagem solta
+export const AnswerCard: React.FC<AnswerCardProps> = ({ letter, className = '' }) => (
+  <svg viewBox="0 0 100 140" className={className} aria-hidden="true">
+    <AnswerCardShape letter={letter} />
+  </svg>
+);
