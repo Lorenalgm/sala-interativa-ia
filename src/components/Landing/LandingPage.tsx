@@ -13,47 +13,29 @@ interface LandingPageProps {
 interface Idea {
   title: string;
   text: string;
-  source: string;
   script?: { id: ScriptId; label: string };
 }
 
-// Cada ideia diz o que a pesquisa mostra e o que o ClassPlay faz com isso, sem prometer resultado
+// Metodologias pelo nome e o benefício de cada uma na aula, sem citar autores nem resultados
 const ideas: Idea[] = [
   {
-    title: 'Revelar o que cada aluno entende',
-    text: 'A avaliação formativa começa por saber o que a turma entende enquanto ainda dá tempo de ajustar a aula. A Pergunta rápida mostra isso em minutos.',
-    source: 'Wiliam e Thompson (2007)',
+    title: 'Avaliação formativa',
+    text: 'Descubra o que a turma entendeu enquanto ainda dá tempo de ajustar a aula. A Pergunta rápida mostra a resposta de cada aluno em poucos minutos.',
     script: { id: 'quick-question', label: 'Abrir Pergunta rápida' },
   },
   {
-    title: 'Usar os alunos como recurso uns dos outros',
-    text: 'Entre as estratégias da avaliação formativa está a ajuda entre colegas. No Grupo com sorteio, o grupo discute e o sistema sorteia quem responde, então todos precisam entender.',
-    source: 'Wiliam e Thompson (2007)',
+    title: 'Aprendizagem em grupo',
+    text: 'O grupo discute a pergunta e o sistema sorteia quem responde. Como qualquer um pode ser sorteado, todos precisam entender.',
     script: { id: 'group-draw', label: 'Abrir Grupo com sorteio' },
   },
   {
-    title: 'Votar, conversar e votar de novo',
-    text: 'Na instrução por pares, a conversa entre colegas rende mais quando o acerto inicial fica entre 35% e 70%. Depois de cada pergunta, o ClassPlay sugere o próximo passo usando essas faixas, e você decide. O roteiro completo chega em breve.',
-    source: 'Crouch e Mazur (2001)',
+    title: 'Instrução por pares',
+    text: 'Os alunos votam, conversam em dupla e votam de novo. Depois de cada pergunta, o ClassPlay sugere o próximo passo pela porcentagem de acertos: retomar a explicação, abrir a discussão ou seguir em frente. Você decide. O roteiro completo chega em breve.',
   },
   {
-    title: 'O papel como interface da sala',
-    text: 'Interfaces em papel já foram estudadas como forma de orquestrar a aula. Aqui, o cartão impresso é a resposta do aluno.',
-    source: 'Cuendet, Bonnard, Kaplan e Dillenbourg (2011)',
+    title: 'Informação na hora',
+    text: 'Enquanto a aula acontece, você vê quem respondeu e quantos escolheram cada letra. Dá para decidir o que fazer em seguida com a turma ainda na sala.',
   },
-  {
-    title: 'Dados em tempo real para quem conduz',
-    text: 'Em um estudo com 286 alunos de 18 turmas, dar ao professor dados em tempo real melhorou a aprendizagem, usando outra ferramenta. A tela do ClassPlay segue a ideia: mostra quem respondeu e quantos escolheram cada letra.',
-    source: 'Holstein, McLaren e Aleven (2018)',
-  },
-];
-
-const references = [
-  'Cuendet, Bonnard, Kaplan e Dillenbourg (2011). CHI.',
-  'Crouch e Mazur (2001). American Journal of Physics.',
-  'Dillenbourg (2013). Computers & Education.',
-  'Holstein, McLaren e Aleven (2018). AIED.',
-  'Wiliam e Thompson (2007).',
 ];
 
 const needs = [
@@ -72,8 +54,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLibrary, onOpenS
             A turma inteira responde. Você vê na hora.
           </h1>
           <p className="text-lg leading-relaxed text-base-content/85 text-pretty">
-            Com datashow, câmera e cartões de papel, você conduz a atividade em tempo real. Os
-            alunos não precisam de celular nem de conta.
+            Os alunos respondem com cartões de papel, a câmera lê todos de uma vez e a tela mostra o
+            resultado. Ninguém precisa de celular nem de conta.
           </p>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
             <button onClick={onOpenLibrary} className="btn btn-primary btn-lg">
@@ -116,23 +98,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLibrary, onOpenS
               id="base-titulo"
               className="font-editorial text-3xl lg:text-4xl font-bold tracking-[-0.015em] leading-[1.1] text-balance"
             >
-              Em que o ClassPlay se apoia
+              Metodologias ativas, prontas para a aula
             </h2>
             <p className="text-lg leading-relaxed text-base-content/85 text-pretty">
-              A ideia que organiza tudo é a orquestração da sala de aula (Dillenbourg, 2013): a
-              tecnologia ajuda o professor a conduzir, em tempo real, atividades individuais, em
-              grupo e com a turma toda. Quem conduz continua sendo você.
+              Aprendizagem ativa é quando o aluno faz algo com o que está aprendendo: responde,
+              discute, explica. O ClassPlay lê as respostas para você usar o tempo da aula na
+              conversa.
             </p>
-            <details className="group text-base">
-              <summary className="cursor-pointer font-bold underline underline-offset-4 decoration-2 w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
-                Ver as referências
-              </summary>
-              <ul className="mt-3 space-y-1.5 text-base-content/80">
-                {references.map((r) => (
-                  <li key={r}>{r}</li>
-                ))}
-              </ul>
-            </details>
           </div>
 
           <ol className="lg:col-span-8 divide-y divide-base-300 border-y border-base-300">
@@ -144,21 +116,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLibrary, onOpenS
                 <p className="text-lg leading-relaxed text-base-content/85 max-w-2xl text-pretty">
                   {idea.text}
                 </p>
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-1.5">
-                  <span className="text-sm font-semibold text-base-content/65">{idea.source}</span>
-                  {idea.script && (
-                    <button
-                      onClick={() => onOpenScript(idea.script!.id)}
-                      className="group inline-flex items-center gap-1.5 font-bold text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary rounded"
-                    >
-                      {idea.script.label}
-                      <ArrowRight
-                        className="w-4 h-4 motion-safe:transition-transform group-hover:translate-x-1"
-                        aria-hidden="true"
-                      />
-                    </button>
-                  )}
-                </div>
+                {idea.script && (
+                  <button
+                    onClick={() => onOpenScript(idea.script!.id)}
+                    className="group inline-flex items-center gap-1.5 font-bold text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary rounded"
+                  >
+                    {idea.script.label}
+                    <ArrowRight
+                      className="w-4 h-4 motion-safe:transition-transform group-hover:translate-x-1"
+                      aria-hidden="true"
+                    />
+                  </button>
+                )}
               </li>
             ))}
           </ol>
@@ -175,7 +144,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenLibrary, onOpenS
             id="primeira-aula"
             className="font-editorial text-3xl lg:text-4xl font-bold tracking-[-0.015em] max-w-xl text-balance"
           >
-            Para a primeira aula, você precisa de
+            O que você precisa para começar
           </h2>
           <ul className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {needs.map((n) => {
