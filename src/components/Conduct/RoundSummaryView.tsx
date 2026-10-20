@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { RoundSession, Student } from '../../types';
 import { Award, BarChart2, RotateCcw, ArrowRight, EyeOff } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { suggestForQuestion } from '../../services/suggestions';
 
 interface RoundSummaryViewProps {
   round: RoundSession;
@@ -103,6 +104,31 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
           )}
         </div>
       </div>
+
+      {/* Sugestões ao final: o que retomar na próxima aula */}
+      {(() => {
+        const items = round.questions.flatMap((q, idx) =>
+          suggestForQuestion(q.correctOption, q.responses)
+            .filter((sg) => sg.id === 'reexplain' || sg.id.startsWith('confusion'))
+            .map((sg) => ({ ...sg, key: `${q.id}-${sg.id}`, label: `Pergunta ${idx + 1}` }))
+        );
+        if (items.length === 0) return null;
+        return (
+          <section className="bg-amber-50 border border-amber-200 rounded-box p-6 space-y-3">
+            <h2 className="text-xl font-bold text-amber-950">Para retomar</h2>
+            <ul className="space-y-3">
+              {items.map((it) => (
+                <li key={it.key}>
+                  <p className="font-semibold text-amber-950">
+                    {it.label}: {it.text}
+                  </p>
+                  <p className="text-sm text-amber-900/80">{it.reason}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })()}
 
       {/* Lista das perguntas da rodada */}
       <section className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 space-y-4">

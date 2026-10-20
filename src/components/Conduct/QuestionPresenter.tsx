@@ -9,6 +9,8 @@ import {
   ScriptId,
   Student,
 } from '../../types';
+import { SuggestionsPanel } from './SuggestionsPanel';
+import { suggestForQuestion } from '../../services/suggestions';
 import { DiscussionTimer, DrawPanel, GroupResultsPanel } from './GroupPanels';
 import { openClassroomCamera } from '../../services/camera';
 import { StableReader } from '../../services/stableReader';
@@ -61,6 +63,8 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [lastDetectedStudent, setLastDetectedStudent] = useState<string | null>(null);
   const [cameraError, setCameraError] = useState(false);
+  // Sugestões ficam escondidas por padrão: a turma vê o datashow e a regra revela a resposta
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [recentId, setRecentId] = useState<number | null>(null);
 
   // Roteiro de grupo: discussão → sorteio → resposta dos sorteados → resultado
@@ -709,6 +713,25 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
             recentId={recentId}
             onCorrect={handleCorrect}
           />
+
+          {isAnswerRevealed && (
+            <div className="no-print space-y-2">
+              <label className="label cursor-pointer justify-start gap-2 py-0">
+                <input
+                  type="checkbox"
+                  className="toggle toggle-sm"
+                  checked={showSuggestions}
+                  onChange={(e) => setShowSuggestions(e.target.checked)}
+                />
+                <span className="label-text text-sm text-base-content/70">Sugestões para o professor</span>
+              </label>
+              {showSuggestions && (
+                <SuggestionsPanel
+                  suggestions={suggestForQuestion(currentQuestion.correctOption, responses)}
+                />
+              )}
+            </div>
+          )}
 
           {isFullscreen && (
             <p className="text-sm text-base-content/70 text-center">
