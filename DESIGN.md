@@ -35,6 +35,24 @@ typography:
     fontWeight: 800
     lineHeight: 1.1
     letterSpacing: "-0.025em"
+  editorial-headline:
+    fontFamily: "Literata Variable, Georgia, serif"
+    fontSize: "clamp(2.25rem, 5vw, 3rem)"
+    fontWeight: 700
+    lineHeight: 1.08
+    letterSpacing: "-0.015em"
+  editorial-section:
+    fontFamily: "Literata Variable, Georgia, serif"
+    fontSize: "clamp(1.875rem, 3vw, 2.25rem)"
+    fontWeight: 700
+    lineHeight: 1.1
+    letterSpacing: "-0.015em"
+  editorial-title:
+    fontFamily: "Literata Variable, Georgia, serif"
+    fontSize: "1.5rem"
+    fontWeight: 700
+    lineHeight: 1.375
+    letterSpacing: "-0.01em"
   body:
     fontFamily: "Atkinson Hyperlegible Next Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.125rem"
@@ -142,15 +160,17 @@ components:
   closing-band:
     backgroundColor: "{colors.teal}"
     textColor: "{colors.page-white}"
-    padding: "48px 56px"
+    rounded: "{rounded.band}"
+    padding: "56px 56px"
   button-closing:
     backgroundColor: "{colors.cover-mustard}"
     textColor: "{colors.ink}"
     rounded: "{rounded.btn}"
   need-tile:
-    backgroundColor: "{colors.teal}"
+    backgroundColor: "rgb(255 255 255 / 0.10)"
     textColor: "{colors.page-white}"
-    size: "48px"
+    rounded: "12px"
+    size: "56px"
   demo-projection:
     backgroundColor: "{colors.teal}"
     textColor: "{colors.page-white}"
@@ -178,11 +198,6 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.band}"
     padding: "36px"
-  practice-row:
-    backgroundColor: "{colors.page-white}"
-    textColor: "{colors.ink}"
-    rounded: "16px"
-    padding: "20px"
   camera-status:
     backgroundColor: "{colors.teal}"
     textColor: "{colors.page-white}"
@@ -202,11 +217,11 @@ O tom é de ferramenta séria e legível de longe. Superfícies são chapadas, s
 **Key Characteristics:**
 - Fundo verde claro como o resto do app; livros de retrato (17rem x 25rem) em grade que cresce, lombada à esquerda, sem prateleira.
 - Um único gesto de movimento: o livro que vira na lombada (0.7s) e a subida escalonada dos livros na entrada.
-- Títulos em Bricolage Grotesque 800, apertados; texto corrido em Atkinson Hyperlegible Next.
+- Títulos do app em Bricolage Grotesque 800, apertados; títulos da landing em Literata 700; texto corrido em Atkinson Hyperlegible Next.
 - Capa em coluna: título, emblema do cartão de resposta no meio (mostra a atividade), objetivo e metadados embaixo. Na página do roteiro, a mesma capa vira o lado esquerdo de um livro aberto.
 - Coluna lateral discreta: painel branco "Antes da aula" e lista quieta "Em breve".
 - Contraste alto e alvos grandes, pensados para projeção e para crianças.
-- Landing: seções que sobem e aparecem uma vez ao entrar na tela, e uma simulação interativa ("Experimente") em que o visitante levanta um cartão e vê a turma de exemplo ser lida.
+- Landing enxuta em quatro seções sem mensagens repetidas: abertura com a cena, simulação ("Levante um cartão"), base pedagógica com referências e uma única faixa petróleo com o que a primeira aula exige. As seções sobem e aparecem uma vez ao entrar na tela.
 
 ## Colors
 
@@ -238,19 +253,23 @@ Paleta de papelaria sobre névoa verde: um teal profundo para estrutura e ação
 ## Typography
 
 **Display Font:** Bricolage Grotesque Variable (com sans-serif do sistema)
+**Editorial Font:** Literata Variable (com Georgia e serifa do sistema), só nos títulos da landing
 **Body Font:** Atkinson Hyperlegible Next Variable (com sans-serif do sistema)
 
-**Character:** Bricolage dá peso e calor de lombada de livro aos títulos; Atkinson, desenhada para leitura difícil, sustenta o texto para quem lê do fundo da sala. Numerais tabulares no corpo.
+**Character:** Bricolage dá peso e calor de lombada de livro aos títulos do app; Literata dá à landing a voz de texto de leitura, de quem explica ao professor; Atkinson, desenhada para leitura difícil, sustenta o texto para quem lê do fundo da sala. Numerais tabulares no corpo.
 
 ### Hierarchy
 - **Display** (800, 1.875rem, 2.25rem em `lg`, 1.02): "Biblioteca de roteiros" e nome do roteiro na página do roteiro (capa à esquerda).
 - **Headline** (800, 2.25rem a 3rem, 1.02): nome do roteiro encabeçando a página do roteiro.
 - **Title** (800, 1.5rem, 1.1): "Etapas" na folha do roteiro; nome do livro na biblioteca em 1.8rem; "Antes da aula" em 1.125rem.
+- **Editorial Headline** (Literata 700, 2.25rem a 3rem, 1.08, -0.015em): só o h1 da landing.
+- **Editorial Section** (Literata 700, 1.875rem a 2.25rem, -0.015em): h2 da landing ("Levante um cartão...", "Em que o ClassPlay se apoia", "Para a primeira aula...").
+- **Editorial Title** (Literata 700, 1.5rem, -0.01em): título de cada uma das cinco ideias da base pedagógica.
 - **Body** (400, 1rem a 1.25rem): linha de apoio do cabeçalho (1rem, a 75%), objetivo na capa da página do roteiro (1.25rem), etapas (1.125rem), itens do painel (1rem, 600). Objetivo do livro na biblioteca em 0.875rem. Parágrafos com `text-wrap: pretty`, títulos com `balance`.
 - **Label** (600-800, 0.875rem a 1rem): minutos, formato, pílulas de filtro e suas contagens, "Em breve" (0.875rem), nomes dos itens futuros (0.875rem, 600).
 
 ### Named Rules
-**A Regra dos Dois Papéis.** Bricolage só para títulos e nomes; Atkinson para todo o resto. Nenhuma terceira família.
+**A Regra dos Três Papéis.** Literata (`font-editorial`) só para os títulos h1, h2 e h3 da landing; Bricolage para a interface do app, nomes de livros e os títulos da simulação e das necessidades; Atkinson para todo o resto. Nenhuma quarta família, e Literata não sai da landing.
 
 ## Layout
 
@@ -260,7 +279,9 @@ Abaixo, uma grade de duas partes (lacuna 2rem, alinhada ao topo): a estante e um
 
 A página do roteiro é um livro aberto de até 72rem (`max-w-6xl`): duas colunas iguais a partir de `lg`, altura mínima `min(34rem, 100dvh - 11rem)` para caber numa viewport de desktop; empilhada abaixo de `lg`, capa em cima. À esquerda a capa de tecido (nome, objetivo, minutos, formato, etapas e emblema grande centralizado); à direita a folha branca com Etapas, Material e a ação "Preparar aula" alinhada à direita no pé. A barra de navegação é fixa no topo (4rem), com rótulos ocultos abaixo de `sm`.
 
-A landing (exibida só na primeira visita; a marca na barra volta a ela) usa o mesmo contêiner de 80rem, com 7rem entre seções (`space-y-28`). Abertura em 12 colunas a partir de `lg`: título, frase de apoio e botão em 5 colunas à esquerda, cena em 7 à direita, alinhadas ao centro; abaixo, três legendas numeradas em linha a partir de `md`. Depois, "Experimente" (simulação em 12 colunas a partir de `lg`: projeção em 7, painel branco do visitante em 5, lacuna de 1.5rem a 2rem), "O que muda na sua aula" (título em 4 colunas, lista de definição em 8, separada por filetes de névoa, linhas de padding vertical 2rem), "Aprendizagem ativa, em poucas palavras" (mesma divisão 4/8, com roteiros em linhas clicáveis) e "O que você precisa" (três colunas), e por fim a faixa de fechamento.
+Regra de conteúdo da landing: citar o que a pesquisa mostra e o que o ClassPlay faz, sem afirmar resultados do próprio ClassPlay.
+
+A landing (exibida só na primeira visita; a marca na barra volta a ela) usa o mesmo contêiner de 80rem, com 6rem entre seções (`space-y-24`) e quatro seções. Abertura em 12 colunas a partir de `lg`: título, um parágrafo, botão e o link "Experimente agora" em 5 colunas à esquerda, cena em 7 à direita, alinhadas ao centro. Depois, "Levante um cartão e veja a turma responder" (simulação em 12 colunas a partir de `lg`: projeção em 7, painel branco do visitante em 5, lacuna de 1.5rem a 2rem). Depois, "Em que o ClassPlay se apoia" em 12 colunas (lacuna 2.5rem a 4rem): à esquerda, em 4, título, parágrafo sobre orquestração da sala e `<details>` "Ver as referências"; à direita, em 8, lista numerada de cinco ideias separadas por filetes de névoa (padding vertical 2rem). Por fim, a única faixa petróleo, "Para a primeira aula, você precisa de", com três necessidades em três colunas.
 
 Na condução, a lista de perguntas (QuestionFlow) é uma grade de 1 coluna que passa a 2 a partir de `lg`, lacuna de 0.75rem, cartões de padding 1rem, alinhados ao topo.
 
@@ -307,19 +328,15 @@ Painel branco (`base-100`), borda de névoa de 1px, raio 20px, padding 1.25rem, 
 Sob o painel, sem cartão: título "Em breve" (0.875rem bold, a 70%) e itens pequenos com borda tracejada de 1px na cor névoa, raio 8px, padding 0.5rem 0.75rem. Cada item leva um marcador de livro tracejado (1.5rem x 2rem, borda de 2px a 35%), o nome (0.875rem 600) e os minutos a 65%. Sem interação; o objetivo aparece como `title`.
 
 ### Navegação
-Barra petróleo fixa, borda inferior branca a 15%. Marca ClassPlay em Bricolage 800 com três barras (mostarda, vermelha, branca) que sobem 2px no hover; a marca leva à landing. Só três itens em pílula: Biblioteca, Turma e Desempenho; ativo em branco com texto petróleo e `aria-current="page"`; inativos fantasmas a 85% de branco com hover a 10%. À direita, o estado da câmera é um botão em pílula ("Testar câmera" / "Câmera ligada", rótulo oculto abaixo de `sm`) que abre o teste da câmera: fundo branco a 10% com borda branca a 25% (branco com texto petróleo quando a tela do teste está ativa) e um ponto de 8px, mostarda com a câmera desligada e verde (`success`) com ela ligada. Cartões e teste da câmera também se alcançam pela lateral da biblioteca e pela Turma.
+Barra petróleo fixa, borda inferior branca a 15%. Marca ClassPlay em Bricolage 800 com três barras (mostarda, vermelha, branca) que sobem 2px no hover; a marca também leva à landing. Quatro itens em pílula, com ícone: Início (ícone Home, abre a landing), Biblioteca, Turma e Desempenho; ativo em branco com texto petróleo e `aria-current="page"`; inativos fantasmas a 85% de branco com hover a 10%. À direita, o estado da câmera é um botão em pílula ("Testar câmera" / "Câmera ligada", rótulo oculto abaixo de `sm`) que abre o teste da câmera: fundo branco a 10% com borda branca a 25% (branco com texto petróleo quando a tela do teste está ativa) e um ponto de 8px, mostarda com a câmera desligada e verde (`success`) com ela ligada. Cartões e teste da câmera também se alcançam pela lateral da biblioteca e pela Turma.
 
 ### Landing: cena da sala (componente assinatura)
 Ilustração SVG fornecida pela equipe (`src/assets/sala-classplay.svg`, viewBox 1200x664), com as cores do sistema aplicadas e inserida inline por `ClassroomScene.tsx` para usar as fontes da página. Fica à direita do título, num painel de 28px de raio com filete de 1px na borda da névoa. Mostra a professora ao lado do quadro com a pergunta (barras no lugar do texto), o datashow no teto com o feixe em mostarda, a câmera com o cone de leitura tracejado, e alunos sentados levantando cartões com marcador e etiquetas "#NN ✓"; o cartão ainda não lido tem contorno tracejado. Piso e paredes em tons da névoa, camisas em petróleo, vermelho, tinta e mostarda. O feixe e o cone usam degradê só como luz, nunca como preenchimento de interface. `role="img"` e `aria-label` vêm do próprio SVG. Sem sombras.
 
 ### Landing: seções de apoio
-- **Legendas numeradas:** círculo petróleo de 2rem com número em Bricolage, texto em 1.125rem.
-- **O que muda:** lista de definição entre filetes de 1px na névoa; termo em Bricolage 800 (1.25rem), descrição em Atkinson 1.125rem a 85%. Linhas de padding vertical 2rem (`py-8`) que ganham fundo branco no hover (raio 16px, transição de cor só com movimento permitido). Sem cartões.
-- **Roteiros (linhas clicáveis):** cada prática é uma linha de largura inteira, papel branco com borda de névoa (raio 16px, padding 1.25rem), mini-livro, título em Bricolage, texto e seta petróleo à direita. Hover: borda petróleo, o mini-livro sobe e inclina (-0.25rem, -3 graus) e a seta desliza 0.25rem; foco-visível com contorno petróleo de 4px. Abre a página do roteiro. A linha "em breve" não é interativa: sem borda nem fundo, a 60% de opacidade.
-- **Mini-livro:** livro fechado de 3.5rem x 4.75rem com capa de tecido na cor do roteiro, lombada de 0.5rem e apoio próprio; a 70% de opacidade quando o roteiro é "em breve". Ao lado, título em Bricolage e texto.
+- **Base pedagógica ("Em que o ClassPlay se apoia"):** coluna esquerda com título Literata, parágrafo em 1.125rem a 85% e `<details>` nativo "Ver as referências" (sumário em negrito sublinhado, lista a 80%). Coluna direita: lista numerada entre filetes de 1px na névoa (`divide-y` e filetes no topo e na base), cada ideia com título Literata 700 (1.5rem), parágrafo em 1.125rem a 85% (máx. 42rem), linha de citação (0.875rem 600, a 65%) e, em duas delas, uma ação em texto petróleo em negrito com seta ("Abrir Pergunta rápida", "Abrir Grupo com sorteio") que abre o roteiro; a seta desliza 0.25rem no hover, só com movimento permitido. Sem cartões, sem fundos.
 - **Entrada das seções (`Reveal`):** cada seção abaixo da abertura sobe 28px e aparece (opacidade) uma única vez ao entrar na tela (limiar 15%), 0.8s `cubic-bezier(0.16, 1, 0.3, 1)`. Sem efeito sob `prefers-reduced-motion: reduce`, e sem `IntersectionObserver` aparece direto.
-- **O que você precisa:** três blocos de ícone petróleo de 3rem (raio 12px, ícone branco de 1.5rem) com título e linha de apoio, sem cartão.
-- **Faixa de fechamento:** única faixa petróleo da página, raio 28px, título em Display e botão mostarda "Abrir a biblioteca" com seta. O botão do topo é petróleo.
+- **Faixa "Para a primeira aula, você precisa de":** única faixa petróleo da página, raio 28px, padding 3.5rem a 3.5rem lateral, título Literata. Três necessidades em linha: bloco de ícone de 3.5rem (raio 12px) translúcido, preenchimento branco a 10% com anel de 1px branco a 35%, ícone branco de 1.75rem; título em Bricolage 800 (1.25rem) e apoio em 1.125rem a 85%. Embaixo, a linha de privacidade dos dados (1rem, a 80%) e o botão mostarda "Abrir a biblioteca" com seta. O botão do topo é petróleo.
 
 ### Landing: simulação "Experimente" (componente assinatura)
 Duas metades, rotuladas como simulação com turma de exemplo ("Na aula, a câmera lê os cartões de papel de verdade").
@@ -339,7 +356,7 @@ Cartões de padding 1rem, raio 16px, borda de névoa; selecionado fica opaco com
 ### Do:
 - **Do** mostrar a aula antes de explicá-la na landing: ilustração da sala num painel com filete, com cartões levantados e etiquetas de leitura.
 - **Do** reutilizar `AnswerCardShape` para qualquer cartão desenhado dentro de outro SVG do app, para que o cartão seja o mesmo em todo o app.
-- **Do** manter a navegação com três destinos (Biblioteca, Turma, Desempenho) e o estado da câmera como botão que leva ao teste.
+- **Do** manter a navegação com quatro destinos (Início, Biblioteca, Turma, Desempenho) e o estado da câmera como botão que leva ao teste.
 - **Do** manter a biblioteca sobre a névoa verde (#e8f0ee), como as demais telas, e pousar objetos coloridos (livros) sobre ela.
 - **Do** dar a todo livro lombada à esquerda com dois frisos, cantos 2px/12px e camadas de profundidade em `translateZ`.
 - **Do** usar texto tinta (#101820) sobre mostarda e branco sobre vermelho e petróleo.
@@ -351,12 +368,14 @@ Cartões de padding 1rem, raio 16px, borda de névoa; selecionado fica opaco com
 - **Do** deixar a grade crescer com o acervo (colunas `auto-fill` de 17rem) e manter o cabeçalho compacto.
 - **Do** deixar a landing mostrar o fluxo funcionando (levantar o cartão, a câmera ler, a projeção contar) em simulação rotulada como exemplo.
 - **Do** fazer cada seção da landing subir uma única vez ao entrar na tela, e desligar o movimento sob `prefers-reduced-motion`.
-- **Do** tornar roteiros disponíveis linhas inteiras clicáveis (borda de névoa, hover petróleo) e manter o "em breve" sem interação.
+- **Do** dizer cada mensagem uma só vez na landing, citando o que a pesquisa mostra e o que o ClassPlay faz.
+- **Do** abrir roteiros a partir das ideias da base pedagógica por ação em texto, não por cartão.
 - **Do** manter itens futuros pequenos, tracejados e na lateral, abaixo do painel de preparo.
 
 ### Don't:
-- **Don't** repetir a faixa petróleo ou o botão mostarda fora do fechamento da landing (a única exceção é a projeção da simulação, que é a tela do datashow e não uma faixa de seção), nem usar grade de cartões com ícone para benefícios: a landing usa lista de definição entre filetes.
-- **Don't** pôr sombra na cena da landing; só os mini-livros e os cartões pousados têm apoio.
+- **Don't** repetir a faixa petróleo ou o botão mostarda fora do fechamento da landing (a única exceção é a projeção da simulação, que é a tela do datashow e não uma faixa de seção), nem usar grade de cartões para benefícios: a base pedagógica usa lista numerada entre filetes.
+- **Don't** pôr sombra na cena da landing; só os cartões pousados têm apoio.
+- **Don't** usar Literata fora dos títulos da landing, nem afirmar na landing resultados que o próprio ClassPlay produziria.
 - **Don't** usar simbologia de jogo de azar (ficha, feltro, bingo, dado, baralho); o tom é de ferramenta séria. O cartão de resposta de papel é o próprio instrumento da aula e pode aparecer, sempre como cartão branco com marcador e letra.
 - **Don't** voltar ao campo petróleo escuro, à classe `.desk`, ao cabeçalho com parágrafo de apresentação nem à tábua da estante.
 - **Don't** voltar a livros "em breve" como livros de contorno na grade; eles são itens pequenos na lateral.
