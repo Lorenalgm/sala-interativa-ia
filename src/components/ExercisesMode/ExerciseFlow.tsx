@@ -59,10 +59,10 @@ export const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 tracking-tight">
-            Catálogo de exercícios com inteligência artificial
+            Catálogo de exercícios
           </h1>
           <p className="text-sm text-zinc-600 mt-1">
-            Escolha uma postura para projetar no datashow e desafiar a turma a replicar ao vivo.
+            Escolha uma postura, projete no datashow e peça para a turma imitar.
           </p>
         </div>
 

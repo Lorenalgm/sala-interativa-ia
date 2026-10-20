@@ -147,7 +147,7 @@ export function evaluatePose(landmarks: PoseLandmark[], exerciseType: PoseType):
         return {
           isMatch: true,
           score: 100,
-          feedback: 'Braço direito erguido com sucesso.',
+          feedback: 'Braço direito erguido. Segure a posição.',
         };
       } else if (!rightUp) {
         return {

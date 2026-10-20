@@ -29,7 +29,7 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
               Impressão dos cartões de resposta
             </h1>
             <p className="text-sm text-zinc-600 mt-1">
-              Cartões com letras discretas nas bordas para preservar a privacidade do voto de cada aluno em sala.
+              As letras ficam pequenas nas bordas, assim quem está ao lado não vê o voto do colega.
             </p>
           </div>
 
@@ -70,7 +70,7 @@ export const CardPrintView: React.FC<CardPrintViewProps> = ({ students }) => {
         <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs text-amber-900">
           <Info className="w-4 h-4 flex-shrink-0 text-amber-600 mt-0.5" />
           <span className="leading-relaxed">
-            As letras A, B, C e D foram posicionadas de forma sutil em cada borda. Cada letra fica voltada para o aluno na posição correta de leitura ao virar aquele lado para cima.
+            Cada borda tem uma letra (A, B, C ou D). O aluno gira o cartão até a letra escolhida ficar em cima, já na posição de leitura.
           </span>
         </div>
       </div>

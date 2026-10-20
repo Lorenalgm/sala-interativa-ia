@@ -36,11 +36,11 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-950 tracking-tight leading-tight">
-            Interação em sala com apenas datashow e uma câmera.
+            Aula interativa com um datashow e uma câmera.
           </h1>
 
           <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
-            Selecione uma modalidade para começar. Os alunos participam usando cartões físicos ou movimentação corporal, sem necessidade de celulares ou tablets individuais.
+            Escolha uma atividade para começar. Os alunos participam com cartões de papel ou com o próprio corpo, sem precisar de celular ou tablet.
           </p>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -85,7 +85,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
 
             <p className="text-zinc-600 text-sm leading-relaxed">
-              Cada estudante ergue seu cartão fiducial com a alternativa desejada para cima. A câmera capta toda a turma e o datashow exibe quem respondeu sem revelar o gabarito.
+              Cada aluno levanta o cartão com a letra escolhida virada para cima. A câmera lê a turma inteira e o datashow mostra quem já respondeu, sem revelar o gabarito.
             </p>
 
             <div className="flex items-center gap-4 text-xs text-zinc-500 pt-2 border-t border-zinc-100">
@@ -131,7 +131,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             </div>
 
             <p className="text-zinc-600 text-sm leading-relaxed">
-              Atividades físicas e dinâmicas avaliadas pela postura corporal em tempo real. A inteligência artificial detecta articulações e orienta a turma com retorno instantâneo.
+              A câmera acompanha a postura dos alunos em tempo real, encontra as articulações e mostra na hora se o movimento está certo.
             </p>
 
             <div className="flex items-center gap-4 text-xs text-zinc-500 pt-2 border-t border-zinc-100">
@@ -167,7 +167,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               Imprimir cartões
             </h3>
             <p className="text-xs text-zinc-500">
-              Folhas A4 prontas com marcadores fiduciais.
+              Folhas A4 com os marcadores prontos para imprimir.
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-zinc-100 group-hover:bg-amber-100 flex items-center justify-center text-zinc-700 group-hover:text-amber-800 transition-colors">

@@ -106,7 +106,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
             Histórico das sessões de aula
           </h1>
           <p className="text-sm text-zinc-600 mt-1">
-            Aproveitamento consolidado e agrupado por cada rodada de perguntas aplicada à turma.
+            Acertos da turma em cada rodada de perguntas.
           </p>
         </div>
 
@@ -197,7 +197,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
               Nenhuma rodada foi concluída ainda
             </h3>
             <p className="text-xs text-zinc-500 max-w-sm mx-auto">
-              Selecione as perguntas no modo perguntas e finalize a rodada para que o desempenho apareça agrupado aqui.
+              Escolha as perguntas no modo Perguntas e encerre a rodada. O resultado aparece aqui.
             </p>
           </div>
         ) : (

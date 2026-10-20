@@ -1,14 +1,14 @@
-# ClassPlay — Sala interativa com IA
+# ClassPlay: sala interativa com IA
 
-Aplicação web para sala de aula interativa que usa visão computacional no navegador do professor. Os alunos respondem perguntas levantando cartões com marcadores impressos e fazem exercícios físicos com feedback de postura em tempo real, tudo pela webcam e sem servidor.
+Aplicação web para aulas interativas com um datashow e uma webcam. Os alunos respondem perguntas levantando cartões impressos e fazem exercícios enquanto a câmera avalia a postura. A visão computacional roda no navegador do professor, sem servidor.
 
 ## Funcionalidades
 
-- **Modo Perguntas**: o professor apresenta uma pergunta de múltipla escolha e a câmera lê os cartões dos alunos. Cada marcador identifica o aluno, e a rotação do cartão indica a alternativa escolhida (A, B, C ou D).
-- **Modo Exercícios**: detecção de pose corporal com MediaPipe Pose, com feedback sobre a execução dos movimentos.
-- **Gerador de cartões**: gera os cartões com marcadores de cada aluno, prontos para impressão.
-- **Gestão da turma**: cadastro e edição dos alunos.
-- **Relatórios**: histórico das rodadas e desempenho por aluno.
+- Modo Perguntas: o professor projeta uma pergunta de múltipla escolha e a câmera lê os cartões. O marcador identifica o aluno, e a rotação do cartão indica a alternativa (A, B, C ou D).
+- Modo Exercícios: o MediaPipe Pose detecta a postura de quem está na frente da câmera e diz se o movimento está certo.
+- Cartões: gera os cartões de cada aluno para imprimir.
+- Turma: cadastro e edição dos alunos.
+- Relatórios: histórico das rodadas e acertos por aluno.
 
 Os dados (turma, perguntas e histórico) ficam salvos no `localStorage` do navegador.
 

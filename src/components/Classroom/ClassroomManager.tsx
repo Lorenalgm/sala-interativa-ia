@@ -69,7 +69,7 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
             Alunos e cartões cadastrados
           </h1>
           <p className="text-sm text-zinc-600 mt-1">
-            Cada aluno possui um número de cartão exclusivo correspondente ao marcador fiducial ArUco.
+            Cada aluno tem um número de cartão, ligado a um marcador ArUco só dele.
           </p>
         </div>
 
@@ -123,7 +123,7 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
           </form>
 
           <div className="p-3.5 rounded-xl bg-stone-50 border border-zinc-200/80 text-xs text-zinc-600 leading-relaxed">
-            Ao adicionar um estudante, o sistema associa o próximo código fiducial automaticamente. Não é preciso reconfigurar os cartões já impressos.
+            Quem entra na turma recebe o próximo código livre, e os cartões já impressos continuam valendo.
           </div>
         </div>
 

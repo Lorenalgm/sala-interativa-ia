@@ -267,7 +267,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
         : options[Math.floor(Math.random() * options.length)];
     });
     setResponses(simulated);
-    setLastDetectedStudent('Respostas da turma simuladas com sucesso');
+    setLastDetectedStudent('Respostas da turma simuladas');
   };
 
   const toggleFullscreen = () => {
@@ -385,7 +385,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
           <button
             onClick={handleSimulateQuickAnswers}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 border border-zinc-200 text-zinc-800 text-xs font-semibold"
-            title="Simula respostas automáticas dos alunos"
+            title="Simula as respostas dos alunos"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span className="hidden sm:inline">Simular</span>

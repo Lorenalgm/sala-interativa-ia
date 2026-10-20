@@ -376,7 +376,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
           <button
             onClick={handleSimulatePose}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-xs font-semibold transition-colors"
-            title="Demonstra a validação da pose sem necessidade de movimentação"
+            title="Simula uma pose correta sem ninguém se mexer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-600" />
             <span>Simular pose</span>
@@ -438,7 +438,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
         <div className="lg:col-span-7 bg-white border border-zinc-200 rounded-3xl p-5 shadow-sm flex flex-col items-center">
           <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-zinc-100 text-xs">
             <span className="font-bold text-zinc-950">
-              Projeção da câmera e rastreamento anatômico
+              Câmera e pontos do corpo
             </span>
             <span className="text-xs text-zinc-500 font-medium">
               Alvo: {currentExercise.targetDurationSeconds} segundos contínuos
@@ -458,7 +458,7 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
                     Câmera desconectada
                   </h3>
                   <p className="text-xs text-zinc-400 max-w-sm mt-1">
-                    Conecte a câmera do professor ou utilize a simulação para ver a validação anatômica.
+                    Conecte a câmera ou use a simulação para ver como a pose é avaliada.
                   </p>
                 </div>
                 <button

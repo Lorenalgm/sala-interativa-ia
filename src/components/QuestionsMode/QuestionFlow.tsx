@@ -328,7 +328,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                 type="text"
                 value={explanation}
                 onChange={(e) => setExplanation(e.target.value)}
-                placeholder="Explicação pedagógica"
+                placeholder="Explicação da resposta (opcional)"
                 className="w-full px-3 py-2 bg-stone-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-none focus:border-zinc-950"
               />
             </div>
@@ -375,7 +375,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
         </div>
 
         <span className="text-xs text-zinc-400">
-          Por padrão apenas os enunciados são exibidos para manter a tela limpa
+          Por padrão a lista mostra só os enunciados
         </span>
       </div>
 

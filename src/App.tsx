@@ -89,7 +89,7 @@ export const App: React.FC = () => {
 
       <footer className="no-print border-t border-zinc-200/80 bg-white py-6 px-6 text-center text-xs text-zinc-500">
         <p>
-          ClassPlay. Processamento de visão computacional em tempo real no navegador do professor.
+          ClassPlay. A visão computacional roda em tempo real no navegador do professor.
         </p>
       </footer>
     </div>
