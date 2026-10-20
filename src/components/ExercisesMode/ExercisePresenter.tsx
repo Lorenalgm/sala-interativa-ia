@@ -20,11 +20,13 @@ import confetti from 'canvas-confetti';
 interface ExercisePresenterProps {
   exercises: Exercise[];
   onCameraStatusChange?: (active: boolean) => void;
+  autoFullscreen?: boolean;
 }
 
 export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
   exercises,
   onCameraStatusChange,
+  autoFullscreen = false,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -325,6 +327,13 @@ export const ExercisePresenter: React.FC<ExercisePresenterProps> = ({
 
   const goPrev = () => setCurrentIndex((p) => Math.max(0, p - 1));
   const goNext = () => setCurrentIndex((p) => Math.min(exercises.length - 1, p + 1));
+
+  // Abre direto em tela cheia: a turma vê só o conteúdo, sem os controles do professor
+  useEffect(() => {
+    if (autoFullscreen && containerRef.current && !document.fullscreenElement) {
+      containerRef.current.requestFullscreen().catch(() => {});
+    }
+  }, []);
 
   // Mantém o estado de tela cheia em sincronia quando o professor sai com Esc
   useEffect(() => {

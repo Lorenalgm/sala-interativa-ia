@@ -22,6 +22,7 @@ interface QuestionPresenterProps {
   onSessionComplete?: () => void;
   onCameraStatusChange?: (active: boolean) => void;
   onFinishRound?: (round: RoundSession) => void;
+  autoFullscreen?: boolean;
 }
 
 export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
@@ -30,6 +31,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
   onSessionComplete,
   onCameraStatusChange,
   onFinishRound,
+  autoFullscreen = false,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
@@ -54,6 +56,13 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
   const currentQuestion = questions[currentIndex] || questions[0];
   const isLastQuestion = currentIndex === questions.length - 1;
+
+  // Abre direto em tela cheia: a turma vê só o conteúdo, sem os controles do professor
+  useEffect(() => {
+    if (autoFullscreen && containerRef.current && !document.fullscreenElement) {
+      containerRef.current.requestFullscreen().catch(() => {});
+    }
+  }, []);
 
   // Inicia detector e câmera automaticamente ao abrir
   useEffect(() => {

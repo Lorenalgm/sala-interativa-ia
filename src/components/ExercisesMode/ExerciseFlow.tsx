@@ -44,6 +44,7 @@ export const ExerciseFlow: React.FC<ExerciseFlowProps> = ({
             ...exercises.filter((e) => e.id !== selectedExercise.id),
           ]}
           onCameraStatusChange={onCameraStatusChange}
+          autoFullscreen
         />
       </div>
     );

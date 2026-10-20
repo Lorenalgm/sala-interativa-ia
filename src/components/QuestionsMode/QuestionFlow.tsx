@@ -183,6 +183,7 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
           onSessionComplete={onSessionComplete}
           onCameraStatusChange={onCameraStatusChange}
           onFinishRound={handleFinishRound}
+          autoFullscreen
         />
       </div>
     );
