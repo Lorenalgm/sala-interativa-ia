@@ -1,5 +1,4 @@
 import React from 'react';
-import { Suit } from './Library/Suit';
 import {
   Library,
   Printer,
@@ -36,9 +35,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => onSelectTab('library')}
           className="btn btn-ghost px-2 gap-2 text-2xl font-display font-extrabold tracking-tight text-primary-content hover:bg-white/10 group"
         >
-          <span className="flex items-center gap-0.5 text-secondary" aria-hidden="true">
-            <Suit shape="circle" className="w-2.5 h-2.5" />
-            <Suit shape="diamond" className="w-3 h-3 text-accent-content/90 group-hover:rotate-45 transition-transform" />
+          <span className="flex items-end gap-0.5" aria-hidden="true">
+            <span className="w-1.5 h-3.5 rounded-sm bg-secondary" />
+            <span className="w-1.5 h-4 rounded-sm bg-accent group-hover:-translate-y-0.5 transition-transform" />
+            <span className="w-1.5 h-3 rounded-sm bg-white" />
           </span>
           ClassPlay
         </button>
