@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Clock, Printer, Users } from 'lucide-react';
+import { ArrowRight, Camera, Clock, Printer, Users } from 'lucide-react';
 import { ActiveTab } from '../Navbar';
 import { scripts } from '../../data/scripts';
 import { ScriptId } from '../../types';
@@ -8,14 +8,12 @@ interface LibraryPageProps {
   onNavigate: (tab: ActiveTab) => void;
   onOpenScript: (id: ScriptId) => void;
   studentsCount: number;
-  roundsCount: number;
 }
 
 export const LibraryPage: React.FC<LibraryPageProps> = ({
   onNavigate,
   onOpenScript,
   studentsCount,
-  roundsCount,
 }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
@@ -122,8 +120,9 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({
                 <strong className="font-bold">Posicione a câmera.</strong> Ela precisa enxergar a
                 turma toda, de frente e com a sala iluminada.
               </p>
-              <button onClick={() => onNavigate('reports')} className="btn btn-sm btn-ghost">
-                {roundsCount === 0 ? 'Desempenho' : `Desempenho (${roundsCount})`}
+              <button onClick={() => onNavigate('camera')} className="btn btn-sm">
+                <Camera className="w-4 h-4" />
+                Testar câmera
               </button>
             </div>
           </li>

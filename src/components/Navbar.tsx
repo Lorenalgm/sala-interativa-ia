@@ -7,7 +7,7 @@ import {
   Camera,
 } from 'lucide-react';
 
-export type ActiveTab = 'library' | 'script' | 'prepare' | 'cards' | 'classroom' | 'reports';
+export type ActiveTab = 'library' | 'script' | 'prepare' | 'cards' | 'camera' | 'classroom' | 'reports';
 
 interface NavbarProps {
   activeTab: ActiveTab;
@@ -23,6 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navItems = [
     { id: 'library' as ActiveTab, label: 'Biblioteca', icon: Library },
     { id: 'cards' as ActiveTab, label: 'Cartões', icon: Printer },
+    { id: 'camera' as ActiveTab, label: 'Teste da câmera', icon: Camera },
     { id: 'classroom' as ActiveTab, label: 'Turma', icon: Users },
     { id: 'reports' as ActiveTab, label: 'Desempenho', icon: BarChart2 },
   ];

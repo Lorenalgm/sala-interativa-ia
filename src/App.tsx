@@ -3,6 +3,7 @@ import { Navbar, ActiveTab } from './components/Navbar';
 import { LibraryPage } from './components/Library/LibraryPage';
 import { ScriptPage } from './components/Library/ScriptPage';
 import { QuestionFlow } from './components/Conduct/QuestionFlow';
+import { CameraTest } from './components/Camera/CameraTest';
 import { CardPrintView } from './components/CardGenerator/CardPrintView';
 import { ClassroomManager } from './components/Classroom/ClassroomManager';
 import { PerformanceSummary } from './components/Reports/PerformanceSummary';
@@ -11,7 +12,6 @@ import {
   loadClassroom,
   loadQuestionHistory,
   loadQuestions,
-  loadRoundHistory,
 } from './services/storageService';
 import { Classroom, Question, QuestionSessionRecord, ScriptId } from './types';
 
@@ -67,7 +67,6 @@ export const App: React.FC = () => {
               setActiveTab('script');
             }}
             studentsCount={classroom.students.length}
-            roundsCount={loadRoundHistory().length}
           />
         )}
 
@@ -90,6 +89,10 @@ export const App: React.FC = () => {
             onNavigateToReports={() => handleSelectTab('reports')}
             onRoundProgressChange={setIsRoundInProgress}
           />
+        )}
+
+        {activeTab === 'camera' && (
+          <CameraTest students={classroom.students} onCameraStatusChange={setCameraActive} />
         )}
 
         {activeTab === 'cards' && (
