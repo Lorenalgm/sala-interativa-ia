@@ -79,6 +79,8 @@ export const App: React.FC = () => {
         {activeTab === 'home' && (
           <LandingPage
             onOpenLibrary={() => handleSelectTab('library')}
+            onOpenQuestions={() => handleSelectTab('questions')}
+            onOpenReports={() => handleSelectTab('reports')}
             onOpenScript={(id) => {
               setActiveScriptId(id);
               handleSelectTab('script');

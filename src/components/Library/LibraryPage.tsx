@@ -11,21 +11,25 @@ interface LibraryPageProps {
   studentsCount: number;
 }
 
-// Livro de roteiro: camadas em profundidade; vira na lombada ao receber foco
-const ScriptBook: React.FC<{
+// Livro de roteiro: camadas em profundidade; vira na lombada ao receber foco.
+// Na estante ele sobe para a mesa; na landing ele gira na lombada ao trocar de roteiro.
+export const ScriptBook: React.FC<{
   script: ActiveScript;
-  index: number;
+  index?: number;
+  entrance?: 'shelve' | 'turn';
   onOpen: () => void;
-}> = ({ script, index, onOpen }) => {
+}> = ({ script, index = 0, entrance = 'shelve', onOpen }) => {
   const binding = bindingFor(script.id);
 
   return (
     <button
       onClick={onOpen}
       style={{ '--i': index } as React.CSSProperties}
-      className="book-btn shelve group w-[17rem] h-[25rem] text-left rounded-xl"
+      aria-label={`Abrir ${script.name}`}
+      className={`book-btn ${entrance === 'shelve' ? 'shelve' : ''} group w-[17rem] h-[25rem] text-left rounded-xl`}
     >
       <span className="book-stage block h-full">
+        <span className={`block w-full h-full ${entrance === 'turn' ? 'turn-in' : ''}`}>
         <span className="book relative block w-full h-full">
           {/* Contracapa e bloco de páginas, recuados em profundidade */}
           <span
@@ -66,6 +70,7 @@ const ScriptBook: React.FC<{
               </span>
             </span>
           </span>
+        </span>
         </span>
       </span>
     </button>

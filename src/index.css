@@ -32,6 +32,10 @@
     perspective: 1600px;
   }
 
+  .turn-in {
+    transform-style: preserve-3d;
+  }
+
   .book {
     transform-style: preserve-3d;
     transform-origin: left center;
@@ -91,6 +95,20 @@
   .shelve {
     animation: shelve 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-delay: calc(var(--i, 0) * 120ms);
+  }
+
+  /* Landing: ao trocar de roteiro, o livro novo chega girando na lombada */
+  @keyframes turn-in {
+    from {
+      opacity: 0;
+      transform: rotateY(-70deg);
+    }
+  }
+
+  .turn-in {
+    transform-style: preserve-3d;
+    transform-origin: left center;
+    animation: turn-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 }
 
