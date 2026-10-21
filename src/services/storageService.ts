@@ -121,6 +121,12 @@ export function addQuestion(question: Question): void {
   saveQuestions(questions);
 }
 
+// Troca uma pergunta existente pela versão editada, na mesma posição
+export function updateQuestion(question: Question): void {
+  const questions = loadQuestions().map((q) => (q.id === question.id ? question : q));
+  saveQuestions(questions);
+}
+
 // Exclui uma pergunta
 export function deleteQuestion(questionId: string): void {
   const questions = loadQuestions();

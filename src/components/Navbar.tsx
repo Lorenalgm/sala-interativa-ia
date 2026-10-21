@@ -1,7 +1,7 @@
 import React from 'react';
-import { Home, Library, BarChart2, Users, Camera } from 'lucide-react';
+import { Home, Library, BarChart2, Users, Camera, ListChecks } from 'lucide-react';
 
-export type ActiveTab = 'home' | 'library' | 'script' | 'prepare' | 'cards' | 'camera' | 'classroom' | 'reports';
+export type ActiveTab = 'home' | 'library' | 'script' | 'prepare' | 'cards' | 'camera' | 'classroom' | 'reports' | 'questions';
 
 interface NavbarProps {
   activeTab: ActiveTab;
@@ -17,6 +17,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navItems = [
     { id: 'home' as ActiveTab, label: 'Início', icon: Home },
     { id: 'library' as ActiveTab, label: 'Biblioteca', icon: Library },
+    { id: 'questions' as ActiveTab, label: 'Perguntas', icon: ListChecks },
     { id: 'classroom' as ActiveTab, label: 'Turma', icon: Users },
     { id: 'reports' as ActiveTab, label: 'Desempenho', icon: BarChart2 },
   ];
