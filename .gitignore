@@ -30,7 +30,5 @@ pnpm-debug.log*
 # TypeScript
 *.tsbuildinfo
 
-# Impeccable (críticas locais)
-.impeccable/critique/
-.impeccable/surfaces/
-.impeccable/review/
+# Impeccable (arquivos locais da ferramenta)
+.impeccable/
