@@ -23,14 +23,14 @@ export function classRecommendations(result: MasteryResult): Recommendation[] {
     if (s.difficulty === 'high') {
       out.push({
         id: `retake-${s.skill}`,
-        text: `Retome ${s.skill} com a turma toda.`,
-        reason: `${reinforce} de ${withData} alunos com dados estão precisando de reforço nesta habilidade.`,
+        text: `Vale retomar ${s.skill} com a turma toda.`,
+        reason: `${reinforce} de ${withData} alunos ainda erram bastante nesta habilidade.`,
       });
     } else if (reinforce > 0) {
       out.push({
         id: `reinforce-${s.skill}`,
-        text: `Reforce ${s.skill} com ${reinforce} ${reinforce === 1 ? 'aluno' : 'alunos'}.`,
-        reason: `São os que estão abaixo de 60% de domínio estimado. A turma em geral vai bem (dificuldade ${s.difficulty === 'medium' ? 'média' : 'baixa'}).`,
+        text: `${reinforce} ${reinforce === 1 ? 'aluno precisa' : 'alunos precisam'} de reforço em ${s.skill}.`,
+        reason: `${reinforce === 1 ? 'Está' : 'Estão'} abaixo de 60% de domínio. No geral, a turma vai bem nesta habilidade.`,
         studentIds: studentsAt(result, s.skill, 'reinforce'),
       });
     }
@@ -39,8 +39,8 @@ export function classRecommendations(result: MasteryResult): Recommendation[] {
     [...s.confusions].sort((x, y) => y.percent - x.percent).slice(0, 2).forEach((c, i) => {
       out.push({
         id: `confusion-${s.skill}-${i}`,
-        text: `Possível confusão comum em ${s.skill}: ${c.percent}% escolheram a alternativa ${c.option}.`,
-        reason: `Pergunta: "${c.questionPrompt}". Uma alternativa errada com mais de 40% das respostas costuma indicar uma ideia equivocada compartilhada.`,
+        text: `Confusão comum em ${s.skill}: ${c.percent}% marcaram a alternativa ${c.option}.`,
+        reason: `Pergunta: "${c.questionPrompt}". Quando mais de 40% da turma marca a mesma alternativa errada, costuma ser uma ideia errada que muitos compartilham.`,
       });
     });
 
@@ -48,7 +48,7 @@ export function classRecommendations(result: MasteryResult): Recommendation[] {
       out.push({
         id: `advance-${s.skill}`,
         text: `${s.skill}: a turma pode avançar.`,
-        reason: `${mastered} de ${withData} alunos estão dominando.`,
+        reason: `${mastered} de ${withData} alunos já dominam.`,
       });
     }
   });
@@ -64,14 +64,14 @@ export function studentRecommendations(row: StudentMasteryRow, skills: SkillSumm
     if (m.level === 'reinforce') {
       out.push({
         id: `reinforce-${m.skill}`,
-        text: `Reforce ${m.skill} com este aluno.`,
-        reason: `Domínio estimado de ${pct(m.mastery)}% depois de ${m.answers} respostas (${m.correct} certas).`,
+        text: `${m.skill} precisa de reforço.`,
+        reason: `Acertou ${m.correct} de ${m.answers} respostas. Domínio estimado: ${pct(m.mastery)}%.`,
       });
     } else if (m.level === 'mastered' && summary && summary.counts.reinforce > 0) {
       out.push({
         id: `help-${m.skill}`,
-        text: `Já domina ${m.skill}: pode ajudar colegas.`,
-        reason: `Domínio estimado de ${pct(m.mastery)}%, e ${summary.counts.reinforce} ${summary.counts.reinforce === 1 ? 'colega precisa' : 'colegas precisam'} de reforço.`,
+        text: `Domina ${m.skill}: pode ajudar os colegas.`,
+        reason: `Domínio estimado: ${pct(m.mastery)}%. ${summary.counts.reinforce} ${summary.counts.reinforce === 1 ? 'colega precisa' : 'colegas precisam'} de reforço.`,
       });
     }
   });

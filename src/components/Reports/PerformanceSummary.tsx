@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Classroom, RoundSession, ScriptId } from '../../types';
 import { getScript } from '../../data/scripts';
-import { MasteryPanel } from './MasteryPanel';
+import { computeMastery } from '../../services/mastery';
+import { MasteryPanel, exportMasteryCsv } from './MasteryPanel';
 import {
   clearRoundHistory,
   loadRoundHistory,
 } from '../../services/storageService';
 import {
-  Award,
   Download,
   Trash2,
-  HelpCircle,
   FileSpreadsheet,
   ChevronDown,
-  ChevronUp,
-  Layers,
+  Check,
+  X,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 interface PerformanceSummaryProps {
@@ -23,19 +24,48 @@ interface PerformanceSummaryProps {
   onRefresh: () => void;
 }
 
+type Tab = 'class' | 'student' | 'rounds';
+
+const TABS: [Tab, string][] = [
+  ['class', 'Turma'],
+  ['student', 'Alunos'],
+  ['rounds', 'Rodadas'],
+];
+
+// Cor sempre acompanhada do número: faixas iguais às do domínio
+const accuracyTone = (pct: number) =>
+  pct >= 80
+    ? { bar: 'bg-emerald-500', text: 'text-emerald-800' }
+    : pct >= 50
+    ? { bar: 'bg-amber-400', text: 'text-amber-900' }
+    : { bar: 'bg-red-500', text: 'text-red-800' };
+
+const AccuracyBar: React.FC<{ pct: number; className?: string }> = ({ pct, className = '' }) => (
+  <div className={`h-3 rounded-full bg-base-200 overflow-hidden ${className}`} aria-hidden="true">
+    <div className={`h-full rounded-full ${accuracyTone(pct).bar}`} style={{ width: `${pct}%` }} />
+  </div>
+);
+
 export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
   classroom,
   onRefresh,
 }) => {
   const [allRounds, setRounds] = useState<RoundSession[]>(() => loadRoundHistory());
-  const [tab, setTab] = useState<'rounds' | 'mastery'>('rounds');
+  const [tab, setTab] = useState<Tab>('class');
   const [scriptFilter, setScriptFilter] = useState<'all' | ScriptId>('all');
+  // Nomes escondidos por padrão: a tela pode estar projetada
+  const [showNames, setShowNames] = useState(false);
   // Registros antigos não têm roteiro: contam como pergunta rápida
   const scriptOf = (r: RoundSession): ScriptId => r.scriptId ?? 'quick-question';
   const rounds =
     scriptFilter === 'all' ? allRounds : allRounds.filter((r) => scriptOf(r) === scriptFilter);
   const [expandedRoundIds, setExpandedRoundIds] = useState<Set<string>>(
     new Set(allRounds.length > 0 ? [allRounds[0].id] : [])
+  );
+
+  const mastery = useMemo(
+    () => computeMastery(allRounds, classroom.students),
+    [allRounds, classroom.students]
   );
 
   const toggleRound = (roundId: string) => {
@@ -58,12 +88,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
     }
   };
 
-  const handleExportCSV = () => {
-    if (rounds.length === 0) {
-      alert('Nenhuma rodada registrada para exportar.');
-      return;
-    }
-
+  const handleExportRoundsCSV = () => {
     let csv = 'Rodada,Roteiro,Data,Pergunta,Resposta certa,Respostas,Acertos (%)\n';
     rounds.forEach((round, rIdx) => {
       const roundName = round.name || `Rodada ${rIdx + 1}`;
@@ -88,6 +113,12 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
     document.body.removeChild(link);
   };
 
+  // A planilha acompanha o que está na tela
+  const exportLabel = 'Baixar planilha (CSV)';
+  const handleExport = () =>
+    tab === 'rounds' ? handleExportRoundsCSV() : exportMasteryCsv(mastery, classroom);
+  const canExport = tab === 'rounds' ? rounds.length > 0 : mastery.skills.length > 0;
+
   // Cálculos consolidados
   const totalRounds = rounds.length;
   const totalQuestionsApplied = rounds.reduce((sum, r) => sum + r.questions.length, 0);
@@ -101,298 +132,277 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
       : 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Topo do relatório */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      {/* Cabeçalho: título à esquerda, ações da tela à direita */}
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
-            Histórico das sessões de aula
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-base-content">
+            Desempenho
           </h1>
-          <p className="text-sm text-base-content/70 mt-1">
-            Acertos da turma em cada rodada de perguntas.
+          <p className="text-base text-base-content/75 mt-1">
+            {allRounds.length === 0
+              ? 'Os resultados aparecem aqui depois da primeira rodada.'
+              : `${allRounds.length} ${allRounds.length === 1 ? 'rodada registrada' : 'rodadas registradas'} · turma de ${classroom.students.length} alunos`}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
-            onClick={handleExportCSV}
-            disabled={rounds.length === 0}
-            className="btn btn-sm"
+            onClick={() => setShowNames((v) => !v)}
+            className="btn btn-ghost"
           >
-            <Download className="w-4 h-4 text-amber-500" />
-            <span>Exportar planilha CSV</span>
+            {showNames ? (
+              <EyeOff className="w-5 h-5" aria-hidden="true" />
+            ) : (
+              <Eye className="w-5 h-5" aria-hidden="true" />
+            )}
+            {showNames ? 'Esconder nomes' : 'Mostrar nomes'}
           </button>
-
-          <button
-            onClick={handleClear}
-            disabled={rounds.length === 0}
-            className="btn btn-sm btn-outline btn-error"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Limpar histórico</span>
+          <button onClick={handleExport} disabled={!canExport} className="btn btn-primary">
+            <Download className="w-5 h-5" aria-hidden="true" />
+            {exportLabel}
           </button>
         </div>
       </div>
 
-      <div role="tablist" aria-label="Seção do desempenho" className="join">
-        <button role="tab" aria-selected={tab === 'rounds'} onClick={() => setTab('rounds')} className={`btn btn-sm join-item ${tab === 'rounds' ? 'btn-neutral' : ''}`}>
-          Rodadas
-        </button>
-        <button role="tab" aria-selected={tab === 'mastery'} onClick={() => setTab('mastery')} className={`btn btn-sm join-item ${tab === 'mastery' ? 'btn-neutral' : ''}`}>
-          Domínio
-        </button>
-      </div>
-
-      {tab === 'mastery' ? (
-        <MasteryPanel classroom={classroom} rounds={allRounds} />
-      ) : (
-      <>
-      {/* Cartões de indicadores gerais */}
-      <div className="stats stats-vertical sm:stats-horizontal w-full bg-base-100 border border-base-300">
-        <div className="stat">
-          <div className="stat-figure text-amber-700">
-            <Layers className="w-7 h-7" />
-          </div>
-          <div className="stat-title">Rodadas finalizadas</div>
-          <div className="stat-value font-extrabold">{totalRounds}</div>
-        </div>
-
-        <div className="stat">
-          <div className="stat-figure text-amber-700">
-            <HelpCircle className="w-7 h-7" />
-          </div>
-          <div className="stat-title">Respostas recebidas</div>
-          <div className="stat-value font-extrabold">{totalResponsesCollected}</div>
-          <div className="stat-desc">Em {totalQuestionsApplied} perguntas</div>
-        </div>
-
-        <div className="stat">
-          <div className="stat-figure text-success">
-            <Award className="w-7 h-7" />
-          </div>
-          <div className="stat-title">Taxa média de acerto</div>
-          <div className="stat-value font-extrabold text-success">{overallAccuracy}%</div>
-        </div>
-      </div>
-
-      {/* Histórico separado por roteiro */}
-      <div role="tablist" aria-label="Filtrar por roteiro" className="flex flex-wrap gap-2">
-        {([
-          ['all', 'Todos'],
-          ['quick-question', 'Pergunta rápida'],
-          ['group-draw', 'Grupo com sorteio'],
-        ] as [('all' | ScriptId), string][]).map(([id, label]) => (
+      {/* Uma única navegação: o que a turma sabe, cada aluno, o que aconteceu */}
+      <div role="tablist" aria-label="Seção do desempenho" className="flex gap-1 border-b border-base-300">
+        {TABS.map(([id, text]) => (
           <button
             key={id}
             role="tab"
-            aria-selected={scriptFilter === id}
-            onClick={() => setScriptFilter(id)}
-            className={`btn btn-sm rounded-full ${scriptFilter === id ? 'btn-neutral' : 'btn-ghost'}`}
+            aria-selected={tab === id}
+            onClick={() => setTab(id)}
+            className={`px-5 py-3 -mb-px text-lg font-extrabold border-b-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary ${
+              tab === id
+                ? 'border-primary text-primary'
+                : 'border-transparent text-base-content/65 hover:text-base-content'
+            }`}
           >
-            {label}
+            {text}
           </button>
         ))}
       </div>
 
-      {/* Listagem agrupada por rodadas */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-base-content">
-            Rodadas registradas
-          </h2>
-          <span className="text-sm text-base-content/70">
-            Clique em uma rodada para ver as perguntas e os alunos
-          </span>
-        </div>
-
-        {rounds.length === 0 ? (
-          <div className="bg-base-100 border border-base-300 rounded-box p-12 text-center space-y-3 shadow-sm">
-            <FileSpreadsheet className="w-10 h-10 text-base-content/40 mx-auto" />
-            <h3 className="text-base font-bold text-base-content">
-              Nenhuma rodada foi concluída ainda
-            </h3>
-            <p className="text-sm text-base-content/70 max-w-sm mx-auto">
-              Conduza um roteiro da Biblioteca e encerre a rodada. O resultado aparece aqui.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {rounds.map((round, rIndex) => {
-              const isExpanded = expandedRoundIds.has(round.id);
-              const dateStr = new Date(round.timestamp).toLocaleString('pt-BR', {
-                dateStyle: 'short',
-                timeStyle: 'short',
-              });
-
-              return (
-                <div
-                  key={round.id}
-                  className="bg-base-100 border border-base-300 rounded-box shadow-sm overflow-hidden transition-all"
+      {tab !== 'rounds' ? (
+        <MasteryPanel
+          classroom={classroom}
+          result={mastery}
+          view={tab}
+          showNames={showNames}
+          rounds={allRounds}
+        />
+      ) : (
+        <div className="space-y-6">
+          {/* Filtro por roteiro e totais, juntos */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div role="tablist" aria-label="Filtrar por roteiro" className="flex flex-wrap gap-2">
+              {([
+                ['all', 'Todos'],
+                ['quick-question', 'Pergunta rápida'],
+                ['group-draw', 'Grupo com sorteio'],
+              ] as [('all' | ScriptId), string][]).map(([id, text]) => (
+                <button
+                  key={id}
+                  role="tab"
+                  aria-selected={scriptFilter === id}
+                  onClick={() => setScriptFilter(id)}
+                  className={`btn rounded-full ${scriptFilter === id ? 'btn-primary' : 'bg-base-100 border-base-300'}`}
                 >
-                  {/* Cabeçalho da rodada */}
-                  <div
-                    onClick={() => toggleRound(round.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        toggleRound(round.id);
-                      }
-                    }}
-                    role="button"
-                    tabIndex={0}
-                    aria-expanded={isExpanded}
-                    className="p-6 cursor-pointer hover:bg-base-200 transition-colors flex flex-wrap items-center justify-between gap-4 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-neutral"
+                  {text}
+                </button>
+              ))}
+            </div>
+
+            {totalRounds > 0 && (
+              <p className="text-base text-base-content/80 tabular-nums">
+                <strong className={`text-2xl font-extrabold ${accuracyTone(overallAccuracy).text}`}>{overallAccuracy}%</strong>{' '}
+                de acerto médio · {totalResponsesCollected} respostas em {totalQuestionsApplied} perguntas
+              </p>
+            )}
+          </div>
+
+          {rounds.length === 0 ? (
+            <div className="bg-base-100 border border-base-300 rounded-[20px] p-12 text-center space-y-3">
+              <FileSpreadsheet className="w-10 h-10 text-base-content/40 mx-auto" aria-hidden="true" />
+              <h2 className="text-xl font-extrabold text-base-content">
+                Nenhuma rodada foi concluída ainda
+              </h2>
+              <p className="text-base text-base-content/75 max-w-sm mx-auto">
+                Conduza um roteiro da Biblioteca e encerre a rodada. O resultado aparece aqui.
+              </p>
+            </div>
+          ) : (
+            <ul className="space-y-3">
+              {rounds.map((round, rIndex) => {
+                const isExpanded = expandedRoundIds.has(round.id);
+                const dateStr = new Date(round.timestamp).toLocaleString('pt-BR', {
+                  dateStyle: 'short',
+                  timeStyle: 'short',
+                });
+                const name = round.name || `Rodada ${rounds.length - rIndex}`;
+
+                return (
+                  <li
+                    key={round.id}
+                    className="bg-base-100 border border-base-300 rounded-[20px] overflow-hidden"
                   >
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 text-amber-900 flex items-center justify-center font-bold text-sm">
-                        #{rounds.length - rIndex}
-                      </div>
-
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-base font-bold text-base-content">
-                            {round.name || `Rodada ${rounds.length - rIndex}`}
-                          </h3>
-                          <span className="text-sm text-base-content/70">
-                            • {dateStr}
-                          </span>
-                        </div>
-                        <span className="text-sm text-base-content/70">
-                          {round.questions.length} {round.questions.length === 1 ? 'pergunta' : 'perguntas'} • {round.totalResponses} respostas
+                    <button
+                      onClick={() => toggleRound(round.id)}
+                      aria-expanded={isExpanded}
+                      className="w-full text-left px-6 py-5 hover:bg-base-200/60 transition-colors grid gap-x-6 gap-y-3 sm:grid-cols-[1fr_14rem_auto] items-center focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
+                    >
+                      <span className="block min-w-0">
+                        <span className="block text-xl font-extrabold leading-tight truncate">{name}</span>
+                        <span className="block text-base text-base-content/75">
+                          {getScript(scriptOf(round)).name} · {dateStr} · {round.questions.length}{' '}
+                          {round.questions.length === 1 ? 'pergunta' : 'perguntas'} · {round.totalResponses} respostas
                         </span>
-                      </div>
-                    </div>
+                      </span>
 
-                    <div className="flex items-center gap-5">
-                      <div className="text-right">
-                        <span className="text-xs text-base-content/70 block font-medium">Acertos</span>
-                        <span className="text-lg font-black text-success">
+                      <span className="flex items-center gap-3">
+                        <AccuracyBar pct={round.overallAccuracy} className="flex-1" />
+                        <span className={`w-14 text-right text-2xl font-extrabold tabular-nums ${accuracyTone(round.overallAccuracy).text}`}>
                           {round.overallAccuracy}%
                         </span>
-                      </div>
+                      </span>
 
-                      <div className="p-2 rounded-xl bg-base-200 text-base-content/70">
-                        {isExpanded ? (
-                          <ChevronUp className="w-4 h-4" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4" />
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                      <ChevronDown
+                        aria-hidden="true"
+                        className={`hidden sm:block w-5 h-5 text-base-content/60 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      />
+                    </button>
 
-                  {/* Conteúdo expandido da rodada */}
-                  {isExpanded && (
-                    <div className="p-6 pt-0 border-t border-base-300/60 space-y-6">
-                      {/* Questões da rodada */}
-                      <div className="space-y-3 pt-4">
-                        <h3 className="text-base font-bold text-base-content">
-                          Perguntas desta rodada
-                        </h3>
+                    {isExpanded && (
+                      <div className="px-6 pb-6 pt-5 border-t border-base-300 space-y-7">
+                        <section className="space-y-2">
+                          <h3 className="text-lg font-extrabold">Perguntas da rodada</h3>
+                          <ol className="divide-y divide-base-300">
+                            {round.questions.map((q, qIdx) => {
+                              const votes = Object.keys(q.responses).length;
+                              const correct = Object.values(q.responses).filter(
+                                (ans) => ans === q.correctOption
+                              ).length;
+                              const acc = votes > 0 ? Math.round((correct / votes) * 100) : 0;
 
-                        <ol className="divide-y divide-base-300/60">
-                          {round.questions.map((q, qIdx) => {
-                            const votes = Object.keys(q.responses).length;
-                            const correct = Object.values(q.responses).filter(
-                              (ans) => ans === q.correctOption
-                            ).length;
-                            const acc = votes > 0 ? Math.round((correct / votes) * 100) : 0;
-
-                            return (
-                              <li
-                                key={q.id || qIdx}
-                                className="py-3 flex flex-wrap items-center justify-between gap-3"
-                              >
-                                <div className="space-y-1 max-w-xl">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-bold text-base-content/70">
-                                      {qIdx + 1}.
-                                    </span>
-                                    <span className="badge badge-success badge-sm font-semibold">
-                                      Resposta certa: {q.correctOption}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm font-medium text-base-content">
+                              return (
+                                <li
+                                  key={q.id || qIdx}
+                                  className="py-3 grid gap-x-6 gap-y-2 sm:grid-cols-[1fr_14rem] items-center"
+                                >
+                                  <p className="text-base font-semibold text-base-content">
+                                    <span className="text-base-content/65 tabular-nums">{qIdx + 1}. </span>
                                     {q.questionPrompt}
+                                    <span className="ml-2 badge badge-success badge-outline font-semibold">
+                                      Resposta: {q.correctOption}
+                                    </span>
                                   </p>
-                                </div>
 
-                                {votes > 0 ? (
-                                  <div className="flex items-center gap-4 text-right">
-                                    <div>
-                                      <span className="text-xs text-base-content/70 block">Acertos</span>
-                                      <span className="text-base font-bold text-success">{acc}%</span>
-                                    </div>
-                                    <div className="pl-3 border-l border-base-300">
-                                      <span className="text-xs text-base-content/70 block">Respostas</span>
-                                      <span className="text-base font-bold text-base-content">{votes}</span>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <span className="badge badge-ghost">Sem respostas</span>
-                                )}
-                              </li>
-                            );
-                          })}
-                        </ol>
+                                  {votes > 0 ? (
+                                    <span className="flex items-center gap-3">
+                                      <AccuracyBar pct={acc} className="flex-1" />
+                                      <span className="text-right tabular-nums">
+                                        <span className={`block text-lg font-extrabold leading-none ${accuracyTone(acc).text}`}>{acc}%</span>
+                                        <span className="block text-sm text-base-content/70">{votes} {votes === 1 ? 'resposta' : 'respostas'}</span>
+                                      </span>
+                                    </span>
+                                  ) : (
+                                    <span className="text-base text-base-content/70">Ninguém respondeu</span>
+                                  )}
+                                </li>
+                              );
+                            })}
+                          </ol>
+                        </section>
+
+                        <section className="space-y-3">
+                          <div>
+                            <h3 className="text-lg font-extrabold">Acertos e erros de cada aluno</h3>
+                            <p className="text-base text-base-content/75">
+                              Cada coluna é uma pergunta. Nos erros, aparece a letra que o aluno marcou.
+                            </p>
+                          </div>
+                          <div className="overflow-x-auto rounded-xl border border-base-300">
+                            <table className="table">
+                              <thead>
+                                <tr>
+                                  <th>Aluno</th>
+                                  {round.questions.map((q, qIdx) => (
+                                    <th key={q.id || qIdx} title={q.questionPrompt} className="text-center whitespace-nowrap">
+                                      Pergunta {qIdx + 1}
+                                    </th>
+                                  ))}
+                                  <th className="text-right whitespace-nowrap">Acertos</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {classroom.students.map((student) => {
+                                  let answered = 0;
+                                  let right = 0;
+                                  const cells = round.questions.map((q, qIdx) => {
+                                    const ans = q.responses[student.id];
+                                    if (!ans) {
+                                      return (
+                                        <td key={q.id || qIdx} className="text-center text-base-content/60">
+                                          <span aria-hidden="true">–</span>
+                                          <span className="sr-only">Não respondeu</span>
+                                        </td>
+                                      );
+                                    }
+                                    answered++;
+                                    const ok = ans === q.correctOption;
+                                    if (ok) right++;
+                                    return (
+                                      <td key={q.id || qIdx} className="text-center">
+                                        <span
+                                          className={`inline-flex items-center gap-1 rounded-btn px-2 py-1 text-base font-bold ${
+                                            ok ? 'bg-emerald-100 text-emerald-950' : 'bg-red-100 text-red-950'
+                                          }`}
+                                        >
+                                          {ok ? (
+                                            <Check className="w-4 h-4" aria-hidden="true" />
+                                          ) : (
+                                            <X className="w-4 h-4" aria-hidden="true" />
+                                          )}
+                                          {ok ? <span className="sr-only">Acertou</span> : <span><span className="sr-only">Errou, marcou </span>{ans}</span>}
+                                        </span>
+                                      </td>
+                                    );
+                                  });
+                                  const who = showNames
+                                    ? student.name
+                                    : `Cartão ${String(student.id).padStart(2, '0')}`;
+                                  return (
+                                    <tr key={student.id}>
+                                      <th className="font-semibold whitespace-nowrap">{who}</th>
+                                      {cells}
+                                      <td className="text-right font-extrabold tabular-nums whitespace-nowrap">
+                                        {answered > 0 ? `${right} de ${answered}` : 'Não respondeu'}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </section>
                       </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
 
-                      {/* Respostas individuais dos alunos nesta rodada */}
-                      <div className="space-y-3">
-                        <h3 className="text-base font-bold text-base-content">
-                          Resultado por aluno
-                        </h3>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 max-h-48 overflow-y-auto pr-1">
-                          {classroom.students.map((student) => {
-                            let studentTotal = 0;
-                            let studentCorrect = 0;
-
-                            round.questions.forEach((q) => {
-                              const ans = q.responses[student.id];
-                              if (ans) {
-                                studentTotal++;
-                                if (ans === q.correctOption) studentCorrect++;
-                              }
-                            });
-
-                            const pct =
-                              studentTotal > 0
-                                ? Math.round((studentCorrect / studentTotal) * 100)
-                                : 0;
-
-                            return (
-                              <div
-                                key={student.id}
-                                className={`p-2 rounded-xl border text-xs flex items-center justify-between ${
-                                  studentTotal === 0
-                                    ? 'bg-base-200 border-base-300 text-base-content/60'
-                                    : pct >= 50
-                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-950'
-                                    : 'bg-amber-50 border-amber-200 text-amber-950'
-                                }`}
-                              >
-                                <span className="truncate pr-1">
-                                  #{String(student.id).padStart(2, '0')} {student.name.split(' ')[0]}
-                                </span>
-
-                                <span className="font-bold text-xs">
-                                  {studentTotal > 0 ? `${pct}%` : 'Ausente'}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-      </>
+          {allRounds.length > 0 && (
+            <div className="pt-4 flex justify-end">
+              <button onClick={handleClear} className="btn btn-ghost btn-sm text-error">
+                <Trash2 className="w-4 h-4" aria-hidden="true" />
+                Limpar todo o histórico
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
