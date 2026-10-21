@@ -27,6 +27,11 @@ const ideas: { title: string; text: string; script: ScriptId }[] = [
     text: 'O grupo discute e o sistema sorteia quem responde, então todos se preparam.',
     script: 'group-draw',
   },
+  {
+    title: 'Lousa interativa',
+    text: 'O grupo move uma paleta de papel sobre a projeção para responder, sem tocar na tela.',
+    script: 'interactive-board',
+  },
 ];
 
 // Exemplo ilustrativo do painel de Desempenho, com turma fictícia de 14 alunos.
