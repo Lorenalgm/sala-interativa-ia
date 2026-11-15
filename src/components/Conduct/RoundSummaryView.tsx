@@ -48,27 +48,27 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Topo de encerramento */}
-      <div className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 flex flex-wrap items-center justify-between gap-6">
+      <div className="flex flex-wrap items-end justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-btn bg-primary text-primary-content flex items-center justify-center flex-shrink-0">
-            <Award className="w-8 h-8" />
+          <div className="w-14 h-14 rounded-full bg-[#e8f5ec] text-success flex items-center justify-center flex-shrink-0">
+            <Award className="w-8 h-8" aria-hidden="true" />
           </div>
           <div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-base-content tracking-tight">
+            <h1 className="font-display text-4xl lg:text-[2.75rem] font-bold text-base-content tracking-tight leading-[1.05]">
               Fim da rodada
             </h1>
-            <p className="text-base sm:text-lg text-base-content/80 mt-1">{statusMessage}</p>
+            <p className="text-lg text-base-content/75 mt-1.5">{statusMessage}</p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <button onClick={onNewRound} className="btn">
-            <RotateCcw className="w-4 h-4" />
+          <button onClick={onNewRound} className="inline-flex items-center gap-2 min-h-[2.75rem] px-5 rounded-full bg-[#e3e3e8] hover:bg-[#d8d8de] text-base font-semibold">
+            <RotateCcw className="w-4 h-4" aria-hidden="true" />
             Nova rodada
           </button>
 
-          <button onClick={onGoToReports} className="btn btn-primary">
-            <BarChart2 className="w-4 h-4" />
+          <button onClick={onGoToReports} className="inline-flex items-center gap-2 min-h-[2.75rem] px-6 rounded-full bg-primary text-primary-content hover:bg-[#0036bd] text-base font-semibold">
+            <BarChart2 className="w-4 h-4" aria-hidden="true" />
             Ver histórico
             <ArrowRight className="w-4 h-4" />
           </button>
@@ -76,31 +76,31 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
       </div>
 
       {/* Indicadores gerais da rodada */}
-      <div className="stats stats-vertical sm:stats-horizontal w-full bg-base-100 border border-base-300">
+      <div className="stats stats-vertical sm:stats-horizontal w-full bg-base-100 border border-base-300 rounded-[0.875rem]">
         <div className="stat">
-          <div className="stat-title text-base">Perguntas com respostas</div>
-          <div className="stat-value font-extrabold">
+          <div className="stat-title text-base text-base-content/75">Perguntas com respostas</div>
+          <div className="stat-value font-display font-bold tracking-tight">
             {answeredQuestions}
             <span className="text-2xl text-base-content/70"> de {round.questions.length}</span>
           </div>
         </div>
 
         <div className="stat">
-          <div className="stat-title text-base">Respostas recebidas</div>
-          <div className="stat-value font-extrabold">{round.totalResponses}</div>
+          <div className="stat-title text-base text-base-content/75">Respostas recebidas</div>
+          <div className="stat-value font-display font-bold tracking-tight">{round.totalResponses}</div>
         </div>
 
         <div className="stat">
-          <div className="stat-title text-base">Acertos da turma</div>
+          <div className="stat-title text-base text-base-content/75">Acertos da turma</div>
           <div
-            className={`stat-value font-extrabold ${
+            className={`stat-value font-display font-bold tracking-tight ${
               round.totalResponses > 0 ? 'text-success' : 'text-base-content/60'
             }`}
           >
             {round.totalResponses > 0 ? `${round.overallAccuracy}%` : '–'}
           </div>
           {unansweredQuestions > 0 && answeredQuestions > 0 && (
-            <div className="stat-desc text-sm">Conta só as perguntas com respostas</div>
+            <div className="stat-desc text-[0.9375rem] text-base-content/70">Conta só as perguntas com respostas</div>
           )}
         </div>
       </div>
@@ -114,15 +114,15 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
         );
         if (items.length === 0) return null;
         return (
-          <section className="bg-amber-50 border border-amber-200 rounded-box p-6 space-y-3">
-            <h2 className="text-xl font-bold text-amber-950">Para retomar</h2>
+          <section className="bg-amber-50 border border-amber-300 rounded-[0.875rem] p-6 space-y-3">
+            <h2 className="font-display text-2xl font-bold text-amber-950">Para retomar</h2>
             <ul className="space-y-3">
               {items.map((it) => (
                 <li key={it.key}>
                   <p className="font-semibold text-amber-950">
                     {it.label}: {it.text}
                   </p>
-                  <p className="text-sm text-amber-900/80">{it.reason}</p>
+                  <p className="text-base text-amber-950/80">{it.reason}</p>
                 </li>
               ))}
             </ul>
@@ -131,10 +131,10 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
       })()}
 
       {/* Lista das perguntas da rodada */}
-      <section className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 space-y-4">
-        <h2 className="text-xl font-bold text-base-content">Pergunta por pergunta</h2>
+      <section className="bg-base-100 border border-base-300 rounded-[0.875rem] p-6 sm:p-8 space-y-4">
+        <h2 className="font-display text-2xl font-bold tracking-tight text-base-content">Pergunta por pergunta</h2>
 
-        <ol className="divide-y divide-base-300/60">
+        <ol className="divide-y divide-base-300">
           {round.questions.map((q, idx) => {
             const votes = Object.keys(q.responses).length;
             const correctCount = Object.values(q.responses).filter(
@@ -146,24 +146,24 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
               <li key={q.id} className="py-4 flex flex-wrap items-center justify-between gap-4">
                 <div className="space-y-1.5 max-w-2xl">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-base-content/70">{idx + 1}.</span>
-                    <span className="badge badge-success badge-sm font-semibold">
+                    <span className="text-base font-semibold text-base-content/70">{idx + 1}.</span>
+                    <span className="inline-flex items-center min-h-[1.75rem] px-2.5 rounded-full bg-[#e8f5ec] text-[#14532d] text-[0.9375rem] font-semibold">
                       Resposta certa: {q.correctOption}
                     </span>
                   </div>
-                  <p className="text-base font-semibold text-base-content">{q.questionPrompt}</p>
+                  <p className="text-lg font-semibold text-base-content leading-snug">{q.questionPrompt}</p>
                 </div>
 
                 <div className="text-right flex items-center gap-5">
                   {votes > 0 ? (
                     <>
                       <div>
-                        <span className="text-sm text-base-content/70 block">Acertos</span>
-                        <span className="text-xl font-bold text-success">{acc}%</span>
+                        <span className="text-[0.9375rem] text-base-content/70 block">Acertos</span>
+                        <span className="font-display text-2xl font-bold text-success">{acc}%</span>
                       </div>
                       <div className="pl-4 border-l border-base-300">
-                        <span className="text-sm text-base-content/70 block">Respostas</span>
-                        <span className="text-xl font-bold text-base-content">
+                        <span className="text-[0.9375rem] text-base-content/70 block">Respostas</span>
+                        <span className="font-display text-2xl font-bold text-base-content">
                           {votes} de {round.totalClassStudents}
                         </span>
                       </div>
@@ -179,11 +179,11 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
       </section>
 
       {/* Resultado por aluno: só para o professor */}
-      <section className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 space-y-4">
+      <section className="bg-base-100 border border-base-300 rounded-[0.875rem] p-6 sm:p-8 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-bold text-base-content">Resultado por aluno</h2>
+          <h2 className="font-display text-2xl font-bold tracking-tight text-base-content">Resultado por aluno</h2>
           <label className="label cursor-pointer gap-2 py-0">
-            <span className="label-text text-sm text-base-content/70">Mostrar</span>
+            <span className="label-text text-base text-base-content/80">Mostrar</span>
             <input
               type="checkbox"
               className="toggle toggle-sm"
