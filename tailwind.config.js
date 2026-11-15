@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Atkinson Hyperlegible Next Variable"', ...defaultTheme.fontFamily.sans],
+        sans: ['"ClassPlay Digits"', '"Atkinson Hyperlegible Next Variable"', ...defaultTheme.fontFamily.sans],
         // Títulos: Inter, desenhada para tela e próxima da San Francisco da Apple
         display: ['"Inter Variable"', '-apple-system', 'BlinkMacSystemFont', ...defaultTheme.fontFamily.sans],
       },
