@@ -12,8 +12,8 @@
   }
 
   html {
-    scrollbar-color: #0a4d4a #e8f0ee;
-    accent-color: #0a4d4a;
+    scrollbar-color: #8e8e93 #f2f2f7;
+    accent-color: #0040dd;
   }
 
   body {
@@ -22,7 +22,7 @@
   }
 
   input, textarea, select {
-    caret-color: #0a4d4a;
+    caret-color: #0040dd;
   }
 }
 
@@ -52,7 +52,7 @@
   }
 
   .book-btn:focus-visible {
-    outline: 4px solid #0a4d4a;
+    outline: 4px solid #0040dd;
     outline-offset: 6px;
   }
 

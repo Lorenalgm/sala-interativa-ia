@@ -299,14 +299,14 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
             cy="32"
             r={RING_R}
             fill="none"
-            stroke="#0f766e"
+            stroke="#0040dd"
             strokeWidth="6"
             strokeLinecap="round"
             strokeDasharray={RING_LEN}
             strokeDashoffset={RING_LEN * (1 - view.progress)}
             transform="rotate(-90 32 32)"
           />
-          <circle cx="32" cy="32" r="6" fill="#0f766e" />
+          <circle cx="32" cy="32" r="6" fill="#0040dd" />
         </svg>
       )}
 

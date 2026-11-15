@@ -2,18 +2,21 @@ import React from 'react';
 import { ScriptId } from '../../types';
 import { AnswerCard } from './AnswerCard';
 
-// Capa de cada roteiro: cor, camada de trás e moldura estampada
+// Capa de cada modelo: cor própria (alto contraste da Apple, texto branco acima de 5:1),
+// camada de trás mais escura e moldura estampada. O azul fica reservado para ações.
 export interface Binding {
   cover: string;
   back: string;
   frame: string;
+  // Cor sólida do modelo, para ícones e marcadores fora do livro
+  swatch: string;
 }
 
 const bindings: Record<ScriptId, Binding> = {
-  'quick-question': { cover: 'bg-secondary text-neutral', back: 'bg-[#8a6200]', frame: 'border-black/25' },
-  'group-draw': { cover: 'bg-accent text-white', back: 'bg-[#8f1a28]', frame: 'border-white/35' },
-  'peer-instruction': { cover: 'bg-secondary text-neutral', back: 'bg-[#8a6200]', frame: 'border-black/25' },
-  'interactive-board': { cover: 'bg-accent text-white', back: 'bg-[#8f1a28]', frame: 'border-white/35' },
+  'quick-question': { cover: 'bg-[#3634a3] text-white', back: 'bg-[#1f1d66]', frame: 'border-white/35', swatch: 'bg-[#3634a3]' },
+  'group-draw': { cover: 'bg-[#c93400] text-white', back: 'bg-[#7a2000]', frame: 'border-white/35', swatch: 'bg-[#c93400]' },
+  'peer-instruction': { cover: 'bg-[#8944ab] text-white', back: 'bg-[#552a6b]', frame: 'border-white/35', swatch: 'bg-[#8944ab]' },
+  'interactive-board': { cover: 'bg-[#006e7f] text-white', back: 'bg-[#00414b]', frame: 'border-white/35', swatch: 'bg-[#006e7f]' },
 };
 
 export const bindingFor = (id: ScriptId): Binding => bindings[id];
@@ -29,7 +32,7 @@ export const Spine: React.FC<{ tone?: string }> = ({ tone = 'bg-black/20' }) => 
   </span>
 );
 
-// Emblema da capa: mostra a atividade, não decora
+// Emblema da capa: mostra a interação do modelo, não decora
 export const Emblem: React.FC<{ id: ScriptId; size?: 'sm' | 'lg' }> = ({ id, size = 'sm' }) => {
   if (id === 'group-draw') {
     // Quatro cartões de um grupo; só o sorteado sobe, a câmera ignora os outros

@@ -21,7 +21,7 @@ export const AnswerCardShape: React.FC<{ letter: 'A' | 'B' | 'C' | 'D' }> = ({ l
     <>
       <rect width="100" height="140" rx="7" fill="#ffffff" />
       <g transform="translate(20 13)">
-        <rect width="60" height="60" fill="#101820" />
+        <rect width="60" height="60" fill="#000000" />
         {bits.split('').map((bit, i) =>
           bit === '1' ? (
             <rect
@@ -42,7 +42,7 @@ export const AnswerCardShape: React.FC<{ letter: 'A' | 'B' | 'C' | 'D' }> = ({ l
         fontSize="46"
         fontWeight="800"
         fontFamily="'Inter Variable', sans-serif"
-        fill="#101820"
+        fill="#000000"
       >
         {letter}
       </text>
