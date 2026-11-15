@@ -1,12 +1,14 @@
 import React, { useMemo, useState } from 'react';
 import { Classroom, Student } from '../../types';
-import { addStudent, removeStudent, updateStudents } from '../../services/storageService';
+import { addStudent, createClassroom, deleteClassroom, removeStudent, renameClassroom, updateStudents } from '../../services/storageService';
 import { STUDENT_MARKERS } from '../../services/markerRanges';
-import { Plus, Printer, Search, Trash2 } from 'lucide-react';
+import { Check, Plus, Printer, Search, Trash2 } from 'lucide-react';
 
 interface ClassroomManagerProps {
   classroom: Classroom;
   onRefresh: () => void;
+  classrooms: Classroom[];
+  onSwitchClassroom: (id: string) => void;
   // Sem ids: todos os cartões. Com ids: só os desses alunos
   onNavigateToCards: (ids?: number[]) => void;
 }
@@ -29,7 +31,15 @@ const pillSecondary =
 const textButton = 'min-h-[2.75rem] px-3 rounded-lg text-base font-semibold text-primary hover:bg-black/5';
 
 // Turma: lista agrupada com o número de cada cartão, cadastro no topo e impressão por aluno
-export const ClassroomManager: React.FC<ClassroomManagerProps> = ({ classroom, onRefresh, onNavigateToCards }) => {
+export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
+  classroom,
+  onRefresh,
+  classrooms,
+  onSwitchClassroom,
+  onNavigateToCards,
+}) => {
+  const [newClass, setNewClass] = useState<string | null>(null);
+  const [renaming, setRenaming] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [pasting, setPasting] = useState(false);
   const [pasted, setPasted] = useState('');
@@ -83,6 +93,33 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({ classroom, o
     onRefresh();
   };
 
+  const addClassroom = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newClass?.trim()) return;
+    createClassroom(newClass);
+    setNewClass(null);
+    onRefresh();
+  };
+
+  const saveRename = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!renaming?.trim()) return;
+    renameClassroom(classroom.id, renaming);
+    setRenaming(null);
+    onRefresh();
+  };
+
+  const removeClassroom = () => {
+    if (
+      !confirm(
+        `Apagar a turma ${classroom.name}? Os ${students.length} alunos e todas as rodadas dela saem deste computador. Não dá para desfazer.`
+      )
+    )
+      return;
+    deleteClassroom(classroom.id);
+    onRefresh();
+  };
+
   const filtered = useMemo(() => {
     const term = searchQuery.trim().toLowerCase();
     return students.filter((s) => !term || s.name.toLowerCase().includes(term) || pad(s.id).includes(term));
@@ -91,7 +128,32 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({ classroom, o
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 space-y-8">
       <header className="space-y-2">
-        <h1 className="font-display text-4xl lg:text-[2.75rem] font-bold tracking-tight leading-[1.05]">Turma</h1>
+        <p className="text-base font-semibold text-base-content/70">Turma</p>
+        {renaming !== null ? (
+          <form onSubmit={saveRename} className="flex flex-wrap items-center gap-2 max-w-xl">
+            <input
+              value={renaming}
+              onChange={(e) => setRenaming(e.target.value)}
+              onKeyDown={(e) => e.key === 'Escape' && setRenaming(null)}
+              autoFocus
+              aria-label="Nome da turma"
+              className={`${field} flex-1 text-2xl font-display font-bold`}
+            />
+            <button type="button" onClick={() => setRenaming(null)} className={textButton}>
+              Cancelar
+            </button>
+            <button type="submit" className={pillPrimary}>
+              Salvar
+            </button>
+          </form>
+        ) : (
+          <div className="flex flex-wrap items-baseline gap-x-3">
+            <h1 className="font-display text-4xl lg:text-[2.75rem] font-bold tracking-tight leading-[1.05]">{classroom.name}</h1>
+            <button onClick={() => setRenaming(classroom.name)} className={textButton}>
+              Renomear
+            </button>
+          </div>
+        )}
         <p className="text-lg text-base-content/75 max-w-3xl">
           Cada aluno tem um cartão com número próprio. É pelo desenho do cartão que a câmera sabe quem respondeu.
         </p>
@@ -100,6 +162,69 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({ classroom, o
       <div className="grid grid-cols-1 lg:grid-cols-[22rem_1fr] gap-8 items-start">
         {/* Lateral: cadastro e cartões */}
         <aside className="space-y-6 lg:sticky lg:top-24">
+          {/* Turmas do professor: cada uma com seus alunos, cartões e rodadas */}
+          <section aria-labelledby="turmas" className="bg-base-100 border border-base-300 rounded-[0.875rem] overflow-hidden">
+            <div className="flex items-center justify-between gap-2 px-5 pt-4 pb-2">
+              <h2 id="turmas" className="font-display text-xl font-bold tracking-tight">
+                Suas turmas
+              </h2>
+              {newClass === null && (
+                <button onClick={() => setNewClass('')} className={`${textButton} -mr-2`}>
+                  Nova turma
+                </button>
+              )}
+            </div>
+            <ul role="radiogroup" aria-label="Turma ativa">
+              {classrooms.map((c) => {
+                const on = c.id === classroom.id;
+                return (
+                  <li key={c.id} className="border-t border-base-300 first:border-t-0">
+                    <button
+                      role="radio"
+                      aria-checked={on}
+                      onClick={() => !on && onSwitchClassroom(c.id)}
+                      className={`w-full flex items-center gap-3 min-h-[3rem] px-5 text-left text-base hover:bg-black/[0.03] ${on ? 'font-semibold' : ''}`}
+                    >
+                      <Check className={`w-4 h-4 shrink-0 text-primary ${on ? '' : 'invisible'}`} aria-hidden="true" />
+                      <span className="flex-1 truncate">{c.name}</span>
+                      <span className="text-[0.9375rem] font-normal text-base-content/60">
+                        {c.students.length} {c.students.length === 1 ? 'aluno' : 'alunos'}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+            {newClass !== null && (
+              <form onSubmit={addClassroom} className="border-t border-base-300 p-4 space-y-2">
+                <input
+                  value={newClass}
+                  onChange={(e) => setNewClass(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Escape' && setNewClass(null)}
+                  autoFocus
+                  placeholder="Nome da turma, ex.: 6º A"
+                  aria-label="Nome da nova turma"
+                  className={field}
+                />
+                <div className="flex justify-end gap-2">
+                  <button type="button" onClick={() => setNewClass(null)} className={textButton}>
+                    Cancelar
+                  </button>
+                  <button type="submit" disabled={!newClass.trim()} className={pillPrimary}>
+                    Criar
+                  </button>
+                </div>
+              </form>
+            )}
+            {classrooms.length > 1 && newClass === null && (
+              <div className="border-t border-base-300 px-5 py-2">
+                <button onClick={removeClassroom} className="min-h-[2.75rem] -ml-3 px-3 rounded-lg text-base font-semibold text-error hover:bg-black/5">
+                  Apagar esta turma
+                </button>
+              </div>
+            )}
+          </section>
+
           <section aria-labelledby="novo-aluno" className="bg-base-100 border border-base-300 rounded-[0.875rem] p-5 space-y-4">
             <div className="flex items-center justify-between gap-2">
               <h2 id="novo-aluno" className="font-display text-xl font-bold tracking-tight">

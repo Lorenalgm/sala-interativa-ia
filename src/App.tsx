@@ -13,6 +13,8 @@ import { PerformanceSummary } from './components/Reports/PerformanceSummary';
 import { getScript } from './data/scripts';
 import {
   loadClassroom,
+  loadClassrooms,
+  setActiveClassroom,
   loadQuestions,
 } from './services/storageService';
 import { Classroom, Question, ScriptId } from './types';
@@ -57,6 +59,7 @@ export const App: React.FC = () => {
   const activeTab = route.tab;
   const activeScriptId = route.scriptId;
   const [classroom, setClassroom] = useState<Classroom>(() => loadClassroom());
+  const [classrooms, setClassrooms] = useState<Classroom[]>(() => loadClassrooms());
   const [questions, setQuestions] = useState<Question[]>(() => loadQuestions());
   const [cameraActive, setCameraActive] = useState(false);
   // Alunos já marcados ao abrir os cartões (vindo da Turma); null = todos
@@ -102,7 +105,14 @@ export const App: React.FC = () => {
 
   const refreshData = () => {
     setClassroom(loadClassroom());
+    setClassrooms(loadClassrooms());
     setQuestions(loadQuestions());
+  };
+
+  // Troca a turma ativa: todas as telas passam a mostrar só os alunos e as rodadas dela
+  const switchClassroom = (id: string) => {
+    setActiveClassroom(id);
+    refreshData();
   };
 
   return (
@@ -111,9 +121,14 @@ export const App: React.FC = () => {
         activeTab={activeTab}
         onSelectTab={handleSelectTab}
         cameraActive={cameraActive}
+        classrooms={classrooms}
+        activeClassroomId={classroom.id}
+        onSwitchClassroom={switchClassroom}
+        switchLocked={isRoundInProgress}
       />
 
-      <main className="flex-1">
+      {/* A chave remonta as telas ao trocar de turma: nada da turma anterior fica na tela */}
+      <main key={classroom.id} className="flex-1">
         {activeTab === 'home' && (
           <LandingPage
             onOpenLibrary={() => handleSelectTab('library')}
@@ -178,6 +193,8 @@ export const App: React.FC = () => {
           <ClassroomManager
             classroom={classroom}
             onRefresh={refreshData}
+            classrooms={classrooms}
+            onSwitchClassroom={switchClassroom}
             onNavigateToCards={(ids) => {
               go('cards');
               setCardsFor(ids ?? null);
