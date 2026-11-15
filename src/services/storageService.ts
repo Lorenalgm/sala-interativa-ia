@@ -189,7 +189,18 @@ export function loadRoundHistory(classroomId = getActiveClassroomId()): RoundSes
 }
 
 export function saveRoundSession(round: RoundSession): boolean {
-  return write(KEYS.ROUNDS, [{ ...round, classroomId: round.classroomId ?? getActiveClassroomId() }, ...allRounds()]);
+  const ok = write(KEYS.ROUNDS, [{ ...round, classroomId: round.classroomId ?? getActiveClassroomId() }, ...allRounds()]);
+  requestPersistence();
+  return ok;
+}
+
+// Pede ao navegador para não apagar os dados quando faltar espaço. Sem garantia: a cópia de segurança é a proteção real
+function requestPersistence(): void {
+  try {
+    navigator.storage?.persist?.().catch(() => undefined);
+  } catch {
+    // navegador sem suporte: segue sem pedir
+  }
 }
 
 // Rodadas de exemplo da turma ativa: entram no lugar das anteriores de exemplo
@@ -225,4 +236,60 @@ export function loadFormation(): GroupFormation | null {
 export function saveFormation(formation: GroupFormation): void {
   const formations = read<Record<string, GroupFormation>>(KEYS.FORMATIONS, {});
   write(KEYS.FORMATIONS, { ...formations, [formation.classroomId]: formation });
+}
+
+// ---------- Cópia de segurança ----------
+
+const BACKUP_KEYS = [KEYS.CLASSROOMS, KEYS.ACTIVE, KEYS.QUESTIONS, KEYS.ROUNDS, KEYS.FORMATIONS] as const;
+
+export interface Backup {
+  app: 'classplay';
+  schemaVersion: 3;
+  exportedAt: string;
+  data: Record<string, unknown>;
+}
+
+export function exportBackup(): Backup {
+  loadClassrooms();
+  return {
+    app: 'classplay',
+    schemaVersion: 3,
+    exportedAt: new Date().toISOString(),
+    data: Object.fromEntries(BACKUP_KEYS.map((k) => [k, read<unknown>(k, null)])),
+  };
+}
+
+// Restaura uma cópia no lugar dos dados atuais. Confere o formato antes de gravar qualquer coisa
+export function importBackup(text: string): { ok: true } | { ok: false; reason: string } {
+  let parsed: Backup;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return { ok: false, reason: 'O arquivo não é uma cópia do ClassPlay.' };
+  }
+  const d = parsed?.data;
+  const valid =
+    parsed?.app === 'classplay' &&
+    parsed.schemaVersion === 3 &&
+    d &&
+    Array.isArray(d[KEYS.CLASSROOMS]) &&
+    (d[KEYS.CLASSROOMS] as unknown[]).every((c) => {
+      const x = c as Classroom;
+      return typeof x?.id === 'string' && typeof x.name === 'string' && Array.isArray(x.students);
+    }) &&
+    Array.isArray(d[KEYS.QUESTIONS] ?? []) &&
+    Array.isArray(d[KEYS.ROUNDS] ?? []);
+  if (!valid) return { ok: false, reason: 'O arquivo não é uma cópia do ClassPlay ou é de uma versão que este app não lê.' };
+  BACKUP_KEYS.forEach((k) => {
+    if (d[k] === null || d[k] === undefined) localStorage.removeItem(k);
+    else write(k, d[k]);
+  });
+  return { ok: true };
+}
+
+// Apaga tudo o que o ClassPlay guardou neste navegador
+export function wipeAllData(): void {
+  Object.keys(localStorage)
+    .filter((k) => k.startsWith('classplay_'))
+    .forEach((k) => localStorage.removeItem(k));
 }

@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Classroom, Student } from '../../types';
-import { addStudent, createClassroom, deleteClassroom, removeStudent, renameClassroom, updateStudents } from '../../services/storageService';
+import { addStudent, createClassroom, deleteClassroom, exportBackup, importBackup, removeStudent, renameClassroom, updateStudents, wipeAllData } from '../../services/storageService';
 import { STUDENT_MARKERS } from '../../services/markerRanges';
-import { Check, Plus, Printer, Search, Trash2 } from 'lucide-react';
+import { Check, Download, Plus, Printer, Search, Trash2, Upload } from 'lucide-react';
 
 interface ClassroomManagerProps {
   classroom: Classroom;
@@ -91,6 +91,32 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
     updateStudents(students.map((s) => (s.id === id ? { ...s, name: editingName.trim() } : s)));
     setEditingId(null);
     onRefresh();
+  };
+
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [backupMsg, setBackupMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const downloadBackup = () => {
+    const blob = new Blob([JSON.stringify(exportBackup(), null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `classplay-copia-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    setBackupMsg({ ok: true, text: 'Cópia baixada. Guarde o arquivo num lugar seguro: ele tem os nomes dos alunos.' });
+  };
+
+  const restoreBackup = async (file: File) => {
+    if (!confirm('Restaurar esta cópia? Turmas, perguntas e rodadas atuais deste computador serão trocadas pelas da cópia.')) return;
+    const result = importBackup(await file.text());
+    setBackupMsg(result.ok ? { ok: true, text: 'Cópia restaurada.' } : { ok: false, text: result.reason });
+    if (result.ok) onRefresh();
+  };
+
+  const wipe = () => {
+    if (!confirm('Apagar todos os dados do ClassPlay deste computador? Turmas, alunos, perguntas e rodadas saem daqui. Baixe uma cópia antes se quiser guardar.')) return;
+    wipeAllData();
+    window.location.reload();
   };
 
   const addClassroom = (e: React.FormEvent) => {
@@ -279,6 +305,43 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
             <button onClick={() => onNavigateToCards()} className={`${pillSecondary} w-full`}>
               <Printer className="w-4 h-4" aria-hidden="true" />
               Imprimir todos os cartões
+            </button>
+          </section>
+
+          {/* Os dados ficam só neste navegador: a cópia é a proteção contra perder tudo */}
+          <section aria-labelledby="dados" className="bg-base-100 border border-base-300 rounded-[0.875rem] p-5 space-y-3">
+            <h2 id="dados" className="font-display text-xl font-bold tracking-tight">Dados deste computador</h2>
+            <p className="text-base text-base-content/75">
+              Turmas, perguntas e rodadas ficam só neste navegador. Baixe uma cópia de vez em quando.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={downloadBackup} className={pillSecondary}>
+                <Download className="w-4 h-4" aria-hidden="true" />
+                Baixar cópia
+              </button>
+              <button onClick={() => fileRef.current?.click()} className={pillSecondary}>
+                <Upload className="w-4 h-4" aria-hidden="true" />
+                Restaurar
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) restoreBackup(f);
+                  e.target.value = '';
+                }}
+              />
+            </div>
+            {backupMsg && (
+              <p role="status" className={`text-base ${backupMsg.ok ? 'text-[#14532d]' : 'font-semibold text-error'}`}>
+                {backupMsg.text}
+              </p>
+            )}
+            <button onClick={wipe} className="min-h-[2.75rem] -ml-3 px-3 rounded-lg text-base font-semibold text-error hover:bg-black/5">
+              Apagar tudo deste computador
             </button>
           </section>
         </aside>
