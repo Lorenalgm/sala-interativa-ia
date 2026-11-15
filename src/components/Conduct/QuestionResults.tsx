@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Alternative, Question } from '../../types';
-import confetti from 'canvas-confetti';
 
 interface QuestionResultsProps {
   question: Question;
@@ -27,11 +26,12 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
 
   useEffect(() => {
     if (totalResponses > 0 && accuracyRate >= 50) {
-      confetti({
+      // Carregado só na hora de comemorar
+      import('canvas-confetti').then(({ default: confetti }) => confetti({
         particleCount: 70,
         spread: 60,
         origin: { y: 0.6 },
-      });
+      }));
     }
   }, [accuracyRate, totalResponses]);
 

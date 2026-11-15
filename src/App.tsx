@@ -1,15 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { QuestionBank } from './components/Questions/QuestionBank';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { Navbar, ActiveTab } from './components/Navbar';
 import { LandingPage } from './components/Landing/LandingPage';
 import { LibraryPage } from './components/Library/LibraryPage';
 import { ScriptPage } from './components/Library/ScriptPage';
-import { BoardFlow } from './components/Board/BoardFlow';
-import { QuestionFlow } from './components/Conduct/QuestionFlow';
-import { CameraTest } from './components/Camera/CameraTest';
-import { CardPrintView } from './components/CardGenerator/CardPrintView';
-import { ClassroomManager } from './components/Classroom/ClassroomManager';
-import { PerformanceSummary } from './components/Reports/PerformanceSummary';
 import { getScript } from './data/scripts';
 import {
   loadClassroom,
@@ -18,6 +11,15 @@ import {
   loadQuestions,
 } from './services/storageService';
 import { Classroom, Question, ScriptId } from './types';
+
+// Telas carregadas só quando abertas: a primeira abertura do app fica leve
+const QuestionBank = lazy(() => import('./components/Questions/QuestionBank').then((m) => ({ default: m.QuestionBank })));
+const BoardFlow = lazy(() => import('./components/Board/BoardFlow').then((m) => ({ default: m.BoardFlow })));
+const QuestionFlow = lazy(() => import('./components/Conduct/QuestionFlow').then((m) => ({ default: m.QuestionFlow })));
+const CameraTest = lazy(() => import('./components/Camera/CameraTest').then((m) => ({ default: m.CameraTest })));
+const CardPrintView = lazy(() => import('./components/CardGenerator/CardPrintView').then((m) => ({ default: m.CardPrintView })));
+const ClassroomManager = lazy(() => import('./components/Classroom/ClassroomManager').then((m) => ({ default: m.ClassroomManager })));
+const PerformanceSummary = lazy(() => import('./components/Reports/PerformanceSummary').then((m) => ({ default: m.PerformanceSummary })));
 
 interface Route {
   tab: ActiveTab;
@@ -129,6 +131,7 @@ export const App: React.FC = () => {
 
       {/* A chave remonta as telas ao trocar de turma: nada da turma anterior fica na tela */}
       <main key={classroom.id} className="flex-1">
+        <Suspense fallback={<p className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 text-lg text-base-content/70" role="status">Carregando…</p>}>
         {activeTab === 'home' && (
           <LandingPage
             onOpenLibrary={() => handleSelectTab('library')}
@@ -209,6 +212,7 @@ export const App: React.FC = () => {
             onRefresh={refreshData}
           />
         )}
+        </Suspense>
       </main>
     </div>
   );

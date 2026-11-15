@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { RoundSession, Student } from '../../types';
 import { Award, BarChart2, RotateCcw, ArrowRight, EyeOff } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { suggestForQuestion } from '../../services/suggestions';
 
 interface RoundSummaryViewProps {
@@ -28,11 +27,12 @@ export const RoundSummaryView: React.FC<RoundSummaryViewProps> = ({
   // Comemora só quando todas as perguntas tiveram respostas e a turma acertou a maioria
   useEffect(() => {
     if (unansweredQuestions === 0 && round.totalResponses > 0 && round.overallAccuracy >= 50) {
-      confetti({
+      // Carregado só na hora de comemorar
+      import('canvas-confetti').then(({ default: confetti }) => confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.5 },
-      });
+      }));
     }
   }, [unansweredQuestions, round.totalResponses, round.overallAccuracy]);
 
