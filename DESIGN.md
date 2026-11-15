@@ -303,6 +303,15 @@ Barra branca a 90% com desfoque (a única superfície translúcida do app, porqu
 ### Preparação da aula (lista agrupada)
 As três preparações (Pergunta rápida, Grupo com sorteio e Lousa interativa) usam o mesmo desenho: título grande com o nome do modelo, ações em cápsula de 44px à direita (secundária em cinza #e3e3e8, principal em azul com a contagem de perguntas) e as perguntas numa lista agrupada como em Lembretes. Cada linha tem um círculo de marcar de 28px dentro de um alvo de 44px (azul cheio com check branco quando marcado, contorno #aeaeb2 quando não), a pergunta em 1.125rem 600 (a 60% quando desmarcada) e, na Pergunta rápida, "Alternativas" com chevron e a lixeira em cinza. Alternativas abertas mostram a certa em verde claro com check e a palavra "Certa", nunca só a cor. No formulário de nova pergunta, cada alternativa tem o cartão com a letra, o campo e um botão "Certa"; não há menu para escolher a resposta. Presença na montagem de grupos: pílulas marcadas por padrão, um toque marca a falta (riscado e cinza).
 
+### Formulário de pergunta (`QuestionForm`)
+Um único formulário para o banco de perguntas e para a preparação da aula. Campos de 44px com borda separadora e foco azul; cada alternativa tem o cartão com a letra, o campo e o botão "Certa" (verde quando marcado). Erros aparecem no próprio formulário, em vermelho ao lado de "Salvar", e o campo vazio ganha borda vermelha; nada de `alert()`.
+
+### Banco de perguntas e Turma
+Mesma página das preparações: título grande, ação principal em cápsula, busca no estilo do sistema (fundo #e3e3e8, sem borda, 44px) e listas agrupadas. No banco, cada habilidade é um grupo que recolhe; cada pergunta mostra as quatro alternativas com a certa em verde, check e "Certa", e as ações "Editar" (texto azul) e lixeira. Na Turma, o número do aluno aparece no formato do cartão (branco, borda preta); cada linha tem "Editar" (edição no lugar, Enter salva, Esc cancela), imprimir só aquele cartão e remover. O cadastro fica no topo, aceita um nome ou uma lista colada (um por linha) e mostra o cartão que o próximo aluno recebe, com o mesmo cálculo do armazenamento (menor número livre).
+
+### Impressão dos cartões
+Título com a contagem ("20 cartões em 20 folhas A4"), controle segmentado de tamanho (1 por folha até 8 m, 2 por folha até 5,5 m) e "Imprimir". Dicas em lista agrupada com ícone cinza. "Quem imprimir" usa as mesmas pílulas da presença, todos marcados por padrão; vindo da Turma, abre só com o aluno escolhido. A prévia mostra folhas pequenas com sombra de papel; na impressão a sombra some e cada cartão ocupa a área útil da A4.
+
 ### Datashow (condução)
 - **Alternativas como cartão:** cada letra aparece como o cartão de papel, branco com borda preta de 3px e letra preta, proporção 4:5. Nada de azul, porque não é botão.
 - **Escala com a tela:** enunciado em Inter 700 com `clamp(2rem, 3.6vw, 4.25rem)`, alternativas em `clamp(1.5rem, 2.3vw, 2.75rem)`.
