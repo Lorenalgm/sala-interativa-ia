@@ -13,10 +13,9 @@ import { PerformanceSummary } from './components/Reports/PerformanceSummary';
 import { getScript } from './data/scripts';
 import {
   loadClassroom,
-  loadQuestionHistory,
   loadQuestions,
 } from './services/storageService';
-import { Classroom, Question, QuestionSessionRecord, ScriptId } from './types';
+import { Classroom, Question, ScriptId } from './types';
 
 interface Route {
   tab: ActiveTab;
@@ -59,9 +58,6 @@ export const App: React.FC = () => {
   const activeScriptId = route.scriptId;
   const [classroom, setClassroom] = useState<Classroom>(() => loadClassroom());
   const [questions, setQuestions] = useState<Question[]>(() => loadQuestions());
-  const [history, setHistory] = useState<QuestionSessionRecord[]>(() =>
-    loadQuestionHistory()
-  );
   const [cameraActive, setCameraActive] = useState(false);
   // Alunos já marcados ao abrir os cartões (vindo da Turma); null = todos
   const [cardsFor, setCardsFor] = useState<number[] | null>(null);
@@ -107,7 +103,6 @@ export const App: React.FC = () => {
   const refreshData = () => {
     setClassroom(loadClassroom());
     setQuestions(loadQuestions());
-    setHistory(loadQuestionHistory());
   };
 
   return (
@@ -193,7 +188,7 @@ export const App: React.FC = () => {
         {activeTab === 'reports' && (
           <PerformanceSummary
             classroom={classroom}
-            history={history}
+            questions={questions}
             onRefresh={refreshData}
           />
         )}

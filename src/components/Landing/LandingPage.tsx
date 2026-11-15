@@ -41,7 +41,7 @@ const shelf: { script: ScriptId; method: string; text: string }[] = [
 ];
 
 // Exemplo ilustrativo do painel de Desempenho, com turma fictícia de 14 alunos.
-// As frases seguem as regras de services/recommendations.ts.
+// As frases seguem as regras de services/insights.ts.
 const exampleSkills = [
   {
     skill: 'Matemática',
