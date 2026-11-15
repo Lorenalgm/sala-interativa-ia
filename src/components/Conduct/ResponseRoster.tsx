@@ -25,22 +25,26 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
   const progressPercent = totalCount > 0 ? Math.round((answeredCount / totalCount) * 100) : 0;
 
   return (
-    <section className="bg-base-100 border border-base-300 rounded-box p-4 flex flex-col flex-1 min-h-0 gap-3">
+    <section className="bg-base-100 border border-base-300 rounded-[0.875rem] p-4 flex flex-col flex-1 min-h-0 gap-3">
       <div>
-        <h2 className="text-base font-bold text-base-content">Respostas da turma</h2>
-        <p className="text-4xl font-extrabold text-base-content leading-none mt-2" aria-live="polite">
+        <h2 className="text-[1.0625rem] font-semibold text-base-content">Respostas da turma</h2>
+        <p className="font-display text-5xl font-bold tracking-tight text-base-content leading-none mt-2 tabular-nums" aria-live="polite">
           {answeredCount}
-          <span className="text-xl font-bold text-base-content/70"> de {totalCount}</span>
+          <span className="text-2xl font-semibold text-base-content/70"> de {totalCount}</span>
         </p>
         <p className="text-base text-base-content/70 mt-1">já responderam</p>
       </div>
 
-      <progress
-        className="progress progress-primary w-full h-3"
-        value={progressPercent}
-        max={100}
+      <div
+        role="progressbar"
+        aria-valuenow={progressPercent}
+        aria-valuemin={0}
+        aria-valuemax={100}
         aria-label="Alunos que já responderam"
-      />
+        className="w-full h-3 rounded-full bg-[#e3e3e8] overflow-hidden"
+      >
+        <div className="h-full rounded-full bg-success motion-safe:transition-[width] motion-safe:duration-300" style={{ width: `${progressPercent}%` }} />
+      </div>
 
       {/* Número de cada cartão: quem ainda não foi lido sabe que precisa levantar de novo */}
       <ul
@@ -58,13 +62,13 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
             <li
               key={student.id}
               title={student.name}
-              className={`flex items-center gap-2 rounded-btn font-bold text-base transition-transform ${
-                showNames ? 'px-2 py-1' : 'justify-center h-10'
+              className={`flex items-center gap-2 rounded-[0.625rem] font-display font-bold text-lg tabular-nums transition-transform ${
+                showNames ? 'px-2.5 py-1.5' : 'justify-center h-11'
               } ${
                 hasAnswered
                   ? 'bg-success text-success-content'
-                  : 'bg-base-200 text-base-content/70'
-              } ${isRecent ? 'scale-110 ring-2 ring-neutral' : ''}`}
+                  : 'bg-[#e3e3e8] text-base-content/75'
+              } ${isRecent ? 'scale-110 ring-[3px] ring-black' : ''}`}
             >
               {onCorrect ? (
                 <button
@@ -90,7 +94,7 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
 
       {onCorrect && editingId !== null && (
         <div className="no-print flex items-center gap-1.5 flex-wrap" role="group" aria-label="Corrigir resposta">
-          <span className="text-sm text-base-content/70">
+          <span className="text-base text-base-content/75">
             {students.find((x) => x.id === editingId)?.name}:
           </span>
           {(['A', 'B', 'C', 'D'] as Alternative[]).map((opt) => (
@@ -101,7 +105,7 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
                 onCorrect(editingId, opt);
                 setEditingId(null);
               }}
-              className={`btn btn-sm ${responses[editingId] === opt ? 'btn-primary' : ''}`}
+              className={`w-11 h-11 rounded-[0.625rem] font-display font-bold text-lg ${responses[editingId] === opt ? 'bg-primary text-primary-content' : 'bg-[#e3e3e8] hover:bg-[#d8d8de]'}`}
             >
               {opt}
             </button>
@@ -116,7 +120,7 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
           checked={showNames}
           onChange={(e) => setShowNames(e.target.checked)}
         />
-        <span className="label-text text-sm text-base-content/70">Mostrar nomes</span>
+        <span className="label-text text-base text-base-content/80">Mostrar nomes</span>
       </label>
     </section>
   );

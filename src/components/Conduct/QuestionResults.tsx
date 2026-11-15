@@ -38,17 +38,17 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
   return (
     <div className="flex-1 min-h-0 flex flex-col gap-4">
       {/* Resposta certa e explicação */}
-      <section className="bg-base-100 border-2 border-success rounded-box p-6 sm:p-8 space-y-4">
+      <section className="bg-base-100 border-[3px] border-success rounded-[1.25rem] p-6 sm:p-8 space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex items-center gap-4 min-w-0">
-            <span className="w-14 h-14 lg:w-16 lg:h-16 rounded-btn bg-success text-success-content flex items-center justify-center font-extrabold text-2xl lg:text-3xl flex-shrink-0">
+            <span className="w-14 h-14 lg:w-16 lg:h-16 rounded-[0.625rem] bg-success text-success-content flex items-center justify-center font-display font-bold text-2xl lg:text-3xl flex-shrink-0">
               {question.correctOption}
             </span>
             <div className="min-w-0">
-              <p className="text-base lg:text-lg font-semibold text-success">
+              <p className="text-lg lg:text-xl font-semibold text-success">
                 Resposta certa
               </p>
-              <h2 className="text-2xl lg:text-4xl font-extrabold text-base-content leading-tight">
+              <h2 className="font-display text-3xl lg:text-5xl font-bold tracking-tight text-base-content leading-tight">
                 {question.options[question.correctOption]}
               </h2>
             </div>
@@ -57,13 +57,13 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
           <div className="flex items-end gap-8 text-right">
             <div>
               <p className="text-base lg:text-lg text-base-content/70">Acertaram</p>
-              <p className="text-4xl lg:text-5xl font-extrabold text-success">
+              <p className="font-display text-5xl lg:text-6xl font-bold tracking-tight text-success tabular-nums">
                 {totalResponses > 0 ? `${accuracyRate}%` : '–'}
               </p>
             </div>
             <div>
               <p className="text-base lg:text-lg text-base-content/70">Respostas</p>
-              <p className="text-4xl lg:text-5xl font-extrabold text-base-content">
+              <p className="font-display text-5xl lg:text-6xl font-bold tracking-tight text-base-content tabular-nums">
                 {totalResponses}
               </p>
             </div>
@@ -76,8 +76,8 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
       </section>
 
       {/* Distribuição dos votos da turma */}
-      <section className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-8 space-y-4">
-        <h2 className="text-xl lg:text-2xl font-bold text-base-content">Como a turma votou</h2>
+      <section className="bg-base-100 border border-base-300 rounded-[1.25rem] p-6 sm:p-8 space-y-4">
+        <h2 className="font-display text-2xl lg:text-3xl font-bold tracking-tight text-base-content">Como a turma votou</h2>
 
         {totalResponses === 0 ? (
           <p className="text-lg lg:text-xl text-base-content/80 max-w-[60ch]">
@@ -94,8 +94,8 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
               return (
                 <li key={opt} className="flex items-center gap-4">
                   <span
-                    className={`w-12 h-12 rounded-btn flex items-center justify-center font-extrabold text-xl flex-shrink-0 ${
-                      isCorrect ? 'bg-success text-success-content' : 'bg-base-200 text-base-content'
+                    className={`w-12 h-12 rounded-[0.625rem] flex items-center justify-center font-display font-bold text-xl flex-shrink-0 ${
+                      isCorrect ? 'bg-success text-success-content' : 'bg-white border-[3px] border-black text-black'
                     }`}
                   >
                     {opt}
@@ -107,23 +107,23 @@ export const QuestionResults: React.FC<QuestionResultsProps> = ({
                   >
                     {question.options[opt]}
                   </p>
-                  <div className="flex-1 h-8 bg-base-200 rounded-btn overflow-hidden">
+                  <div className="flex-1 h-8 bg-[#e3e3e8] rounded-[0.625rem] overflow-hidden">
                     <div
-                      className={`h-full rounded-btn transition-[width] duration-700 ease-out ${
-                        isCorrect ? 'bg-success' : 'bg-base-content/25'
+                      className={`h-full rounded-[0.625rem] motion-safe:transition-[width] motion-safe:duration-700 ease-out ${
+                        isCorrect ? 'bg-success' : 'bg-[#636366]'
                       }`}
                       style={{ width: count > 0 ? `${Math.max(2, percent)}%` : '0%' }}
                     />
                   </div>
                   <p className="w-28 text-right flex-shrink-0">
                     <span
-                      className={`text-2xl lg:text-3xl font-extrabold ${
+                      className={`font-display text-2xl lg:text-3xl font-bold tabular-nums ${
                         isCorrect ? 'text-success' : 'text-base-content'
                       }`}
                     >
                       {percent}%
                     </span>
-                    <span className="block text-sm text-base-content/70">
+                    <span className="block text-base text-base-content/75">
                       {count} {count === 1 ? 'voto' : 'votos'}
                     </span>
                   </p>
