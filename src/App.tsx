@@ -36,16 +36,16 @@ const TAB_PATHS: Partial<Record<ActiveTab, string>> = {
 const SCRIPT_IDS: ScriptId[] = ['quick-question', 'group-draw', 'peer-instruction', 'interactive-board'];
 
 const buildPath = ({ tab, scriptId }: Route): string => {
-  if (tab === 'script') return `/roteiros/${scriptId}`;
-  if (tab === 'prepare') return `/roteiros/${scriptId}/aula`;
+  if (tab === 'script') return `/modelos/${scriptId}`;
+  if (tab === 'prepare') return `/modelos/${scriptId}/aula`;
   return TAB_PATHS[tab] ?? '/';
 };
 
-// Endereço desconhecido cai no início
+// Endereço desconhecido cai no início; /atividades/ e /roteiros/ são endereços antigos dos modelos
 const parsePath = (pathname: string): Route => {
   const path = pathname.replace(/\/+$/, '') || '/';
   const scriptId: ScriptId = 'quick-question';
-  const match = path.match(/^\/roteiros\/([^/]+)(\/aula)?$/);
+  const match = path.match(/^\/(?:modelos|atividades|roteiros)\/([^/]+)(\/aula)?$/);
   if (match && SCRIPT_IDS.includes(match[1] as ScriptId)) {
     return { tab: match[2] ? 'prepare' : 'script', scriptId: match[1] as ScriptId };
   }
