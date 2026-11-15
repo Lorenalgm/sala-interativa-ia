@@ -255,7 +255,12 @@ export function nextClassInsights(
 // Planilha com uma linha por resposta: dá para filtrar por aluno, pergunta ou habilidade
 export function answersCsv(rounds: RoundSession[], students: Student[], scriptName: (r: RoundSession) => string): string {
   const name = new Map(students.map((s) => [s.id, s.name]));
-  const esc = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
+  // Aspas escapadas e fórmulas neutralizadas: um nome que comece com = + - @ não vira fórmula no Excel (OWASP, CSV Injection)
+  const esc = (v: string | number) => {
+    const text = String(v);
+    const safe = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+    return `"${safe.replace(/"/g, '""')}"`;
+  };
   const rows = [['Data', 'Modelo', 'Pergunta', 'Habilidade', 'Resposta certa', 'Cartão', 'Aluno', 'Resposta', 'Acertou']];
   for (const r of [...rounds].sort((a, b) => a.timestamp - b.timestamp)) {
     for (const q of r.questions) {
