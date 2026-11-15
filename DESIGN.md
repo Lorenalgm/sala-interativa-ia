@@ -300,6 +300,19 @@ Mesmo grupo, sem chevron e sem hover. Cada linha leva uma lombada pequena (24x32
 ### Navegação
 Barra branca a 90% com desfoque (a única superfície translúcida do app, porque flutua sobre o conteúdo), 64px, separador inferior de 1px. Marca ClassPlay em Inter 700 com três lombadas nas cores das capas (índigo, laranja, verde-azulado); o nome some abaixo de `md`. Itens em pílula de 44px com ícone: ativo em azul de ação com texto branco e `aria-current="page"`; inativos em preto com hover a 5%. A barra rola na horizontal em telas estreitas em vez de empurrar a página. À direita, o botão da câmera ("Testar câmera" / "Câmera ligada") em pílula branca com borda, ponto de 10px laranja (desligada) ou verde (ligada).
 
+### Preparação da aula (lista agrupada)
+As três preparações (Pergunta rápida, Grupo com sorteio e Lousa interativa) usam o mesmo desenho: título grande com o nome do modelo, ações em cápsula de 44px à direita (secundária em cinza #e3e3e8, principal em azul com a contagem de perguntas) e as perguntas numa lista agrupada como em Lembretes. Cada linha tem um círculo de marcar de 28px dentro de um alvo de 44px (azul cheio com check branco quando marcado, contorno #aeaeb2 quando não), a pergunta em 1.125rem 600 (a 60% quando desmarcada) e, na Pergunta rápida, "Alternativas" com chevron e a lixeira em cinza. Alternativas abertas mostram a certa em verde claro com check e a palavra "Certa", nunca só a cor. No formulário de nova pergunta, cada alternativa tem o cartão com a letra, o campo e um botão "Certa"; não há menu para escolher a resposta. Presença na montagem de grupos: pílulas marcadas por padrão, um toque marca a falta (riscado e cinza).
+
+### Datashow (condução)
+- **Alternativas como cartão:** cada letra aparece como o cartão de papel, branco com borda preta de 3px e letra preta, proporção 4:5. Nada de azul, porque não é botão.
+- **Escala com a tela:** enunciado em Inter 700 com `clamp(2rem, 3.6vw, 4.25rem)`, alternativas em `clamp(1.5rem, 2.3vw, 2.75rem)`.
+- **Barra do professor:** cápsulas de 44px; navegação com setas em botões redondos cinza, "Simular" discreto sem fundo, "Projetar" e "Repetir" em cinza, ação principal em azul sempre por último.
+- **Respostas da turma:** contagem em Inter 700 (3rem), barra de progresso verde sobre trilho #e3e3e8, números dos cartões em Inter, verdes quando lidos; o último lido ganha anel preto.
+- **Resultado:** caixa da resposta certa com borda verde de 3px; barras das outras letras em #636366 sobre #e3e3e8 (o cinza claro sumia na projeção).
+- **Sorteio do grupo:** nome do grupo pequeno em cima e aluno sorteado grande embaixo, com filete preto de 4px à esquerda.
+
+**A Regra dos Algarismos.** Todos os números usam os algarismos da Inter (`@font-face` "ClassPlay Digits" com `unicode-range` 0-9 à frente da Atkinson). O zero cortado da Atkinson parece Ø de longe.
+
 ### Landing: cena da sala (componente assinatura)
 Ilustração SVG fornecida pela equipe (`src/assets/sala-classplay.svg`, viewBox 1200x664), com as cores do sistema aplicadas e inserida inline por `ClassroomScene.tsx` para usar as fontes da página. Fica à direita do título, num painel de 28px de raio com filete de 1px na borda da pauta. Mostra a professora ao lado do quadro com a pergunta (barras no lugar do texto), o datashow no teto com o feixe em amarela, a câmera com o cone de leitura tracejado, e alunos sentados levantando cartões com marcador e etiquetas "#NN ✓"; o cartão ainda não lido tem contorno tracejado. Piso e paredes em tons da pauta, camisas em azul, vermelho, tinta e amarela. O feixe e o cone usam degradê só como luz, nunca como preenchimento de interface. `role="img"` e `aria-label` vêm do próprio SVG. Sem sombras.
 
