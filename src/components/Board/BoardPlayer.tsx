@@ -243,7 +243,7 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
 
       {feedback ? (
         <p
-          className={`absolute left-[4%] right-[4%] top-[8%] h-[24%] flex items-center justify-center text-center rounded-2xl px-[2vw] font-display font-extrabold text-[3.4vw] leading-tight text-white ${
+          className={`absolute left-[4%] right-[4%] top-[8%] h-[24%] flex items-center justify-center text-center rounded-2xl px-[2vw] font-display font-bold text-[3.4vw] leading-tight text-white ${
             feedback.kind === 'right'
               ? feedback.firstTry
                 ? 'bg-green-600'
@@ -257,7 +257,7 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
             `Não foi dessa vez. A resposta certa é ${feedback.zone}: ${question?.options[feedback.zone]}`}
         </p>
       ) : (
-        <p className="absolute left-[4%] right-[4%] top-[8%] h-[24%] flex items-center font-display font-extrabold text-[3.4vw] leading-tight">
+        <p className="absolute left-[4%] right-[4%] top-[8%] h-[24%] flex items-center font-display font-bold text-[3.4vw] leading-tight">
           {question?.prompt}
         </p>
       )}
@@ -270,7 +270,7 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
             className={`absolute rounded-2xl border-4 flex items-center gap-[2vw] px-[2vw] transition-colors ${zoneClass(letter)}`}
             style={{ left: `${zone.x * 100}%`, top: `${zone.y * 100}%`, width: `${zone.w * 100}%`, height: `${zone.h * 100}%` }}
           >
-            <span className="font-display font-extrabold text-[5vw] leading-none">{letter}</span>
+            <span className="font-display font-bold text-[5vw] leading-none">{letter}</span>
             <span className="text-[2.6vw] font-semibold leading-tight">{question?.options[letter]}</span>
           </div>
         );
@@ -330,11 +330,11 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
           <p className="text-[2.2vw] font-semibold text-zinc-500">
             Pergunta {game.idx + 1} de {questions.length}
           </p>
-          <p className="font-display font-extrabold text-[7vw] leading-none">{group.name}</p>
+          <p className="font-display font-bold text-[7vw] leading-none">{group.name}</p>
           <p className="text-[3vw] font-bold">
             {isHand ? 'vai responder' : `vai responder com a Paleta ${groupIndex + 1}`}
           </p>
-          <p aria-live="polite" className="font-display font-extrabold text-[14vw] leading-none text-primary tabular-nums">
+          <p aria-live="polite" className="font-display font-bold text-[14vw] leading-none text-primary tabular-nums">
             {intro}
           </p>
         </div>

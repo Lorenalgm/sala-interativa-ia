@@ -41,7 +41,7 @@ export const AnswerCardShape: React.FC<{ letter: 'A' | 'B' | 'C' | 'D' }> = ({ l
         textAnchor="middle"
         fontSize="46"
         fontWeight="800"
-        fontFamily="'Bricolage Grotesque Variable', sans-serif"
+        fontFamily="'Inter Variable', sans-serif"
         fill="#101820"
       >
         {letter}

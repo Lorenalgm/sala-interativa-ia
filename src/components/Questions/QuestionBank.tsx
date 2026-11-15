@@ -108,7 +108,7 @@ export const QuestionBank: React.FC<QuestionBankProps> = ({ questions, onChange 
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20 space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-2">
-          <h1 className="font-display text-4xl font-extrabold tracking-[-0.025em]">Banco de perguntas</h1>
+          <h1 className="font-display text-4xl font-bold tracking-[-0.025em]">Banco de perguntas</h1>
           <p className="text-lg text-base-content/80">
             {questions.length} {questions.length === 1 ? 'pergunta' : 'perguntas'} em {skills.length}{' '}
             {skills.length === 1 ? 'habilidade' : 'habilidades'}. Na rodada, você escolhe quais usar.
@@ -126,7 +126,7 @@ export const QuestionBank: React.FC<QuestionBankProps> = ({ questions, onChange 
           className="bg-base-100 border border-base-300 rounded-[1.25rem] p-6 sm:p-8 space-y-5"
           aria-label={draft.id ? 'Editar pergunta' : 'Nova pergunta'}
         >
-          <h2 className="font-display text-2xl font-extrabold">
+          <h2 className="font-display text-2xl font-bold">
             {draft.id ? 'Editar pergunta' : 'Nova pergunta'}
           </h2>
           <label className="block space-y-1">
@@ -172,7 +172,7 @@ export const QuestionBank: React.FC<QuestionBankProps> = ({ questions, onChange 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {LETTERS.map((l) => (
               <label key={l} className="flex items-center gap-2">
-                <span className="w-8 h-8 shrink-0 rounded-lg bg-primary text-primary-content font-display font-extrabold flex items-center justify-center">
+                <span className="w-8 h-8 shrink-0 rounded-lg bg-primary text-primary-content font-display font-bold flex items-center justify-center">
                   {l}
                 </span>
                 <input
@@ -232,7 +232,7 @@ export const QuestionBank: React.FC<QuestionBankProps> = ({ questions, onChange 
                 <button
                   onClick={() => toggle(skill)}
                   aria-expanded={!isClosed}
-                  className="flex items-center gap-2 font-display text-2xl font-extrabold tracking-[-0.02em]"
+                  className="flex items-center gap-2 font-display text-2xl font-bold tracking-[-0.02em]"
                 >
                   <ChevronDown
                     className={`w-5 h-5 motion-safe:transition-transform ${isClosed ? '-rotate-90' : ''}`}

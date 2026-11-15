@@ -89,7 +89,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Abertura: a promessa e a cena da sala */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
         <div className="lg:col-span-5 space-y-6">
-          <h1 className="font-editorial text-4xl sm:text-5xl font-bold tracking-[-0.015em] leading-[1.06] text-balance">
+          <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-[-0.015em] leading-[1.06] text-balance">
             Roteiros de aprendizagem ativa para a sala de aula
           </h1>
           <p className="text-lg leading-relaxed text-base-content/85 text-pretty">
@@ -127,7 +127,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <section id="experimente" aria-labelledby="experimente-titulo" className="space-y-8 scroll-mt-24">
           <h2
             id="experimente-titulo"
-            className="font-editorial text-3xl lg:text-4xl font-bold tracking-[-0.015em] text-balance"
+            className="font-display text-3xl lg:text-4xl font-bold tracking-[-0.015em] text-balance"
           >
             Levante um cartão e veja a turma responder
           </h2>
@@ -154,7 +154,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-6">
             <h2
               id="primeira-aula"
-              className="font-editorial text-3xl lg:text-4xl font-bold tracking-[-0.015em] max-w-xl text-balance"
+              className="font-display text-3xl lg:text-4xl font-bold tracking-[-0.015em] max-w-xl text-balance"
             >
               O que você precisa para começar
             </h2>
@@ -232,7 +232,7 @@ const MethodShelf: React.FC<{
       <div className="lg:col-span-6 space-y-8">
         <h2
           id="base-titulo"
-          className="font-editorial text-3xl lg:text-4xl font-bold tracking-[-0.015em] leading-[1.1] text-balance"
+          className="font-display text-3xl lg:text-4xl font-bold tracking-[-0.015em] leading-[1.1] text-balance"
         >
           Cada roteiro é uma metodologia ativa
         </h2>
@@ -260,7 +260,7 @@ const MethodShelf: React.FC<{
                 />
                 <span className="space-y-2">
                   <span
-                    className={`block font-editorial text-2xl font-bold tracking-[-0.01em] leading-snug motion-safe:transition-colors motion-safe:duration-300 ${
+                    className={`block font-display text-2xl font-bold tracking-[-0.01em] leading-snug motion-safe:transition-colors motion-safe:duration-300 ${
                       selected ? 'text-base-content' : 'text-base-content/55 hover:text-base-content/80'
                     }`}
                   >
@@ -311,7 +311,7 @@ const MasteryExample: React.FC<{
       <div className="lg:col-span-5 space-y-6">
         <h2
           id="depois-titulo"
-          className="font-editorial text-3xl lg:text-4xl font-bold tracking-[-0.015em] leading-[1.1] text-balance"
+          className="font-display text-3xl lg:text-4xl font-bold tracking-[-0.015em] leading-[1.1] text-balance"
         >
           O domínio de cada aluno, por habilidade
         </h2>

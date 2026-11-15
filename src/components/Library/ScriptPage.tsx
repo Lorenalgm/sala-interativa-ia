@@ -32,7 +32,7 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({ script, onBack, onPrepar
             aria-hidden="true"
           />
           <div className="relative flex flex-col h-full gap-5 pl-14 pr-10 py-10">
-            <h1 className="font-display text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.02]">
+            <h1 className="font-display text-4xl lg:text-5xl font-bold tracking-tight leading-[1.02]">
               {script.name}
             </h1>
             <p className="text-xl leading-snug">{script.goal}</p>
@@ -53,7 +53,7 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({ script, onBack, onPrepar
         {/* Página: etapas, material e ação */}
         <section className="relative bg-white rounded-b-2xl lg:rounded-bl-none lg:rounded-r-2xl px-8 sm:px-10 py-9 flex flex-col gap-6">
           <div className="space-y-4">
-            <h2 className="font-display text-2xl font-extrabold">Etapas</h2>
+            <h2 className="font-display text-2xl font-bold">Etapas</h2>
             <ol className="space-y-3.5">
               {script.steps.map((step, i) => (
                 <li key={step} className="flex items-start gap-3.5">
@@ -67,7 +67,7 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({ script, onBack, onPrepar
           </div>
 
           <div className="space-y-2.5">
-            <h2 className="font-display text-lg font-extrabold flex items-center gap-2">
+            <h2 className="font-display text-lg font-bold flex items-center gap-2">
               <Package className="w-4 h-4 text-primary" />
               Material
             </h2>
