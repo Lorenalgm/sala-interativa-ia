@@ -4,6 +4,7 @@ import { GroupSetup } from './GroupSetup';
 import { getScript } from '../../data/scripts';
 import { QuestionPresenter } from './QuestionPresenter';
 import { RoundSummaryView } from './RoundSummaryView';
+import { QuestionForm } from '../Questions/QuestionForm';
 import { addQuestion, deleteQuestion } from '../../services/storageService';
 import { ArrowLeft, Check, ChevronDown, Play, Plus, Trash2 } from 'lucide-react';
 
@@ -44,16 +45,6 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
     onRoundProgressChange?.(stage === 'presenting');
   }, [stage, onRoundProgressChange]);
 
-  // Campos do formulário de nova pergunta
-  const [newPrompt, setNewPrompt] = useState('');
-  const [newCat, setNewCat] = useState('Geral');
-  const [optA, setOptA] = useState('');
-  const [optB, setOptB] = useState('');
-  const [optC, setOptC] = useState('');
-  const [optD, setOptD] = useState('');
-  const [correct, setCorrect] = useState<Alternative>('A');
-  const [explanation, setExplanation] = useState('');
-
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -81,37 +72,10 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
     setSelectedIds([]);
   };
 
-  const handleCreateQuestion = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPrompt.trim() || !optA.trim() || !optB.trim() || !optC.trim() || !optD.trim()) {
-      alert('Preencha a pergunta e todas as quatro opções.');
-      return;
-    }
-
-    const newQuestion: Question = {
-      id: `custom-${Date.now()}`,
-      prompt: newPrompt.trim(),
-      category: newCat.trim() || 'Geral',
-      options: {
-        A: optA.trim(),
-        B: optB.trim(),
-        C: optC.trim(),
-        D: optD.trim(),
-      },
-      correctOption: correct,
-      explanation: explanation.trim() || 'Resposta correta registrada pela professora.',
-    };
-
-    addQuestion(newQuestion);
-    setSelectedIds((prev) => [newQuestion.id, ...prev]);
+  const handleCreateQuestion = (question: Question) => {
+    addQuestion(question);
+    setSelectedIds((prev) => [question.id, ...prev]);
     setIsCreatingQuestion(false);
-
-    setNewPrompt('');
-    setOptA('');
-    setOptB('');
-    setOptC('');
-    setOptD('');
-    setExplanation('');
     onRefreshQuestions();
   };
 
@@ -207,14 +171,6 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
   // Etapa 1: preparação. Lista agrupada como em Lembretes: marca à esquerda, pergunta, alternativas sob demanda
   const script = getScript(scriptId);
   const optionsKeys: Alternative[] = ['A', 'B', 'C', 'D'];
-  const optionState: Record<Alternative, [string, (v: string) => void]> = {
-    A: [optA, setOptA],
-    B: [optB, setOptB],
-    C: [optC, setOptC],
-    D: [optD, setOptD],
-  };
-  const field =
-    'w-full min-h-[2.75rem] rounded-[0.625rem] border border-base-300 bg-base-100 px-3.5 text-[1.0625rem] placeholder:text-base-content/45 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/25';
   const startLabel = isGroupScript ? 'Montar grupos' : 'Iniciar no datashow';
 
   return (
@@ -249,111 +205,12 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
         </div>
       </header>
 
-      {/* Nova pergunta: formulário em grupo, alternativas com a marca de resposta certa ao lado */}
       {isCreatingQuestion && (
-        <section aria-labelledby="nova-pergunta" className="bg-base-100 border border-base-300 rounded-[0.875rem] p-6 sm:p-8 space-y-6">
-          <div className="flex items-center justify-between gap-4">
-            <h2 id="nova-pergunta" className="font-display text-2xl font-bold">
-              Nova pergunta
-            </h2>
-            <button
-              onClick={() => setIsCreatingQuestion(false)}
-              className="min-h-[2.75rem] px-3 rounded-lg text-base font-semibold text-primary hover:bg-black/5"
-            >
-              Cancelar
-            </button>
-          </div>
-
-          <form onSubmit={handleCreateQuestion} className="space-y-6">
-            <label className="block space-y-1.5">
-              <span className="text-base font-semibold">Enunciado</span>
-              <textarea
-                value={newPrompt}
-                onChange={(e) => setNewPrompt(e.target.value)}
-                rows={2}
-                placeholder="Exemplo: Quantos lados tem um hexágono?"
-                className={`${field} py-2.5 leading-snug`}
-              />
-            </label>
-
-            <fieldset className="space-y-2">
-              <legend className="text-base font-semibold mb-1.5">Alternativas</legend>
-              <p className="text-[0.9375rem] text-base-content/70 -mt-1 mb-2">Toque em "Certa" na alternativa correta.</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {optionsKeys.map((opt) => {
-                  const [value, setValue] = optionState[opt];
-                  const isRight = correct === opt;
-                  return (
-                    <div key={opt} className="flex items-center gap-2.5">
-                      <span
-                        aria-hidden="true"
-                        className="shrink-0 w-11 h-11 rounded-[0.5rem] border-2 border-black bg-white font-display font-bold text-xl flex items-center justify-center"
-                      >
-                        {opt}
-                      </span>
-                      <input
-                        type="text"
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                        placeholder={`Alternativa ${opt}`}
-                        aria-label={`Alternativa ${opt}`}
-                        className={field}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setCorrect(opt)}
-                        aria-pressed={isRight}
-                        aria-label={`Marcar ${opt} como resposta certa`}
-                        className={`shrink-0 inline-flex items-center gap-1.5 min-h-[2.75rem] px-3 rounded-full text-[0.9375rem] font-semibold border ${
-                          isRight
-                            ? 'bg-success text-success-content border-success'
-                            : 'border-base-300 text-base-content/75 hover:bg-black/5'
-                        }`}
-                      >
-                        <Check className="w-4 h-4" aria-hidden="true" />
-                        Certa
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </fieldset>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label className="block space-y-1.5">
-                <span className="text-base font-semibold">Habilidade</span>
-                <input
-                  type="text"
-                  value={newCat}
-                  onChange={(e) => setNewCat(e.target.value)}
-                  placeholder="Exemplo: Frações"
-                  className={field}
-                />
-              </label>
-              <label className="block space-y-1.5">
-                <span className="text-base font-semibold">
-                  Explicação <span className="font-normal text-base-content/70">(opcional)</span>
-                </span>
-                <input
-                  type="text"
-                  value={explanation}
-                  onChange={(e) => setExplanation(e.target.value)}
-                  placeholder="Aparece no datashow depois da resposta"
-                  className={field}
-                />
-              </label>
-            </div>
-
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                className="inline-flex items-center min-h-[2.75rem] px-6 rounded-full bg-primary text-primary-content text-base font-semibold hover:bg-[#0036bd]"
-              >
-                Salvar pergunta
-              </button>
-            </div>
-          </form>
-        </section>
+        <QuestionForm
+          skills={[...new Set(questions.map((q) => q.category.trim()).filter(Boolean))]}
+          onSave={handleCreateQuestion}
+          onCancel={() => setIsCreatingQuestion(false)}
+        />
       )}
 
       <section aria-labelledby="lista-perguntas" className="space-y-2">
