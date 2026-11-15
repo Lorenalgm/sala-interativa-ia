@@ -48,6 +48,10 @@ export interface Insight {
   kind: InsightKind;
   title: string;
   detail: string;
+  // Uma linha para a lista "Para a próxima aula"; o detalhe completo fica na seção da habilidade
+  summary: string;
+  // Habilidade a abrir quando o professor toca na sugestão
+  skill?: string;
   studentIds?: number[];
   helperIds?: number[]; // quem domina e pode ajudar
 }
@@ -199,6 +203,8 @@ export function nextClassInsights(
     }
     out.push({
       id: `skill-${s.skill}`,
+      skill: s.skill,
+      summary: `${s.counts.reinforce} de ${s.studentsWithData} alunos abaixo de 60% de domínio${hardest ? ` · mais errada: "${hardest.prompt}"` : ''}`,
       kind: share >= 0.25 ? 'retake' : 'reinforce',
       title:
         share >= 0.25
@@ -220,6 +226,8 @@ export function nextClassInsights(
       id: `misconception-${misconception.key}`,
       kind: 'misconception',
       title: `Engano comum em ${misconception.skill}`,
+      skill: misconception.skill,
+      summary: `${w.share}% marcaram ${w.option}${w.text ? ` (${w.text})` : ''} em "${misconception.prompt}"`,
       detail: `Em "${misconception.prompt}", ${w.share}% marcaram ${w.option}${w.text ? ` (${w.text})` : ''}. Vale perguntar à turma por que essa alternativa parece certa.`,
     });
   }
@@ -232,6 +240,7 @@ export function nextClassInsights(
       kind: 'attendance',
       title: `${absent.length === 1 ? '1 aluno respondeu' : `${absent.length} alunos responderam`} menos de 60% das perguntas`,
       detail: 'Pode ser falta ou cartão que a câmera não está lendo. Vale conferir a presença e testar o cartão.',
+      summary: 'Pode ser falta ou cartão que a câmera não está lendo.',
       studentIds: absent.map((s) => s.studentId),
     });
   }
@@ -246,6 +255,8 @@ export function nextClassInsights(
       kind: 'advance',
       title: `A turma pode avançar em ${ready.map((s) => s.skill).join(' e ')}`,
       detail: ready.map((s) => `${s.skill}: ${s.counts.mastered} de ${s.studentsWithData} dominam`).join('. ') + '.',
+      summary: ready.map((s) => `${s.skill}: ${s.counts.mastered} de ${s.studentsWithData} dominam`).join(' · '),
+      skill: ready[0].skill,
     });
   }
 

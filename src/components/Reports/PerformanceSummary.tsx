@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { AlertTriangle, ArrowRight, BookOpen, Download, HelpCircle, Minus, TrendingDown, TrendingUp, UserX, Users } from 'lucide-react';
+import { AlertTriangle, ArrowRight, BookOpen, ChevronRight, Download, HelpCircle, Minus, TrendingDown, TrendingUp, UserX, Users } from 'lucide-react';
 import { Alternative, Classroom, Question, RoundSession } from '../../types';
 import { getScript } from '../../data/scripts';
 import { LEVEL_LABEL, MasteryLevel, SkillSummary, computeMastery } from '../../services/mastery';
-import { InsightKind, QuestionStat, answersCsv, nextClassInsights, questionStats, roundStats, studentStats, trendOf } from '../../services/insights';
+import { Insight, InsightKind, QuestionStat, answersCsv, nextClassInsights, questionStats, roundStats, studentStats, trendOf } from '../../services/insights';
 import { mixedFormation } from '../../services/recommendations';
 import { addDemoRounds, clearRoundHistory, loadClassroom, loadRoundHistory, removeDemoRounds, saveFormation } from '../../services/storageService';
 import { buildDemoRounds } from '../../services/demoData';
@@ -18,6 +18,13 @@ const LETTERS: Alternative[] = ['A', 'B', 'C', 'D'];
 const pad = (id: number) => String(id).padStart(2, '0');
 const day = (ts: number) => new Date(ts).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
 const scriptName = (r: { scriptId?: RoundSession['scriptId'] }) => getScript(r.scriptId ?? 'quick-question').name;
+// Nome curto embaixo das colunas, onde o nome inteiro não cabe
+const SHORT_SCRIPT: Record<string, string> = {
+  'quick-question': 'Rápida',
+  'group-draw': 'Grupo',
+  'interactive-board': 'Lousa',
+  'peer-instruction': 'Pares',
+};
 
 // Níveis de domínio: paleta validada (faixa de luminosidade e daltonismo entre todos os pares).
 // A cor nunca vem sozinha: sempre há legenda, número ou rótulo junto.
@@ -26,6 +33,13 @@ const LEVEL_COLOR: Record<MasteryLevel, string> = {
   progress: '#d98200',
   mastered: '#1f7a3a',
   nodata: '#e3e3e8',
+};
+// Células do mapa: tom suave do nível e texto escuro da mesma cor (contraste acima de 7:1)
+const CELL: Record<MasteryLevel, { bg: string; fg: string }> = {
+  reinforce: { bg: '#fde3e3', fg: '#8a0010' },
+  progress: { bg: '#fdefd6', fg: '#6b3d00' },
+  mastered: { bg: '#e2f2e6', fg: '#14532d' },
+  nodata: { bg: '#f2f2f7', fg: 'rgb(0 0 0 / 0.5)' },
 };
 const LEVELS: ('reinforce' | 'progress' | 'mastered')[] = ['reinforce', 'progress', 'mastered'];
 const CHART = '#5856d6'; // série única da evolução por rodada
@@ -267,9 +281,21 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
 
   const lowPart = (s: { asked: number; answered: number }) => s.asked > 0 && s.answered / s.asked < 0.6;
   const sorted = [...data.sStats].sort((a, b) => (a.accuracy ?? 101) - (b.accuracy ?? 101));
-  const needing = sorted.filter((s) => s.weakSkills.length > 0 || lowPart(s) || (s.accuracy !== null && s.accuracy < 60));
+  // Pedem atenção: acerto abaixo de 60%, reforço em 2 ou mais habilidades, ou pouca participação
+  const needing = sorted.filter((s) => s.weakSkills.length >= 2 || lowPart(s) || (s.accuracy !== null && s.accuracy < 60));
   const rows = allStudents ? sorted : needing;
   const student = data.sStats.find((s) => s.studentId === studentSel) ?? rows[0];
+
+  const openInsight = (ins: Insight) => {
+    if (ins.kind === 'attendance' && ins.studentIds?.length) {
+      setAllStudents(false);
+      setStudentSel(ins.studentIds[0]);
+      document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (ins.skill) {
+      setSkillSel(ins.skill);
+      document.getElementById('habilidades')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   const round = rounds.find((r) => r.id === roundSel) ?? rounds.reduce((a, b) => (a.timestamp > b.timestamp ? a : b));
   const trend = data.trend;
@@ -332,71 +358,52 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
         </div>
       </dl>
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-        {/* Para a próxima aula */}
-        <section aria-labelledby="proxima-aula" className={`${card} xl:col-span-5 overflow-hidden`}>
-          <h2 id="proxima-aula" className={`${cardTitle} px-6 pt-6 pb-1`}>
-            Para a próxima aula
-          </h2>
-          <ul>
-            {data.insights.length === 0 && (
-              <li className="px-6 py-4 text-lg text-base-content/75">
-                Ainda faltam respostas para sugerir algo. Cada aluno precisa responder pelo menos 3 perguntas de uma habilidade.
-              </li>
-            )}
-            {data.insights.map((ins, i) => {
+      {/* Para a próxima aula: cartões curtos lado a lado; o toque abre o detalhe na seção certa */}
+      <section aria-labelledby="proxima-aula" className="space-y-3">
+        <h2 id="proxima-aula" className={cardTitle}>
+          Para a próxima aula
+        </h2>
+        {data.insights.length === 0 ? (
+          <p className={`${card} px-6 py-5 text-lg text-base-content/75`}>
+            Ainda faltam respostas para sugerir algo. Cada aluno precisa responder pelo menos 3 perguntas de uma habilidade.
+          </p>
+        ) : (
+          <ul className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${data.insights.length >= 4 ? 'xl:grid-cols-4' : data.insights.length === 3 ? 'xl:grid-cols-3' : ''}`}>
+            {data.insights.map((ins) => {
               const { icon: Icon, tile } = KIND[ins.kind];
               return (
-                <li key={ins.id} className="flex items-start gap-4 pl-6">
-                  <span className={`shrink-0 mt-4 w-9 h-9 rounded-[0.5rem] text-white flex items-center justify-center ${tile}`} aria-hidden="true">
-                    <Icon className="w-5 h-5" />
-                  </span>
-                  <div className={`flex-1 min-w-0 py-4 pr-6 space-y-2 ${i > 0 ? 'border-t border-base-300' : ''}`}>
-                    <p className="text-lg font-semibold leading-snug">{ins.title}</p>
-                    <p className="text-base leading-relaxed text-base-content/80">{ins.detail}</p>
-                    {ins.studentIds && ins.studentIds.length > 0 && (
-                      <p className="text-base">
-                        <span className="text-base-content/70">Quem: </span>
-                        <span className="font-semibold">{ins.studentIds.map(label).join(', ')}</span>
-                      </p>
-                    )}
-                    {ins.helperIds && ins.helperIds.length > 0 && (
-                      <p className="text-base">
-                        <span className="text-[#14532d] font-semibold">Pode ajudar: </span>
-                        <span className="font-semibold">{ins.helperIds.map(label).join(', ')}</span>
-                      </p>
-                    )}
-                  </div>
+                <li key={ins.id}>
+                  <button
+                    onClick={() => openInsight(ins)}
+                    className={`${card} group w-full h-full flex flex-col gap-3 p-5 text-left hover:border-[#aeaeb2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
+                  >
+                    <span className={`w-9 h-9 rounded-[0.5rem] text-white flex items-center justify-center ${tile}`} aria-hidden="true">
+                      <Icon className="w-5 h-5" />
+                    </span>
+                    <span className="block text-lg font-semibold leading-snug">{ins.title}</span>
+                    <span className="block flex-1 text-base leading-snug text-base-content/75">{ins.summary}</span>
+                    <span className="inline-flex items-center gap-1 text-base font-semibold text-primary">
+                      Ver detalhe
+                      <ChevronRight className="w-4 h-4 motion-safe:transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                    </span>
+                  </button>
                 </li>
               );
             })}
           </ul>
-          <div className="border-t border-base-300 px-6 py-4 bg-[#f7f7f9] space-y-3">
-            <p className="text-base text-base-content/80">
-              {savedGroups
-                ? `Formação com ${savedGroups} grupos salva. No Grupo com sorteio, toque em "Reaproveitar última formação".`
-                : 'Grupos que misturam quem domina com quem precisa de ajuda, para usar no Grupo com sorteio:'}
-            </p>
-            <div className="flex gap-2">
-              <button onClick={() => makeGroups(3)} className={pillSecondary}>
-                Grupos de 3
-              </button>
-              <button onClick={() => makeGroups(4)} className={pillSecondary}>
-                Grupos de 4
-              </button>
-            </div>
-          </div>
-        </section>
+        )}
+      </section>
 
         {/* Evolução: uma coluna por rodada; tocar abre as perguntas da rodada */}
-        <section aria-labelledby="evolucao" className={`${card} xl:col-span-7 p-6 space-y-5`}>
+        <section aria-labelledby="evolucao" className={`${card} p-6 space-y-5`}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 id="evolucao" className={cardTitle}>
               Acerto por rodada
             </h2>
             <p className="text-[0.9375rem] text-base-content/70">Toque numa coluna para ver as perguntas</p>
           </div>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+          <div className="xl:col-span-7 flex gap-2">
             {/* Eixo: 0, 50 e 100%, alinhado à área do gráfico (14rem = 100%) */}
             <div className="relative w-9 h-56 mt-7 shrink-0" aria-hidden="true">
               {[100, 50, 0].map((t) => (
@@ -441,14 +448,14 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
                         />
                       </span>
                       <span className={`mt-2 text-[0.875rem] tabular-nums ${sel ? 'font-bold' : 'font-semibold text-base-content/80'}`}>{day(r.timestamp)}</span>
-                      <span className="w-full px-1 text-[0.75rem] text-base-content/70 truncate text-center">{scriptName(r)}</span>
+                      <span className="w-full px-1 text-[0.75rem] text-base-content/70 truncate text-center">{SHORT_SCRIPT[r.scriptId ?? 'quick-question']}</span>
                     </button>
                   </li>
                 );
               })}
             </ol>
           </div>
-          <div className="rounded-[0.875rem] bg-[#f7f7f9] p-4 space-y-2">
+          <div className="xl:col-span-5 rounded-[0.875rem] bg-[#f7f7f9] p-4 space-y-2">
             <p className="text-base font-semibold">
               {day(round.timestamp)} · {scriptName(round)} · {round.overallAccuracy}% de acerto
             </p>
@@ -468,8 +475,8 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
               })}
             </ul>
           </div>
+          </div>
         </section>
-      </div>
 
       {/* Habilidades: lista à esquerda, detalhe da escolhida à direita, como no exemplo da página inicial */}
       {skill && (
@@ -491,11 +498,11 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
                         onClick={() => setSkillSel(s.skill)}
                         aria-pressed={sel}
                         aria-label={`${s.skill}: ${s.counts.reinforce} em reforço, ${s.counts.progress} em progresso, ${s.counts.mastered} dominam, ${s.accuracy}% de acerto`}
-                        className={`w-full grid grid-cols-[7.5rem_1fr_3.5rem] items-center gap-4 rounded-[0.875rem] px-3 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${
+                        className={`w-full grid grid-cols-[10.5rem_1fr_3.5rem] items-center gap-4 rounded-[0.875rem] px-3 py-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${
                           sel ? 'bg-[#f2f2f7]' : 'hover:bg-[#f7f7f9]'
                         }`}
                       >
-                        <span className="font-display text-lg font-bold truncate">{s.skill}</span>
+                        <span className="font-display text-lg font-bold leading-tight">{s.skill}</span>
                         <StackBar s={s} />
                         <span className="font-display text-lg font-bold text-right">{s.accuracy}%</span>
                       </button>
@@ -646,7 +653,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
                               <span
                                 tabIndex={0}
                                 className="group relative flex items-center justify-center h-11 min-w-[5.5rem] rounded-[4px] font-display text-base font-bold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-black"
-                                style={{ background: LEVEL_COLOR[level], color: level === 'nodata' ? 'rgb(0 0 0 / 0.55)' : level === 'progress' ? '#1c1c1e' : '#ffffff' }}
+                                style={{ background: CELL[level].bg, color: CELL[level].fg }}
                                 aria-label={`${sk.skill}: ${level === 'nodata' ? 'poucas respostas' : `${LEVEL_LABEL[level].toLowerCase()}, ${pct}% de domínio`}`}
                               >
                                 {level === 'nodata' ? '–' : `${pct}%`}
@@ -726,6 +733,23 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
               </div>
             </aside>
           )}
+        </div>
+
+        {/* Os níveis do mapa viram grupos que misturam quem domina com quem precisa de ajuda */}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-[0.875rem] bg-[#f7f7f9] px-5 py-3">
+          <p className="text-base text-base-content/80">
+            {savedGroups
+              ? `Formação com ${savedGroups} grupos salva. No Grupo com sorteio, toque em "Reaproveitar última formação".`
+              : 'Monte grupos que misturam quem domina com quem precisa de ajuda, para o Grupo com sorteio.'}
+          </p>
+          <div className="flex gap-2">
+            <button onClick={() => makeGroups(3)} className={pillSecondary}>
+              Grupos de 3
+            </button>
+            <button onClick={() => makeGroups(4)} className={pillSecondary}>
+              Grupos de 4
+            </button>
+          </div>
         </div>
       </section>
 
