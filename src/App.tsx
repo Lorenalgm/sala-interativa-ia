@@ -63,6 +63,8 @@ export const App: React.FC = () => {
     loadQuestionHistory()
   );
   const [cameraActive, setCameraActive] = useState(false);
+  // Alunos já marcados ao abrir os cartões (vindo da Turma); null = todos
+  const [cardsFor, setCardsFor] = useState<number[] | null>(null);
   const [isRoundInProgress, setIsRoundInProgress] = useState(false);
 
   // Navega para uma aba empurrando a URL correspondente no histórico
@@ -71,6 +73,7 @@ export const App: React.FC = () => {
     const path = buildPath(next);
     if (path !== window.location.pathname) window.history.pushState(null, '', path);
     setRoute(next);
+    setCardsFor(null);
   };
 
   // Voltar/avançar do navegador
@@ -173,14 +176,17 @@ export const App: React.FC = () => {
         )}
 
         {activeTab === 'cards' && (
-          <CardPrintView students={classroom.students} />
+          <CardPrintView key={cardsFor?.join(',') ?? 'todos'} students={classroom.students} initialSelected={cardsFor} />
         )}
 
         {activeTab === 'classroom' && (
           <ClassroomManager
             classroom={classroom}
             onRefresh={refreshData}
-            onNavigateToCards={() => go('cards')}
+            onNavigateToCards={(ids) => {
+              go('cards');
+              setCardsFor(ids ?? null);
+            }}
           />
         )}
 
