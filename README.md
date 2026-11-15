@@ -1,12 +1,17 @@
-# ClassPlay: sala interativa com IA
+# ClassPlay
 
-Acervo de roteiros de aprendizagem ativa para professores. Cada roteiro usa só cartões de papel, um datashow comum e uma webcam virada para a turma. A leitura dos cartões roda no navegador do professor, sem servidor.
+Uma ferramenta interativa baseada em visão computacional para apoiar a aprendizagem ativa.
+
+O professor projeta a atividade com um datashow comum e uma webcam lê as respostas da turma: cartões de papel, uma paleta movida sobre o quadro ou a própria mão. Os alunos não precisam de celular nem de conta, e toda a leitura roda no navegador do professor, sem servidor.
+
+O ClassPlay é pensado para crescer: cada modelo é um tipo de interação, e o professor escolhe um modelo e cadastra as próprias perguntas para montar a atividade. Novos modelos entram conforme as sugestões dos professores que usam a ferramenta.
 
 ## Funcionalidades
 
-- Biblioteca: página inicial com os roteiros. Pergunta rápida e Grupo com sorteio estão prontos; Instrução por pares e Lousa interativa aparecem como "em breve".
+- Biblioteca: os modelos de atividade disponíveis. Pergunta rápida, Grupo com sorteio e Lousa interativa estão prontos; Instrução por pares aparece como "em breve".
 - Pergunta rápida: o professor projeta uma pergunta de múltipla escolha e a câmera lê os cartões. O marcador identifica o aluno, e a rotação do cartão indica a alternativa (A, B, C ou D).
 - Grupo com sorteio: os grupos discutem, o sistema sorteia um aluno de cada grupo e só os cartões dos sorteados são lidos.
+- Lousa interativa: o grupo responde movendo uma paleta de papel ou a mão sobre a projeção no quadro, sem tocar na tela.
 - Cartões: gera os cartões de cada aluno para imprimir.
 - Turma: cadastro e edição dos alunos.
 - Relatórios: histórico das rodadas e acertos por aluno.

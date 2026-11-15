@@ -12,7 +12,7 @@ Professores do ensino fundamental e médio, de qualquer disciplina. Eles usam o 
 
 ## Product Purpose
 
-Acervo de roteiros de aprendizagem ativa que não exige nenhum aparelho dos alunos. Cada roteiro é uma sequência de etapas conduzida pelo professor: projeta a pergunta, a câmera lê os cartões levantados pela turma e a tela mostra o resultado. Hoje: Pergunta rápida e Grupo com sorteio; Instrução por pares e Lousa interativa aparecem como "em breve". Sucesso é a turma inteira participar e o professor ver na hora quem respondeu e quanto acertou.
+Ferramenta interativa baseada em visão computacional para apoiar a aprendizagem ativa, sem exigir nenhum aparelho dos alunos. A câmera do professor lê a participação da turma (cartões de papel, paleta ou mão sobre a projeção) e a tela mostra o resultado na hora. Cada modelo é um tipo de interação: o professor escolhe o modelo, cadastra as próprias perguntas e conduz a atividade. Hoje: Pergunta rápida, Grupo com sorteio e Lousa interativa; Instrução por pares aparece como "em breve". Novos modelos entram conforme as sugestões dos professores. Sucesso é a turma inteira participar e o professor ver na hora quem respondeu e quanto acertou.
 
 ## Positioning
 
@@ -32,7 +32,7 @@ Só datashow e uma câmera: os alunos não precisam de celular, tablet ou conta.
 - Turma, perguntas e histórico ficam no `localStorage`; exportação do histórico em CSV.
 - A câmera só funciona em `localhost` ou HTTPS.
 - Modos de simulação permitem demonstrar respostas sem câmera.
-- Terminologia: turma, aluno, cartão, rodada, pergunta, gabarito, roteiro, grupo, sorteio.
+- Terminologia: turma, aluno, cartão, rodada, pergunta, gabarito, modelo, atividade, grupo, sorteio. "Modelo" é o item da biblioteca (Pergunta rápida, Grupo com sorteio, Lousa interativa); "atividade" é o que acontece na aula com as perguntas do professor. Não usar "roteiro": o ClassPlay é uma ferramenta, não uma sequência fixa.
 
 ## Brand Commitments
 
