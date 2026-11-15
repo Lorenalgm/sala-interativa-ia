@@ -89,187 +89,176 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({ classroom, o
   }, [students, searchQuery]);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
-        <div className="space-y-2">
-          <h1 className="font-display text-4xl lg:text-[2.75rem] font-bold tracking-tight leading-[1.05]">Turma</h1>
-          <p className="text-lg text-base-content/75 max-w-2xl">
-            Cada aluno tem um cartão com número próprio. É pelo desenho do cartão que a câmera sabe quem respondeu.
-          </p>
-        </div>
-        <button onClick={() => onNavigateToCards()} className={pillSecondary}>
-          <Printer className="w-4 h-4" aria-hidden="true" />
-          Imprimir todos os cartões
-        </button>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 space-y-8">
+      <header className="space-y-2">
+        <h1 className="font-display text-4xl lg:text-[2.75rem] font-bold tracking-tight leading-[1.05]">Turma</h1>
+        <p className="text-lg text-base-content/75 max-w-3xl">
+          Cada aluno tem um cartão com número próprio. É pelo desenho do cartão que a câmera sabe quem respondeu.
+        </p>
       </header>
 
-      {/* Cadastro: um nome por vez ou uma lista colada */}
-      <section aria-labelledby="novo-aluno" className="space-y-2">
-        <div className="flex flex-wrap items-center justify-between gap-2 px-4">
-          <h2 id="novo-aluno" className="text-[0.8125rem] font-semibold uppercase tracking-wide text-base-content/70">
-            {pasting ? 'Colar uma lista de nomes' : 'Novo aluno'}
-          </h2>
-          <button onClick={() => setPasting((p) => !p)} className={textButton}>
-            {pasting ? 'Adicionar um por vez' : 'Colar uma lista de nomes'}
-          </button>
-        </div>
-        <form
-          onSubmit={handleAdd}
-          className="bg-base-100 border border-base-300 rounded-[0.875rem] p-4 flex flex-wrap items-start gap-3"
-        >
-          {pasting ? (
-            <label className="flex-1 min-w-[16rem] space-y-1.5">
-              <span className="sr-only">Nomes, um por linha</span>
-              <textarea
-                value={pasted}
-                onChange={(e) => setPasted(e.target.value)}
-                rows={5}
-                autoFocus
-                placeholder={'Um nome por linha. Exemplo:\nLucas Silva\nMariana Costa'}
-                className={`${field} py-2.5 leading-snug`}
-              />
-              <span className="block text-[0.9375rem] text-base-content/70">
-                Cada nome recebe o próximo cartão livre.
-              </span>
-            </label>
-          ) : (
-            <label className="flex-1 min-w-[16rem]">
-              <span className="sr-only">Nome do aluno</span>
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                placeholder="Nome do aluno"
-                className={field}
-              />
-            </label>
-          )}
-          <div className="flex items-center gap-3">
-            {!pasting && nextId !== null && (
-              <span className="text-[0.9375rem] text-base-content/70 whitespace-nowrap">
-                Recebe o cartão <strong className="font-semibold text-base-content">#{pad(nextId)}</strong>
-              </span>
-            )}
-            <button
-              type="submit"
-              disabled={pasting ? pastedNames.length === 0 : !newName.trim()}
-              className={pillPrimary}
-            >
-              <Plus className="w-4 h-4" aria-hidden="true" />
-              {pasting && pastedNames.length > 1 ? `Adicionar ${pastedNames.length} alunos` : 'Adicionar'}
-            </button>
-          </div>
-          {error && (
-            <p role="alert" className="w-full text-base font-semibold text-error">
-              {error}
+      <div className="grid grid-cols-1 lg:grid-cols-[22rem_1fr] gap-8 items-start">
+        {/* Lateral: cadastro e cartões */}
+        <aside className="space-y-6 lg:sticky lg:top-24">
+          <section aria-labelledby="novo-aluno" className="bg-base-100 border border-base-300 rounded-[0.875rem] p-5 space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              <h2 id="novo-aluno" className="font-display text-xl font-bold tracking-tight">
+                {pasting ? 'Colar uma lista' : 'Novo aluno'}
+              </h2>
+              <button onClick={() => setPasting((p) => !p)} className={`${textButton} -mr-2`}>
+                {pasting ? 'Um por vez' : 'Colar lista'}
+              </button>
+            </div>
+            <form onSubmit={handleAdd} className="space-y-3">
+              {pasting ? (
+                <label className="block space-y-1.5">
+                  <span className="sr-only">Nomes, um por linha</span>
+                  <textarea
+                    value={pasted}
+                    onChange={(e) => setPasted(e.target.value)}
+                    rows={6}
+                    autoFocus
+                    placeholder={'Um nome por linha. Exemplo:\nLucas Silva\nMariana Costa'}
+                    className={`${field} py-2.5 leading-snug`}
+                  />
+                  <span className="block text-[0.9375rem] text-base-content/70">Cada nome recebe o próximo cartão livre.</span>
+                </label>
+              ) : (
+                <label className="block space-y-1.5">
+                  <span className="sr-only">Nome do aluno</span>
+                  <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nome do aluno" className={field} />
+                  {nextId !== null && (
+                    <span className="block text-[0.9375rem] text-base-content/70">
+                      Recebe o cartão <strong className="font-semibold text-base-content">#{pad(nextId)}</strong>
+                    </span>
+                  )}
+                </label>
+              )}
+              <button type="submit" disabled={pasting ? pastedNames.length === 0 : !newName.trim()} className={`${pillPrimary} w-full`}>
+                <Plus className="w-4 h-4" aria-hidden="true" />
+                {pasting && pastedNames.length > 1 ? `Adicionar ${pastedNames.length} alunos` : 'Adicionar'}
+              </button>
+              {error && (
+                <p role="alert" className="text-base font-semibold text-error">
+                  {error}
+                </p>
+              )}
+            </form>
+          </section>
+
+          <section aria-labelledby="cartoes" className="bg-base-100 border border-base-300 rounded-[0.875rem] p-5 space-y-3">
+            <h2 id="cartoes" className="font-display text-xl font-bold tracking-tight">Cartões</h2>
+            <p className="text-base text-base-content/75">
+              Remover um aluno não muda o cartão dos outros. Os cartões já impressos continuam valendo.
             </p>
-          )}
-        </form>
-      </section>
+            <button onClick={() => onNavigateToCards()} className={`${pillSecondary} w-full`}>
+              <Printer className="w-4 h-4" aria-hidden="true" />
+              Imprimir todos os cartões
+            </button>
+          </section>
+        </aside>
 
-      <section aria-labelledby="lista-alunos" className="space-y-2">
-        <div className="flex flex-wrap items-center justify-between gap-3 px-4">
-          <h2 id="lista-alunos" className="text-[0.8125rem] font-semibold uppercase tracking-wide text-base-content/70">
-            {students.length} {students.length === 1 ? 'aluno' : 'alunos'}
-          </h2>
-          <label className="relative block w-full sm:w-72">
-            <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/60" aria-hidden="true" />
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar por nome ou número"
-              aria-label="Buscar alunos"
-              className="w-full min-h-[2.75rem] rounded-[0.625rem] bg-[#e3e3e8] pl-10 pr-3 text-[1.0625rem] placeholder:text-base-content/55 focus:outline-none focus:ring-2 focus:ring-primary/40"
-            />
-          </label>
-        </div>
+        {/* Lista em duas colunas, aproveitando a largura do notebook */}
+        <section aria-labelledby="lista-alunos" className="space-y-3 min-w-0">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 id="lista-alunos" className="font-display text-2xl font-bold tracking-tight">
+              {students.length} {students.length === 1 ? 'aluno' : 'alunos'}
+            </h2>
+            <label className="relative block w-full sm:w-80">
+              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/60" aria-hidden="true" />
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Buscar por nome ou número"
+                aria-label="Buscar alunos"
+                className="w-full min-h-[2.75rem] rounded-[0.625rem] bg-[#e3e3e8] pl-10 pr-3 text-[1.0625rem] placeholder:text-base-content/55 focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </label>
+          </div>
 
-        {filtered.length === 0 ? (
-          <p className="bg-base-100 border border-base-300 rounded-[0.875rem] p-6 text-lg text-base-content/75">
-            {students.length === 0 ? 'Nenhum aluno ainda. Adicione o primeiro acima.' : 'Nenhum aluno encontrado para a busca.'}
-          </p>
-        ) : (
-          <ul className="bg-base-100 rounded-[0.875rem] border border-base-300 overflow-hidden">
-            {filtered.map((student, i) => {
-              const editing = editingId === student.id;
-              return (
-                <li key={student.id} className="flex items-center gap-3 pl-4">
-                  {/* O número no formato do cartão de papel */}
-                  <span
-                    className="shrink-0 w-11 h-11 rounded-[0.5rem] border-2 border-black bg-white font-display font-bold text-base flex items-center justify-center"
-                    aria-label={`Cartão ${pad(student.id)}`}
+          {filtered.length === 0 ? (
+            <p className="bg-base-100 border border-base-300 rounded-[0.875rem] p-6 text-lg text-base-content/75">
+              {students.length === 0 ? 'Nenhum aluno ainda. Adicione o primeiro ao lado.' : 'Nenhum aluno encontrado para a busca.'}
+            </p>
+          ) : (
+            <ul className="bg-base-100 rounded-[0.875rem] border border-base-300 overflow-hidden grid grid-cols-1 xl:grid-cols-2">
+              {filtered.map((student, i) => {
+                const editing = editingId === student.id;
+                return (
+                  <li
+                    key={student.id}
+                    className={`flex items-center gap-3 pl-4 border-base-300 ${i > 0 ? 'border-t' : ''} ${i === 1 ? 'xl:border-t-0' : ''} ${
+                      i % 2 === 0 ? 'xl:border-r' : ''
+                    }`}
                   >
-                    {pad(student.id)}
-                  </span>
-                  <div
-                    className={`flex-1 min-w-0 min-h-[4rem] flex items-center gap-2 pr-2 ${i > 0 ? 'border-t border-base-300' : ''}`}
-                  >
-                    {editing ? (
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          saveEdit(student.id);
-                        }}
-                        className="flex-1 flex items-center gap-2 py-2"
-                      >
-                        <input
-                          type="text"
-                          value={editingName}
-                          onChange={(e) => setEditingName(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Escape' && setEditingId(null)}
-                          autoFocus
-                          aria-label={`Nome do cartão ${pad(student.id)}`}
-                          className={field}
-                        />
-                        <button type="button" onClick={() => setEditingId(null)} className={textButton}>
-                          Cancelar
-                        </button>
-                        <button type="submit" className={pillPrimary}>
-                          Salvar
-                        </button>
-                      </form>
-                    ) : (
-                      <>
-                        <span className="flex-1 min-w-0 truncate text-lg font-medium">{student.name}</span>
-                        <button
-                          onClick={() => {
-                            setEditingId(student.id);
-                            setEditingName(student.name);
+                    <span
+                      className="shrink-0 w-11 h-11 rounded-[0.5rem] border-2 border-black bg-white font-display font-bold text-base flex items-center justify-center"
+                      aria-label={`Cartão ${pad(student.id)}`}
+                    >
+                      {pad(student.id)}
+                    </span>
+                    <div className="flex-1 min-w-0 min-h-[4rem] flex items-center gap-1 pr-2">
+                      {editing ? (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            saveEdit(student.id);
                           }}
-                          className={textButton}
-                          aria-label={`Editar o nome de ${student.name}`}
+                          className="flex-1 flex items-center gap-2 py-2"
                         >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => onNavigateToCards([student.id])}
-                          className="w-11 h-11 flex items-center justify-center rounded-lg text-base-content/70 hover:bg-black/5"
-                          aria-label={`Imprimir o cartão de ${student.name}`}
-                          title="Imprimir só este cartão"
-                        >
-                          <Printer className="w-5 h-5" aria-hidden="true" />
-                        </button>
-                        <button
-                          onClick={() => handleRemove(student)}
-                          className="w-11 h-11 flex items-center justify-center rounded-lg text-base-content/55 hover:text-error hover:bg-black/5"
-                          aria-label={`Remover ${student.name}`}
-                          title="Remover aluno"
-                        >
-                          <Trash2 className="w-5 h-5" aria-hidden="true" />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        <p className="px-4 text-[0.9375rem] text-base-content/70">
-          Remover um aluno não muda o cartão dos outros. Os cartões já impressos continuam valendo.
-        </p>
-      </section>
+                          <input
+                            type="text"
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Escape' && setEditingId(null)}
+                            autoFocus
+                            aria-label={`Nome do cartão ${pad(student.id)}`}
+                            className={field}
+                          />
+                          <button type="submit" className={pillPrimary}>
+                            Salvar
+                          </button>
+                        </form>
+                      ) : (
+                        <>
+                          <span className="flex-1 min-w-0 truncate text-lg font-medium">{student.name}</span>
+                          <button
+                            onClick={() => {
+                              setEditingId(student.id);
+                              setEditingName(student.name);
+                            }}
+                            className={textButton}
+                            aria-label={`Editar o nome de ${student.name}`}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => onNavigateToCards([student.id])}
+                            className="w-11 h-11 flex items-center justify-center rounded-lg text-base-content/70 hover:bg-black/5"
+                            aria-label={`Imprimir o cartão de ${student.name}`}
+                            title="Imprimir só este cartão"
+                          >
+                            <Printer className="w-5 h-5" aria-hidden="true" />
+                          </button>
+                          <button
+                            onClick={() => handleRemove(student)}
+                            className="w-11 h-11 flex items-center justify-center rounded-lg text-base-content/55 hover:text-error hover:bg-black/5"
+                            aria-label={`Remover ${student.name}`}
+                            title="Remover aluno"
+                          >
+                            <Trash2 className="w-5 h-5" aria-hidden="true" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      </div>
     </div>
   );
 };
