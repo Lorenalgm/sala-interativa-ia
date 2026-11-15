@@ -18,7 +18,7 @@ import { drawFromGroup, drawOnePerGroup } from '../../services/groupDraw';
 import { ResponseRoster } from './ResponseRoster';
 import { QuestionResults } from './QuestionResults';
 import { ArucoCardDetector } from '../../services/arucoDetector';
-import { saveQuestionSession, saveRoundSession } from '../../services/storageService';
+import { saveRoundSession } from '../../services/storageService';
 import {
   Camera,
   CameraOff,
@@ -255,18 +255,6 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
       setGroupResults(results);
       setRoundGroupResults((prev) => ({ ...prev, [currentQuestion.id]: results! }));
     }
-
-    saveQuestionSession({
-      id: `sessao-${Date.now()}`,
-      questionId: currentQuestion.id,
-      questionPrompt: currentQuestion.prompt,
-      skill: currentQuestion.category,
-      correctOption: currentQuestion.correctOption,
-      timestamp: Date.now(),
-      responses,
-      totalClassStudents: students.length,
-      groupResults: results,
-    });
 
     if (onSessionComplete) onSessionComplete();
   };
