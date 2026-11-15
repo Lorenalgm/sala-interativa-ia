@@ -312,6 +312,12 @@ Mesma página das preparações: título grande, ação principal em cápsula, b
 ### Impressão dos cartões
 Título com a contagem ("20 cartões em 20 folhas A4"), controle segmentado de tamanho (1 por folha até 8 m, 2 por folha até 5,5 m) e "Imprimir". Dicas em lista agrupada com ícone cinza. "Quem imprimir" usa as mesmas pílulas da presença, todos marcados por padrão; vindo da Turma, abre só com o aluno escolhido. A prévia mostra folhas pequenas com sombra de papel; na impressão a sombra some e cada cartão ocupa a área útil da A4.
 
+### Desempenho (uma página, sem abas)
+Responde, nesta ordem, às perguntas do professor depois da aula. "Para a próxima aula": no máximo quatro sugestões de `services/insights.ts`, da mais importante para a menos importante (retomar ou reforçar a habilidade com mais alunos abaixo de 60% de domínio, com a pergunta mais errada e a alternativa errada mais marcada; engano comum; quem respondeu menos de 60% das perguntas; o que já pode avançar). Cada sugestão tem bloco de ícone colorido (vermelho retomar, laranja reforçar, âmbar engano, cinza participação, verde avançar), título em Inter 700, o motivo com números e os alunos como etiquetas no formato do cartão; quando há quem domina, aparece "Quem domina e pode ajudar". O fim do grupo monta grupos que misturam níveis. Depois, Habilidades, Alunos e Rodadas em listas que abrem no lugar: a habilidade mostra as perguntas com acerto e o erro mais comum; o aluno mostra o nível em cada habilidade e os três últimos erros; a rodada mostra o acerto de cada pergunta. Por padrão, Alunos lista só quem pede atenção. A evolução vira uma frase ("A turma está acertando mais", com as médias). Nomes escondidos por padrão, com interruptor no estilo do sistema. A planilha tem uma linha por resposta.
+
+### Teste da câmera
+Vídeo grande à esquerda com "Ligar câmera" no centro quando desligado; embaixo, "Desligar" e "Travar foco" em cápsula cinza e os dados técnicos em cinza. Dicas em duas listas agrupadas (cartões na sala, lousa no quadro). À direita, "Cartões lidos" com contagem em Inter 3rem, barra verde e todos os alunos em grade de duas colunas, verdes quando lidos; "Ler de novo" zera a contagem sem desligar a câmera.
+
 ### Datashow (condução)
 - **Alternativas como cartão:** cada letra aparece como o cartão de papel, branco com borda preta de 3px e letra preta, proporção 4:5. Nada de azul, porque não é botão.
 - **Escala com a tela:** enunciado em Inter 700 com `clamp(2rem, 3.6vw, 4.25rem)`, alternativas em `clamp(1.5rem, 2.3vw, 2.75rem)`.
