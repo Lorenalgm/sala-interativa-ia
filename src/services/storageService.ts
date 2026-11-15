@@ -158,6 +158,21 @@ export function saveRoundSession(round: RoundSession): void {
   }
 }
 
+// Acrescenta rodadas de exemplo ao histórico
+export function addDemoRounds(rounds: RoundSession[]): void {
+  try {
+    const history = loadRoundHistory().filter((r) => !r.demo);
+    localStorage.setItem(STORAGE_KEYS.ROUNDS, JSON.stringify([...rounds, ...history].sort((a, b) => b.timestamp - a.timestamp)));
+  } catch (err) {
+    console.error('Falha ao salvar o exemplo:', err);
+  }
+}
+
+// Tira só as rodadas de exemplo; as reais ficam
+export function removeDemoRounds(): void {
+  localStorage.setItem(STORAGE_KEYS.ROUNDS, JSON.stringify(loadRoundHistory().filter((r) => !r.demo)));
+}
+
 // Limpa o histórico de rodadas
 export function clearRoundHistory(): void {
   localStorage.removeItem(STORAGE_KEYS.ROUNDS);

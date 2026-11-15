@@ -5,7 +5,8 @@ import { getScript } from '../../data/scripts';
 import { LEVEL_LABEL, MasteryLevel, SkillSummary, computeMastery } from '../../services/mastery';
 import { InsightKind, QuestionStat, answersCsv, nextClassInsights, questionStats, roundStats, studentStats, trendOf } from '../../services/insights';
 import { mixedFormation } from '../../services/recommendations';
-import { clearRoundHistory, loadClassroom, loadRoundHistory, saveFormation } from '../../services/storageService';
+import { addDemoRounds, clearRoundHistory, loadClassroom, loadRoundHistory, removeDemoRounds, saveFormation } from '../../services/storageService';
+import { buildDemoRounds } from '../../services/demoData';
 
 interface PerformanceSummaryProps {
   classroom: Classroom;
@@ -182,6 +183,16 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
     setSavedGroups(formation.groups.length);
   };
 
+  const loadDemo = () => {
+    addDemoRounds(buildDemoRounds(questions, students));
+    setRounds(loadRoundHistory());
+  };
+  const removeDemo = () => {
+    removeDemoRounds();
+    setRounds(loadRoundHistory());
+  };
+  const hasDemo = rounds.some((r) => r.demo);
+
   const clearAll = () => {
     if (!confirm('Apagar todo o histórico de rodadas deste computador? Não dá para desfazer.')) return;
     clearRoundHistory();
@@ -231,10 +242,15 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 space-y-8">
         {header}
-        <p className={`${card} p-6 text-lg text-base-content/75`}>
-          Conduza uma rodada de qualquer modelo da Biblioteca. Depois de algumas respostas, esta página mostra o que retomar,
-          quem precisa de ajuda e como a turma evolui.
-        </p>
+        <div className={`${card} p-6 space-y-4`}>
+          <p className="text-lg text-base-content/75 max-w-3xl">
+            Conduza uma rodada de qualquer modelo da Biblioteca. Depois de algumas respostas, esta página mostra o que retomar,
+            quem precisa de ajuda e como a turma evolui.
+          </p>
+          <button onClick={loadDemo} className={pillSecondary}>
+            Ver com dados de exemplo
+          </button>
+        </div>
       </div>
     );
   }
@@ -263,6 +279,19 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 space-y-6">
       {header}
+
+      {/* Aviso enquanto houver rodadas de exemplo misturadas ao histórico */}
+      {hasDemo && (
+        <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-[0.875rem] bg-[#eef0ff] border border-[#c9cbf5] px-5 py-3">
+          <p className="text-base">
+            <strong className="font-semibold">Você está vendo dados de exemplo.</strong>{' '}
+            <span className="text-base-content/80">São rodadas inventadas com as suas perguntas e os seus alunos, para conhecer a página.</span>
+          </p>
+          <button onClick={removeDemo} className="min-h-[2.75rem] px-3 rounded-lg text-base font-semibold text-primary hover:bg-black/5">
+            Remover o exemplo
+          </button>
+        </div>
+      )}
 
       {/* Três números, cada um com o que ele quer dizer */}
       <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -700,7 +729,12 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
         </div>
       </section>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap justify-end gap-2">
+        {!hasDemo && (
+          <button onClick={loadDemo} className="min-h-[2.75rem] px-3 rounded-lg text-base font-semibold text-primary hover:bg-black/5">
+            Adicionar rodadas de exemplo
+          </button>
+        )}
         <button onClick={clearAll} className="min-h-[2.75rem] px-3 rounded-lg text-base font-semibold text-error hover:bg-black/5">
           Apagar o histórico
         </button>
