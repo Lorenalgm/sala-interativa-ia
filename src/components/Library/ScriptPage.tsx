@@ -9,7 +9,7 @@ interface ScriptPageProps {
   onPrepare: () => void;
 }
 
-// O roteiro aberto como um livro: capa à esquerda, página com as etapas à direita
+// O modelo aberto como um livro: capa à esquerda, página com as etapas à direita
 export const ScriptPage: React.FC<ScriptPageProps> = ({ script, onBack, onPrepare }) => {
   const binding = bindingFor(script.id);
 

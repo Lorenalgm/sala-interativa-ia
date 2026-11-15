@@ -89,7 +89,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
   };
 
   const handleExportRoundsCSV = () => {
-    let csv = 'Rodada,Roteiro,Data,Pergunta,Resposta certa,Respostas,Acertos (%)\n';
+    let csv = 'Rodada,Modelo,Data,Pergunta,Resposta certa,Respostas,Acertos (%)\n';
     rounds.forEach((round, rIdx) => {
       const roundName = round.name || `Rodada ${rIdx + 1}`;
       const date = new Date(round.timestamp).toLocaleString('pt-BR');
@@ -194,9 +194,9 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
         />
       ) : (
         <div className="space-y-6">
-          {/* Filtro por roteiro e totais, juntos */}
+          {/* Filtro por modelo e totais, juntos */}
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div role="tablist" aria-label="Filtrar por roteiro" className="flex flex-wrap gap-2">
+            <div role="tablist" aria-label="Filtrar por modelo" className="flex flex-wrap gap-2">
               {([
                 ['all', 'Todos'],
                 ['quick-question', 'Pergunta rápida'],
@@ -229,7 +229,7 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({
                 Nenhuma rodada foi concluída ainda
               </h2>
               <p className="text-base text-base-content/75 max-w-sm mx-auto">
-                Conduza um roteiro da Biblioteca e encerre a rodada. O resultado aparece aqui.
+                Escolha um modelo na Biblioteca, conduza a rodada e encerre. O resultado aparece aqui.
               </p>
             </div>
           ) : (

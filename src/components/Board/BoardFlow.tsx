@@ -170,7 +170,7 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
             Nova rodada
           </button>
           <button onClick={onBack} className="btn">
-            Voltar ao roteiro
+            Voltar ao modelo
           </button>
         </div>
       </div>
@@ -184,7 +184,7 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
       <div>
         <button onClick={onBack} className="btn btn-sm rounded-full mb-3">
           <ArrowLeft className="w-3.5 h-3.5" />
-          Roteiro
+          Modelo
         </button>
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Quiz no quadro</h1>
         <p className="text-sm text-base-content/70 mt-1">
@@ -213,7 +213,7 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
         </ul>
         {questions.length === 0 && (
           <p className="text-sm text-base-content/70">
-            Cadastre perguntas em "Preparar aula" de outro roteiro antes de usar a lousa.
+            Cadastre perguntas em "Preparar aula" de outro modelo antes de usar a lousa.
           </p>
         )}
       </section>

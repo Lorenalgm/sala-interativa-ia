@@ -100,11 +100,11 @@ export const ClassMastery: React.FC<ClassMasteryProps> = ({ result, students, la
             Grupos que misturam níveis
           </h2>
           <p className="text-base text-base-content/75">
-            Monta grupos com alunos de níveis diferentes e salva a formação para o roteiro Grupo com sorteio.
+            Monta grupos com alunos de níveis diferentes e salva a formação para o modelo Grupo com sorteio.
           </p>
           {saved && (
             <p role="status" className="text-base text-success font-semibold">
-              Formação com grupos de {saved} salva. No roteiro Grupo com sorteio, use "Reaproveitar última formação".
+              Formação com grupos de {saved} salva. No modelo Grupo com sorteio, use "Reaproveitar última formação".
             </p>
           )}
         </div>
