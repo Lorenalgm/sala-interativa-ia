@@ -1,10 +1,7 @@
 import { Point } from './homography';
 
 export const DWELL_MS = 1000; // tempo parado sobre a zona até registrar
-export const LOST_MS = 300; // falha de leitura tolerada: mantém a última posição
-export const LOST_MS_HAND = 500; // a mão some mais vezes que a paleta (dedos fechando, luz)
-export const ZONE_MARGIN = 0.03; // folga ao redor da zona, como fração da tela
-export const SMOOTHING = 0.5; // peso do quadro novo na média móvel
+export const LOST_MS_HAND = 500; // falha de leitura tolerada (dedos fechando, luz): mantém a última posição
 export const PINCH_CLOSED = 0.45; // polegar e indicador juntos: clique
 export const PINCH_RELEASE = 0.6; // pinça fechada só conta como solta acima disso (evita piscar perto do limite)
 export const PINCH_OPEN = 0.75; // abriu a pinça: libera o próximo clique
@@ -123,9 +120,6 @@ export interface PointerState {
   fired: string | null; // zona registrada neste quadro
 }
 
-const inside = (z: Zone, p: Point, margin: number) =>
-  p.x >= z.x - margin && p.x <= z.x + z.w + margin && p.y >= z.y - margin && p.y <= z.y + z.h + margin;
-
 // Distância do ponto até o retângulo da zona (0 se estiver dentro)
 const distanceTo = (z: Zone, p: Point) =>
   Math.hypot(Math.max(z.x - p.x, 0, p.x - (z.x + z.w)), Math.max(z.y - p.y, 0, p.y - (z.y + z.h)));
@@ -146,9 +140,8 @@ export class DwellPointer {
   private aim: { id: string; at: number } | null = null; // última zona sob a mão com a pinça aberta
   private needsOpen = false; // depois de um clique ou de um reinício, a pinça precisa abrir antes de valer de novo
 
-  // adaptive: filtro One Euro em vez da média móvel (usado com a mão)
   // snap: distância máxima (fração da tela) em que a zona mais próxima conta como apontada
-  constructor(private mode: ClickMode = 'dwell', private adaptive = false, private snap = 0) {}
+  constructor(private mode: ClickMode = 'dwell', private snap = 0.15) {}
 
   public reset(): void {
     this.pos = null;
@@ -166,18 +159,10 @@ export class DwellPointer {
     const dt = this.lastUpdate ? (now - this.lastUpdate) / 1000 : 0;
     this.lastUpdate = now;
     if (!this.pos && point) this.handSince = now;
-    if (point && this.adaptive) {
+    if (point) {
       this.pos = { x: this.fx.filter(point.x, dt), y: this.fy.filter(point.y, dt) };
       this.lastSeen = now;
-    } else if (point) {
-      this.pos = this.pos
-        ? {
-            x: this.pos.x * (1 - SMOOTHING) + point.x * SMOOTHING,
-            y: this.pos.y * (1 - SMOOTHING) + point.y * SMOOTHING,
-          }
-        : point;
-      this.lastSeen = now;
-    } else if (this.pos && now - this.lastSeen > (this.adaptive ? LOST_MS_HAND : LOST_MS)) {
+    } else if (this.pos && now - this.lastSeen > LOST_MS_HAND) {
       this.pos = null;
       this.fx.reset();
       this.fy.reset();
@@ -197,23 +182,15 @@ export class DwellPointer {
       return { pos: null, zoneId: null, progress: 0, fired: null };
     }
 
-    // Dentro da zona atual vale a folga; para entrar numa zona nova, só o retângulo
+    // Zonas grandes: vale a mais próxima, e a atual só troca se a outra estiver bem mais perto
     const current = this.zoneId ? zones.find((z) => z.id === this.zoneId) : undefined;
+    const pos = this.pos;
+    const ranked = zones.map((z) => ({ z, d: distanceTo(z, pos) })).sort((a, b) => a.d - b.d);
+    const best = ranked[0];
+    const cur = current ? ranked.find((r) => r.z.id === current.id) : undefined;
     let hit: Zone | undefined;
-    if (this.snap > 0) {
-      // Zonas grandes: vale a mais próxima, e a atual só troca se a outra estiver bem mais perto
-      const pos = this.pos;
-      const ranked = zones.map((z) => ({ z, d: distanceTo(z, pos) })).sort((a, b) => a.d - b.d);
-      const best = ranked[0];
-      const cur = current ? ranked.find((r) => r.z.id === current.id) : undefined;
-      if (cur && cur.d <= best.d + 0.04 && cur.d <= this.snap) hit = cur.z;
-      else if (best && best.d <= this.snap) hit = best.z;
-    } else {
-      hit =
-        current && inside(current, this.pos, ZONE_MARGIN)
-          ? current
-          : zones.find((z) => inside(z, this.pos as Point, 0));
-    }
+    if (cur && cur.d <= best.d + 0.04 && cur.d <= this.snap) hit = cur.z;
+    else if (best && best.d <= this.snap) hit = best.z;
 
     if (this.mode === 'pinch') {
       // O anel mostra a pinça fechando; o clique vale quando ela fecha sobre uma zona

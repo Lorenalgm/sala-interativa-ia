@@ -67,7 +67,7 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
   onCameraStatusChange,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const pointer = useMemo(() => new DwellPointer(settings.click, true, 0.15), []); // eslint-disable-line react-hooks/exhaustive-deps
+  const pointer = useMemo(() => new DwellPointer(settings.click), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [game, setGame] = useState<Game>({ idx: 0, turn: 0, attempts: 0, chosen: [], results: [] });
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [intro, setIntro] = useState<number | null>(INTRO_SECONDS); // contagem antes de cada pergunta
