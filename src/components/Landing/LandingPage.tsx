@@ -16,9 +16,8 @@ interface LandingPageProps {
 // Vídeo de demonstração: coloque o arquivo em public/video/. Enquanto ele não existir,
 // a ilustração da sala aparece no mesmo lugar e a página continua inteira.
 const DEMO_VIDEO = {
-  src: '/video/classplay-demo.mp4',
+  src: '/video/classplay-modelo1.mp4',
   poster: undefined as string | undefined, // ex.: '/video/classplay-demo.jpg'
-  caption: 'O ClassPlay em uma aula de verdade.',
 };
 
 // Os modelos que a página mostra, com o nome da metodologia que cada um apoia
@@ -256,9 +255,6 @@ const DemoVideo: React.FC = () => {
           </video>
         )}
       </div>
-      {!failed && (
-        <figcaption className="text-center text-lg text-base-content/70">{DEMO_VIDEO.caption}</figcaption>
-      )}
     </figure>
   );
 };
