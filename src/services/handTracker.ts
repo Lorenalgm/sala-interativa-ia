@@ -1,4 +1,4 @@
-import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
+import type { HandLandmarker } from '@mediapipe/tasks-vision';
 import { Point } from './homography';
 
 export interface HandReading {
@@ -25,6 +25,8 @@ export class HandTracker {
   private constructor(private landmarker: HandLandmarker) {}
 
   public static async create(): Promise<HandTracker> {
+    // Carregado sob demanda: o MediaPipe só entra quando a lousa usa a mão
+    const { FilesetResolver, HandLandmarker } = await import('@mediapipe/tasks-vision');
     const fileset = await FilesetResolver.forVisionTasks(`${base}wasm`);
     const options = (delegate: 'GPU' | 'CPU') => ({
       baseOptions: { modelAssetPath: `${base}hand_landmarker.task`, delegate },

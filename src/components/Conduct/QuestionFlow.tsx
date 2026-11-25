@@ -4,15 +4,9 @@ import { GroupSetup } from './GroupSetup';
 import { getScript } from '../../data/scripts';
 import { QuestionPresenter } from './QuestionPresenter';
 import { RoundSummaryView } from './RoundSummaryView';
+import { QuestionForm } from '../Questions/QuestionForm';
 import { addQuestion, deleteQuestion } from '../../services/storageService';
-import {
-  Plus,
-  Play,
-  Trash2,
-  ArrowLeft,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, Play, Plus, Trash2 } from 'lucide-react';
 
 interface QuestionFlowProps {
   scriptId: ScriptId;
@@ -51,16 +45,6 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
     onRoundProgressChange?.(stage === 'presenting');
   }, [stage, onRoundProgressChange]);
 
-  // Campos do formulário de nova pergunta
-  const [newPrompt, setNewPrompt] = useState('');
-  const [newCat, setNewCat] = useState('Geral');
-  const [optA, setOptA] = useState('');
-  const [optB, setOptB] = useState('');
-  const [optC, setOptC] = useState('');
-  const [optD, setOptD] = useState('');
-  const [correct, setCorrect] = useState<Alternative>('A');
-  const [explanation, setExplanation] = useState('');
-
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -88,37 +72,10 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
     setSelectedIds([]);
   };
 
-  const handleCreateQuestion = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPrompt.trim() || !optA.trim() || !optB.trim() || !optC.trim() || !optD.trim()) {
-      alert('Preencha a pergunta e todas as quatro opções.');
-      return;
-    }
-
-    const newQuestion: Question = {
-      id: `custom-${Date.now()}`,
-      prompt: newPrompt.trim(),
-      category: newCat.trim() || 'Geral',
-      options: {
-        A: optA.trim(),
-        B: optB.trim(),
-        C: optC.trim(),
-        D: optD.trim(),
-      },
-      correctOption: correct,
-      explanation: explanation.trim() || 'Resposta correta registrada pela professora.',
-    };
-
-    addQuestion(newQuestion);
-    setSelectedIds((prev) => [newQuestion.id, ...prev]);
+  const handleCreateQuestion = (question: Question) => {
+    addQuestion(question);
+    setSelectedIds((prev) => [question.id, ...prev]);
     setIsCreatingQuestion(false);
-
-    setNewPrompt('');
-    setOptA('');
-    setOptB('');
-    setOptC('');
-    setOptD('');
-    setExplanation('');
     onRefreshQuestions();
   };
 
@@ -186,13 +143,13 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
                 setStage('setup');
               }
             }}
-            className="btn btn-sm rounded-full"
+            className="inline-flex items-center gap-1 min-h-[2.75rem] px-2 -ml-2 rounded-lg text-base font-semibold text-primary hover:bg-black/5"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Voltar para a preparação</span>
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            <span>Preparação</span>
           </button>
 
-          <span className="text-sm text-base-content/70 font-medium">
+          <span className="text-base text-base-content/70 font-medium">
             Rodada com {activeQuestions.length} {activeQuestions.length === 1 ? 'pergunta' : 'perguntas'}
           </span>
         </div>
@@ -211,292 +168,157 @@ export const QuestionFlow: React.FC<QuestionFlowProps> = ({
     );
   }
 
-  // Visualização da Etapa 1: Preparação e Seleção de Perguntas
+  // Etapa 1: preparação. Lista agrupada como em Lembretes: marca à esquerda, pergunta, alternativas sob demanda
+  const script = getScript(scriptId);
+  const optionsKeys: Alternative[] = ['A', 'B', 'C', 'D'];
+  const startLabel = isGroupScript ? 'Montar grupos' : 'Iniciar no datashow';
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      {/* Topo informativo */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-base-content tracking-tight">
-            {getScript(scriptId).name}: escolha as perguntas
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 space-y-8">
+      <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+        <div className="space-y-2">
+          <h1 className="font-display text-4xl lg:text-[2.75rem] font-bold tracking-tight leading-[1.05]">
+            {script.name}
           </h1>
-          <p className="text-sm text-base-content/70 mt-1">
-            Escolha as perguntas desta rodada ou crie novas.
+          <p className="text-lg text-base-content/75">
+            Marque as perguntas desta rodada. Você pode criar uma nova aqui mesmo.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => setIsCreatingQuestion(true)}
-            className="btn btn-sm"
+            className="inline-flex items-center gap-2 min-h-[2.75rem] px-5 rounded-full bg-[#e3e3e8] hover:bg-[#d8d8de] text-base font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
-            <Plus className="w-4 h-4 text-amber-500" />
-            <span>Criar nova pergunta</span>
+            <Plus className="w-5 h-5" aria-hidden="true" />
+            Nova pergunta
           </button>
-
           <button
-            onClick={() => {
-              if (activeQuestions.length === 0) {
-                alert('Selecione pelo menos uma pergunta para iniciar.');
-                return;
-              }
-              setStage(isGroupScript ? 'groups' : 'presenting');
-            }}
+            onClick={() => setStage(isGroupScript ? 'groups' : 'presenting')}
             disabled={activeQuestions.length === 0}
-            className="btn btn-sm btn-primary"
+            className="inline-flex items-center gap-2 min-h-[2.75rem] px-6 rounded-full bg-primary text-primary-content text-base font-semibold hover:bg-[#0036bd] disabled:bg-[#e3e3e8] disabled:text-base-content/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
-            <Play className="w-4 h-4 fill-current" />
-            <span>{isGroupScript ? 'Montar grupos' : 'Iniciar no datashow'} ({activeQuestions.length})</span>
+            <Play className="w-4 h-4 fill-current" aria-hidden="true" />
+            {startLabel}
+            <span className="font-normal opacity-85">({activeQuestions.length})</span>
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Modal de criação de pergunta simples */}
       {isCreatingQuestion && (
-        <div className="bg-base-100 border-2 border-amber-300 rounded-box p-6 sm:p-8 shadow-sm space-y-5">
-          <div className="flex items-center justify-between pb-3 border-b border-base-300/60">
-            <h2 className="text-lg font-bold text-base-content">
-              Cadastrar pergunta para a turma
-            </h2>
-            <button
-              onClick={() => setIsCreatingQuestion(false)}
-              className="btn btn-sm btn-ghost"
-            >
-              Cancelar
-            </button>
-          </div>
-
-          <form onSubmit={handleCreateQuestion} className="space-y-4">
-            <div>
-              <label className="text-sm font-semibold text-base-content/80 block mb-1">
-                Enunciado da pergunta
-              </label>
-              <textarea
-                value={newPrompt}
-                onChange={(e) => setNewPrompt(e.target.value)}
-                rows={2}
-                placeholder="Exemplo: Qual é o papel da função de ativação?"
-                className="textarea textarea-bordered text-base w-full"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-base-content/80 block mb-1">
-                  Habilidade
-                </label>
-                <input
-                  type="text"
-                  value={newCat}
-                  onChange={(e) => setNewCat(e.target.value)}
-                  placeholder="Exemplo: Frações"
-                  className="input input-bordered input-sm w-full"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-base-content/80 block mb-1">
-                  Resposta certa
-                </label>
-                <select
-                  value={correct}
-                  onChange={(e) => setCorrect(e.target.value as Alternative)}
-                  className="select select-bordered select-sm w-full"
-                >
-                  <option value="A">Alternativa A</option>
-                  <option value="B">Alternativa B</option>
-                  <option value="C">Alternativa C</option>
-                  <option value="D">Alternativa D</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <span className="text-sm font-semibold text-base-content/80 block">
-                Alternativas de resposta
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  value={optA}
-                  onChange={(e) => setOptA(e.target.value)}
-                  placeholder="Alternativa A"
-                  className="input input-bordered input-sm"
-                />
-                <input
-                  type="text"
-                  value={optB}
-                  onChange={(e) => setOptB(e.target.value)}
-                  placeholder="Alternativa B"
-                  className="input input-bordered input-sm"
-                />
-                <input
-                  type="text"
-                  value={optC}
-                  onChange={(e) => setOptC(e.target.value)}
-                  placeholder="Alternativa C"
-                  className="input input-bordered input-sm"
-                />
-                <input
-                  type="text"
-                  value={optD}
-                  onChange={(e) => setOptD(e.target.value)}
-                  placeholder="Alternativa D"
-                  className="input input-bordered input-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-base-content/80 block mb-1">
-                Explicação da resposta (opcional)
-              </label>
-              <input
-                type="text"
-                value={explanation}
-                onChange={(e) => setExplanation(e.target.value)}
-                placeholder="Explicação da resposta (opcional)"
-                className="input input-bordered input-sm w-full"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsCreatingQuestion(false)}
-                className="btn btn-sm btn-ghost"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="btn btn-sm btn-neutral"
-              >
-                Salvar pergunta
-              </button>
-            </div>
-          </form>
-        </div>
+        <QuestionForm
+          skills={[...new Set(questions.map((q) => q.category.trim()).filter(Boolean))]}
+          onSave={handleCreateQuestion}
+          onCancel={() => setIsCreatingQuestion(false)}
+        />
       )}
 
-      {/* Controles de seleção rápida */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-base-300">
-        <div className="flex items-center gap-3 text-sm text-base-content/70">
-          <span className="font-semibold text-base-content">
-            {activeQuestions.length} de {questions.length} selecionadas
-          </span>
-          <span>•</span>
-          <button
-            onClick={selectAll}
-            className="btn btn-link btn-sm px-1 text-amber-800 font-semibold"
-          >
-            Selecionar todas
-          </button>
-          <span>•</span>
-          <button
-            onClick={deselectAll}
-            className="btn btn-link btn-sm px-1 text-base-content/70 font-normal"
-          >
-            Limpar seleção
-          </button>
+      <section aria-labelledby="lista-perguntas" className="space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4">
+          <h2 id="lista-perguntas" className="text-[0.8125rem] font-semibold uppercase tracking-wide text-base-content/70">
+            {activeQuestions.length} de {questions.length} marcadas
+          </h2>
+          <div className="flex items-center gap-1">
+            <button onClick={selectAll} className="min-h-[2.75rem] px-2 rounded-lg text-base font-semibold text-primary hover:bg-black/5">
+              Marcar todas
+            </button>
+            <button onClick={deselectAll} className="min-h-[2.75rem] px-2 rounded-lg text-base font-semibold text-primary hover:bg-black/5">
+              Desmarcar todas
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Lista de perguntas (exibindo por padrão apenas o enunciado) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
-        {questions.map((q, idx) => {
-          const isSelected = selectedIds.includes(q.id);
-          const isExpanded = expandedIds.has(q.id);
+        <ul className="bg-base-100 rounded-[0.875rem] border border-base-300 overflow-hidden">
+          {questions.map((q, idx) => {
+            const isSelected = selectedIds.includes(q.id);
+            const isExpanded = expandedIds.has(q.id);
 
-          return (
-            <div
-              key={q.id}
-              onClick={() => toggleSelect(q.id)}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-3 ${
-                isSelected
-                  ? 'bg-base-100 border-amber-400 shadow-sm ring-1 ring-amber-400/30'
-                  : 'bg-base-100/70 border-base-300 opacity-70 hover:opacity-100'
-              }`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 min-w-0">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-primary mt-0.5"
-                    checked={isSelected}
-                    onChange={() => toggleSelect(q.id)}
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label={`Selecionar pergunta ${idx + 1}`}
-                  />
-
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-base-content/70">
-                        Pergunta {idx + 1}
-                      </span>
-                      <span className="badge badge-ghost badge-sm">
-                        {q.category}
-                      </span>
-                    </div>
-
-                    <p className="text-base font-bold text-base-content leading-snug">
-                      {q.prompt}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={(e) => toggleExpand(q.id, e)}
-                    className="btn btn-sm"
-                    title={isExpanded ? 'Ocultar alternativas' : 'Ver alternativas e resposta certa'}
+            return (
+              <li key={q.id} className="flex items-start gap-3 pl-3">
+                {/* Marca circular, alvo de 44px */}
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={isSelected}
+                  aria-label={`Marcar pergunta ${idx + 1}: ${q.prompt}`}
+                  onClick={() => toggleSelect(q.id)}
+                  className="shrink-0 w-11 h-11 mt-2.5 flex items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                >
+                  <span
+                    className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                      isSelected ? 'bg-primary text-primary-content' : 'border-2 border-[#aeaeb2]'
+                    }`}
                   >
-                    <span>{isExpanded ? 'Ocultar' : 'Ver alternativas'}</span>
-                    {isExpanded ? (
-                      <ChevronUp className="w-3.5 h-3.5" />
-                    ) : (
-                      <ChevronDown className="w-3.5 h-3.5" />
-                    )}
-                  </button>
+                    {isSelected && <Check className="w-4 h-4" strokeWidth={3} aria-hidden="true" />}
+                  </span>
+                </button>
 
-                  <button
-                    onClick={(e) => handleDelete(q.id, e)}
-                    className="btn btn-sm btn-ghost btn-square text-base-content/60 hover:text-error"
-                    title="Excluir pergunta"
-                    aria-label={`Excluir pergunta ${idx + 1}`}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Bloco expandido de alternativas e gabarito (somente exibido se a professora clicar para expandir) */}
-              {isExpanded && (
-                <div className="pt-3 mt-2 border-t border-base-300/60 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  {(['A', 'B', 'C', 'D'] as Alternative[]).map((opt) => (
-                    <div
-                      key={opt}
-                      className={`truncate px-3 py-1.5 rounded-xl border ${
-                        opt === q.correctOption
-                          ? 'bg-emerald-50 border-emerald-300 text-emerald-950 font-semibold'
-                          : 'bg-base-200 border-base-300 text-base-content/70'
-                      }`}
+                <div className={`flex-1 min-w-0 py-3.5 pr-3 space-y-3 ${idx > 0 ? 'border-t border-base-300' : ''}`}>
+                  <div className="flex items-start gap-3">
+                    <button
+                      type="button"
+                      onClick={() => toggleSelect(q.id)}
+                      className="flex-1 min-w-0 text-left space-y-0.5"
                     >
-                      <strong className="mr-1">{opt}:</strong>
-                      <span>{q.options[opt]}</span>
-                      {opt === q.correctOption && (
-                        <span className="ml-1 text-xs text-emerald-800 font-bold">
-                          (resposta certa)
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                      <span className="block text-[0.9375rem] text-base-content/70">
+                        Pergunta {idx + 1} · {q.category}
+                      </span>
+                      <span className={`block text-lg font-semibold leading-snug ${isSelected ? '' : 'text-base-content/60'}`}>
+                        {q.prompt}
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={(e) => toggleExpand(q.id, e)}
+                      aria-expanded={isExpanded}
+                      className="shrink-0 inline-flex items-center gap-1 min-h-[2.75rem] px-2.5 rounded-lg text-base font-semibold text-primary hover:bg-black/5"
+                    >
+                      Alternativas
+                      <ChevronDown
+                        className={`w-4 h-4 motion-safe:transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                      />
+                    </button>
+                    <button
+                      onClick={(e) => handleDelete(q.id, e)}
+                      className="shrink-0 w-11 h-11 flex items-center justify-center rounded-lg text-base-content/55 hover:text-error hover:bg-black/5"
+                      aria-label={`Excluir pergunta ${idx + 1}`}
+                      title="Excluir pergunta"
+                    >
+                      <Trash2 className="w-5 h-5" aria-hidden="true" />
+                    </button>
+                  </div>
+
+                  {isExpanded && (
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {optionsKeys.map((opt) => {
+                        const isRight = opt === q.correctOption;
+                        return (
+                          <li
+                            key={opt}
+                            className={`flex items-center gap-2.5 rounded-[0.625rem] px-3 py-2 text-base ${
+                              isRight ? 'bg-[#e8f5ec] text-[#14532d] font-semibold' : 'bg-base-200'
+                            }`}
+                          >
+                            <span className="font-display font-bold">{opt}</span>
+                            <span className="flex-1 min-w-0">{q.options[opt]}</span>
+                            {isRight && (
+                              <span className="inline-flex items-center gap-1 text-[0.9375rem]">
+                                <Check className="w-4 h-4" aria-hidden="true" />
+                                Certa
+                              </span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
     </div>
   );
 };

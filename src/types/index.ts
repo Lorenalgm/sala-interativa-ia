@@ -55,6 +55,8 @@ export interface RoundSession {
   overallAccuracy: number;
   totalResponses: number;
   scriptId?: ScriptId; // ausente nos registros antigos: contam como pergunta rápida
+  demo?: boolean; // rodada de exemplo, criada pelo botão do Desempenho
+  classroomId?: string; // turma em que a rodada aconteceu (ausente só antes da migração)
 }
 
 export interface DetectedMarker {

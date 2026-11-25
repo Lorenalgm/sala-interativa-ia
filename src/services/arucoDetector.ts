@@ -61,11 +61,21 @@ export class ArucoCardDetector {
     const image = this.ctx.getImageData(0, 0, width, height);
     const found = this.detector.detect(image);
 
-    const markers: DetectedMarker[] = [];
-    const seen = new Set<number>();
+    // O mesmo número pode aparecer duas vezes (ex.: a prévia da câmera projetada no quadro):
+    // fica o maior, que é o marcador de verdade
+    const area = (cs: { x: number; y: number }[]) =>
+      Math.abs(cs.reduce((s, c, i) => {
+        const n = cs[(i + 1) % cs.length];
+        return s + c.x * n.y - n.x * c.y;
+      }, 0)) / 2;
+    const largest = new Map<number, { id: number; corners: { x: number; y: number }[] }>();
     for (const m of found) {
-      if (seen.has(m.id)) continue;
-      seen.add(m.id);
+      const prev = largest.get(m.id);
+      if (!prev || area(m.corners) > area(prev.corners)) largest.set(m.id, m);
+    }
+
+    const markers: DetectedMarker[] = [];
+    for (const m of largest.values()) {
       const rotation = rotationFromCorners(m.corners);
       markers.push({
         id: m.id,

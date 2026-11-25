@@ -23,7 +23,7 @@ export const HandGhost: React.FC<HandGhostProps> = ({ points, closed, progress =
   const w = window.innerWidth;
   const h = window.innerHeight;
   const at = (i: number) => ({ x: points[i].x * w, y: points[i].y * h });
-  const color = closed ? '#16a34a' : '#0f766e';
+  const color = closed ? '#16a34a' : '#0040dd';
   const unit = Math.min(w, h) / 100;
   const thumb = at(4);
   const index = at(8);

@@ -1,10 +1,9 @@
-import React, { useRef, useState } from 'react';
-import { ArrowRight, Check, Lock, Monitor, Printer, ShieldCheck, Video } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronRight, Lock, Play } from 'lucide-react';
 import { ScriptId } from '../../types';
 import { getScript } from '../../data/scripts';
 import { ClassroomScene } from './ClassroomScene';
 import { LiveDemo } from './LiveDemo';
-import { Reveal } from './Reveal';
 import { ScriptBook } from '../Library/LibraryPage';
 
 interface LandingPageProps {
@@ -14,28 +13,35 @@ interface LandingPageProps {
   onOpenReports: () => void;
 }
 
-// Uma amostra da biblioteca: a metodologia pelo nome e o que ela muda na aula.
-// O resto do acervo o professor descobre na biblioteca.
-const ideas: { title: string; text: string; script: ScriptId }[] = [
+// Vídeo de demonstração: coloque o arquivo em public/video/. Enquanto ele não existir,
+// a ilustração da sala aparece no mesmo lugar e a página continua inteira.
+const DEMO_VIDEO = {
+  src: '/video/classplay-demo.mp4',
+  poster: undefined as string | undefined, // ex.: '/video/classplay-demo.jpg'
+  caption: 'O ClassPlay em uma aula de verdade.',
+};
+
+// Os modelos que a página mostra, com o nome da metodologia que cada um apoia
+const shelf: { script: ScriptId; method: string; text: string }[] = [
   {
-    title: 'Avaliação formativa',
-    text: 'Veja o que a turma entendeu enquanto ainda dá tempo de ajustar a aula.',
     script: 'quick-question',
+    method: 'Avaliação formativa',
+    text: 'Veja o que a turma entendeu enquanto ainda dá tempo de mudar a aula.',
   },
   {
-    title: 'Aprendizagem em grupo',
-    text: 'O grupo discute e o sistema sorteia quem responde, então todos se preparam.',
     script: 'group-draw',
+    method: 'Aprendizagem em grupo',
+    text: 'Como ninguém sabe quem vai ser sorteado para responder, o grupo inteiro precisa entender a resposta.',
   },
   {
-    title: 'Lousa interativa',
-    text: 'O grupo move uma paleta de papel sobre a projeção para responder, sem tocar na tela.',
     script: 'interactive-board',
+    method: 'Lousa interativa',
+    text: 'O grupo leva uma paleta de papel até a resposta projetada no quadro.',
   },
 ];
 
 // Exemplo ilustrativo do painel de Desempenho, com turma fictícia de 14 alunos.
-// As frases seguem as regras de services/recommendations.ts.
+// As frases seguem as regras de services/insights.ts.
 const exampleSkills = [
   {
     skill: 'Matemática',
@@ -70,13 +76,26 @@ const levels = [
   { key: 'mastered', label: 'Dominando', chip: 'bg-emerald-100 text-emerald-950', bar: 'bg-emerald-300' },
 ] as const;
 
-const promises = ['Sem celular', 'Sem conta'];
+const focusRing =
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary';
 
-const needs = [
-  { icon: Monitor, title: 'Datashow', text: 'Projeta a pergunta.' },
-  { icon: Video, title: 'Uma câmera', text: 'Lê as respostas.' },
-  { icon: Printer, title: 'Cartões de papel', text: 'A4, 2 ou 4 por folha. Na lousa, uma paleta.' },
-];
+// Botão cheio em cápsula e link com chevron, como nas páginas de produto da Apple
+const pillButton = `inline-flex items-center justify-center min-h-[3.25rem] px-7 rounded-full bg-primary text-primary-content text-lg font-semibold hover:bg-[#0036bd] active:bg-[#002c9c] motion-safe:transition-colors ${focusRing}`;
+const chevronLink = `group inline-flex items-center gap-1 min-h-[2.75rem] text-lg font-semibold text-primary hover:underline underline-offset-4 rounded ${focusRing}`;
+
+// Títulos de seção grandes e centralizados, legíveis do fundo da sala
+const SectionTitle: React.FC<{ id: string; children: React.ReactNode; lead?: React.ReactNode }> = ({
+  id,
+  children,
+  lead,
+}) => (
+  <div className="max-w-3xl mx-auto text-center space-y-4">
+    <h2 id={id} className="font-display text-4xl sm:text-5xl font-bold tracking-tight leading-[1.05]">
+      {children}
+    </h2>
+    {lead && <p className="text-xl sm:text-2xl leading-snug text-base-content/75">{lead}</p>}
+  </div>
+);
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenLibrary,
@@ -85,299 +104,218 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onOpenReports,
 }) => {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-20 space-y-24">
-      {/* Abertura: a promessa e a cena da sala */}
-      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-        <div className="lg:col-span-5 space-y-6">
-          <h1 className="font-editorial text-4xl sm:text-5xl font-bold tracking-[-0.015em] leading-[1.06] text-balance">
-            Roteiros de aprendizagem ativa para a sala de aula
-          </h1>
-          <p className="text-lg leading-relaxed text-base-content/85 text-pretty">
-            Cada aluno levanta um cartão de papel. A câmera lê todos de uma vez e a tela mostra quem respondeu o quê.
-          </p>
-          <ul className="flex flex-wrap gap-2" aria-label="Sem celular e sem conta">
-            {promises.map((t) => (
-              <li
-                key={t}
-                className="inline-flex items-center gap-1.5 rounded-full bg-base-100 border border-base-300 px-3.5 py-1.5 text-sm font-extrabold"
-              >
-                <Check className="w-4 h-4 text-primary" aria-hidden="true" />
-                {t}
-              </li>
-            ))}
-          </ul>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
-            <button onClick={onOpenLibrary} className="btn btn-primary btn-lg">
-              Abrir a biblioteca
-              <ArrowRight className="w-5 h-5" aria-hidden="true" />
-            </button>
-            <a href="#experimente" className="font-bold underline underline-offset-4 decoration-2">
-              Experimente agora
-            </a>
+    <div>
+      {/* Abertura: nome, promessa e o vídeo grande logo embaixo */}
+      <section aria-labelledby="abertura" className="bg-base-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 pb-16 sm:pb-24">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <p className="font-display text-xl sm:text-2xl font-bold text-base-content/70">ClassPlay</p>
+            <h1
+              id="abertura"
+              className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.02]"
+            >
+              A turma inteira responde de uma vez.
+            </h1>
+            <p className="text-xl sm:text-2xl leading-snug text-base-content/75 max-w-3xl mx-auto">
+              Cada aluno levanta um cartão de papel e a câmera do professor lê todos de uma vez, sem
+              celular na mão de ninguém. No datashow aparece quem respondeu e quantos acertaram.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 pt-2">
+              <button onClick={onOpenLibrary} className={pillButton}>
+                Abrir a biblioteca
+              </button>
+              <a href="#video" className={chevronLink}>
+                <Play className="w-5 h-5 fill-current" aria-hidden="true" />
+                Assistir ao vídeo
+              </a>
+            </div>
           </div>
-        </div>
 
-        <div className="lg:col-span-7 rounded-[1.75rem] overflow-hidden border border-base-300">
-          <ClassroomScene />
+          <DemoVideo />
         </div>
       </section>
 
-      {/* Demonstração: o visitante levanta um cartão */}
-      <Reveal>
-        <section id="experimente" aria-labelledby="experimente-titulo" className="space-y-8 scroll-mt-24">
-          <h2
+      {/* Simulação: o visitante levanta um cartão */}
+      <section id="experimente" aria-labelledby="experimente-titulo" className="bg-base-200 scroll-mt-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 space-y-12">
+          <SectionTitle
             id="experimente-titulo"
-            className="font-editorial text-3xl lg:text-4xl font-bold tracking-[-0.015em] text-balance"
+            lead="Clique numa letra como se fosse o seu cartão. Os outros sete alunos são de exemplo; na sala, quem lê os cartões é a câmera."
           >
-            Levante um cartão e veja a turma responder
-          </h2>
+            Teste com uma pergunta de exemplo.
+          </SectionTitle>
           <LiveDemo />
-        </section>
-      </Reveal>
+        </div>
+      </section>
 
-      {/* Amostra da biblioteca: uma metodologia por vez, com o livro do roteiro */}
-      <Reveal>
-        <MethodShelf onOpenScript={onOpenScript} onOpenLibrary={onOpenLibrary} />
-      </Reveal>
+      {/* Modelos lado a lado, cada um com a metodologia que apoia */}
+      <section aria-labelledby="modelos-titulo" className="bg-base-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 space-y-14">
+          <SectionTitle
+            id="modelos-titulo"
+            lead="Cada modelo tem as etapas prontas. Você cadastra as suas perguntas e conduz a aula."
+          >
+            Escolha o jeito de perguntar.
+          </SectionTitle>
 
-      {/* Depois da rodada: banco de perguntas e desempenho */}
-      <Reveal>
-        <MasteryExample onOpenQuestions={onOpenQuestions} onOpenReports={onOpenReports} />
-      </Reveal>
-
-      {/* Primeira aula */}
-      <Reveal>
-        <section
-          aria-labelledby="primeira-aula"
-          className="bg-primary text-primary-content rounded-[1.75rem] px-8 sm:px-14 py-14 space-y-10"
-        >
-          <div className="flex flex-wrap items-center justify-between gap-6">
-            <h2
-              id="primeira-aula"
-              className="font-editorial text-3xl lg:text-4xl font-bold tracking-[-0.015em] max-w-xl text-balance"
-            >
-              O que você precisa para começar
-            </h2>
-            <button onClick={onOpenLibrary} className="btn btn-secondary btn-lg">
-              Abrir a biblioteca
-              <ArrowRight className="w-5 h-5" aria-hidden="true" />
-            </button>
-          </div>
-
-          <ul className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {needs.map((n) => {
-              const Icon = n.icon;
+          <ul className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-14 justify-items-center">
+            {shelf.map((item, i) => {
+              const script = getScript(item.script);
               return (
-                <li key={n.title} className="flex items-start gap-4">
-                  <span className="shrink-0 w-14 h-14 rounded-xl bg-white/10 ring-1 ring-white/35 flex items-center justify-center">
-                    <Icon className="w-7 h-7" aria-hidden="true" />
-                  </span>
-                  <span>
-                    <span className="block font-display text-xl font-extrabold">{n.title}</span>
-                    <span className="block text-lg text-primary-content/85">{n.text}</span>
-                  </span>
+                <li key={item.script} className="flex flex-col items-center gap-6 max-w-[17rem]">
+                  <ScriptBook script={script} index={i} onOpen={() => onOpenScript(item.script)} />
+                  <div className="text-center space-y-1.5">
+                    <h3 className="font-display text-2xl font-bold tracking-tight">{item.method}</h3>
+                    <p className="text-lg leading-snug text-base-content/75">{item.text}</p>
+                  </div>
                 </li>
               );
             })}
           </ul>
 
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4 border-t border-white/20 pt-8 text-base text-primary-content/90">
-            <li className="flex items-start gap-3">
-              <ShieldCheck className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
-              A câmera não grava nem envia imagens: a leitura acontece no seu navegador.
-            </li>
-            <li className="flex items-start gap-3">
-              <Lock className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
-              Turma e histórico ficam só neste computador. Você exporta em CSV e apaga quando quiser.
-            </li>
-          </ul>
-        </section>
-      </Reveal>
+          <div className="text-center">
+            <button onClick={onOpenLibrary} className={chevronLink}>
+              Ver todos os modelos
+              <ChevronRight className="w-5 h-5 motion-safe:transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Depois da rodada: domínio por habilidade */}
+      <section aria-labelledby="depois-titulo" className="bg-base-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 space-y-12">
+          <SectionTitle
+            id="depois-titulo"
+            lead="Com as respostas das rodadas, o ClassPlay estima o que cada aluno já domina e sugere o que retomar com a turma e como montar os grupos."
+          >
+            Depois da aula, você sabe quem precisa de ajuda.
+          </SectionTitle>
+          <MasteryExample />
+          <div className="flex flex-wrap justify-center gap-x-10 gap-y-2">
+            <button onClick={onOpenReports} className={chevronLink}>
+              Ver o desempenho
+              <ChevronRight className="w-5 h-5" aria-hidden="true" />
+            </button>
+            <button onClick={onOpenQuestions} className={chevronLink}>
+              Abrir o banco de perguntas
+              <ChevronRight className="w-5 h-5" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Fechamento: o que precisa, em uma frase, e a ação */}
+      <section aria-labelledby="comecar-titulo" className="bg-base-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 text-center space-y-8">
+          <h2
+            id="comecar-titulo"
+            className="font-display text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]"
+          >
+            Para começar, você precisa de um datashow, uma webcam virada para a turma e cartões
+            impressos em A4.
+          </h2>
+          <p className="inline-flex items-start gap-2 text-lg text-base-content/75 max-w-2xl text-left sm:text-center">
+            <Lock className="w-5 h-5 shrink-0 mt-1" aria-hidden="true" />
+            A imagem da câmera não sai do seu computador. A turma e o histórico ficam salvos só nele.
+          </p>
+          <div>
+            <button onClick={onOpenLibrary} className={pillButton}>
+              Abrir a biblioteca
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
 
-const linkClass =
-  'group inline-flex items-center gap-1.5 font-bold text-primary rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
-
-const LinkArrow: React.FC = () => (
-  <ArrowRight className="w-4 h-4 motion-safe:transition-transform group-hover:translate-x-1" aria-hidden="true" />
-);
-
-// Abas com o nome das metodologias; o livro do roteiro escolhido chega girando na lombada
-const MethodShelf: React.FC<{
-  onOpenScript: (id: ScriptId) => void;
-  onOpenLibrary: () => void;
-}> = ({ onOpenScript, onOpenLibrary }) => {
-  const [active, setActive] = useState(0);
-  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
-  const idea = ideas[active];
-  const script = getScript(idea.script);
-
-  const onKey = (e: React.KeyboardEvent) => {
-    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-    e.preventDefault();
-    const step = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : -1;
-    const next = (active + step + ideas.length) % ideas.length;
-    setActive(next);
-    tabs.current[next]?.focus();
-  };
+// Vídeo grande em 16:9. Sem reprodução automática: tem áudio e quem decide é o professor.
+const DemoVideo: React.FC = () => {
+  const [failed, setFailed] = useState(false);
 
   return (
-    <section
-      id="base"
-      aria-labelledby="base-titulo"
-      className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center scroll-mt-24"
-    >
-      <div className="lg:col-span-6 space-y-8">
-        <h2
-          id="base-titulo"
-          className="font-editorial text-3xl lg:text-4xl font-bold tracking-[-0.015em] leading-[1.1] text-balance"
-        >
-          Cada roteiro é uma metodologia ativa
-        </h2>
-
-        <div role="tablist" aria-label="Metodologias" aria-orientation="vertical" className="border-y border-base-300 divide-y divide-base-300" onKeyDown={onKey}>
-          {ideas.map((it, i) => {
-            const selected = i === active;
-            return (
-              <button
-                key={it.title}
-                ref={(el) => (tabs.current[i] = el)}
-                role="tab"
-                id={`metodo-${i}`}
-                aria-selected={selected}
-                aria-controls="metodo-painel"
-                tabIndex={selected ? 0 : -1}
-                onClick={() => setActive(i)}
-                className="w-full text-left py-5 flex items-start gap-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary rounded"
-              >
-                <span
-                  className={`mt-1.5 w-1 self-stretch rounded-full motion-safe:transition-colors motion-safe:duration-300 ${
-                    selected ? 'bg-primary' : 'bg-transparent'
-                  }`}
-                  aria-hidden="true"
-                />
-                <span className="space-y-2">
-                  <span
-                    className={`block font-editorial text-2xl font-bold tracking-[-0.01em] leading-snug motion-safe:transition-colors motion-safe:duration-300 ${
-                      selected ? 'text-base-content' : 'text-base-content/55 hover:text-base-content/80'
-                    }`}
-                  >
-                    {it.title}
-                  </span>
-                  {selected && (
-                    <span className="block text-lg leading-relaxed text-base-content/85 max-w-md">{it.text}</span>
-                  )}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="flex flex-wrap gap-x-6 gap-y-2">
-          <button onClick={() => onOpenScript(idea.script)} className={linkClass}>
-            Abrir {script.name}
-            <LinkArrow />
-          </button>
-          <button onClick={onOpenLibrary} className="inline-flex items-center gap-1.5 font-bold underline underline-offset-4 decoration-2 rounded focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-            Ver todos os roteiros
-          </button>
-        </div>
+    <figure id="video" className="mt-14 sm:mt-20 space-y-4 scroll-mt-20">
+      <div className="relative aspect-video rounded-[1.25rem] overflow-hidden bg-black border border-base-300">
+        {failed ? (
+          <div className="absolute inset-0 bg-base-200 flex items-center justify-center">
+            <div className="w-full">
+              <ClassroomScene />
+            </div>
+          </div>
+        ) : (
+          <video
+            className="absolute inset-0 w-full h-full object-contain"
+            src={DEMO_VIDEO.src}
+            poster={DEMO_VIDEO.poster}
+            controls
+            playsInline
+            preload="metadata"
+            onError={() => setFailed(true)}
+          >
+            Seu navegador não conseguiu abrir o vídeo.
+          </video>
+        )}
       </div>
-
-      <div
-        id="metodo-painel"
-        role="tabpanel"
-        aria-labelledby={`metodo-${active}`}
-        className="lg:col-span-6 flex justify-center py-6"
-      >
-        <ScriptBook key={idea.script} script={script} entrance="turn" onOpen={() => onOpenScript(idea.script)} />
-      </div>
-    </section>
+      {!failed && (
+        <figcaption className="text-center text-lg text-base-content/70">{DEMO_VIDEO.caption}</figcaption>
+      )}
+    </figure>
   );
 };
 
 // Painel de exemplo: cada habilidade é clicável e mostra a sugestão que o Desempenho daria
-const MasteryExample: React.FC<{
-  onOpenQuestions: () => void;
-  onOpenReports: () => void;
-}> = ({ onOpenQuestions, onOpenReports }) => {
+const MasteryExample: React.FC = () => {
   const [active, setActive] = useState(0);
   const current = exampleSkills[active];
 
   return (
-    <section aria-labelledby="depois-titulo" className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-      <div className="lg:col-span-5 space-y-6">
-        <h2
-          id="depois-titulo"
-          className="font-editorial text-3xl lg:text-4xl font-bold tracking-[-0.015em] leading-[1.1] text-balance"
-        >
-          O domínio de cada aluno, por habilidade
-        </h2>
-        <p className="text-lg leading-relaxed text-base-content/85 text-pretty">
-          As respostas das rodadas viram uma estimativa de domínio, com sugestões para a turma, para
-          cada aluno e para grupos que misturam níveis. As habilidades vêm do seu banco de perguntas.
-        </p>
-        <div className="flex flex-wrap gap-x-6 gap-y-2">
-          <button onClick={onOpenReports} className={linkClass}>
-            Ver o desempenho
-            <LinkArrow />
-          </button>
-          <button onClick={onOpenQuestions} className={linkClass}>
-            Abrir o banco de perguntas
-            <LinkArrow />
-          </button>
-        </div>
+    <div className="max-w-3xl mx-auto bg-base-100 border border-base-300 rounded-[1.25rem] p-6 sm:p-10 space-y-7">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="font-display text-2xl font-bold">Escolha uma habilidade</h3>
+        <p className="text-base text-base-content/70">Turma fictícia de 14 alunos</p>
       </div>
 
-      <div className="lg:col-span-7 bg-base-100 border border-base-300 rounded-[1.75rem] p-7 sm:p-9 space-y-6">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="font-display text-xl font-extrabold">Escolha uma habilidade</h3>
-          <p className="text-sm text-base-content/70">Turma fictícia de 14 alunos</p>
-        </div>
-
-        <ul className="space-y-2" role="group" aria-label="Habilidades do exemplo">
-          {exampleSkills.map((r, i) => {
-            const selected = i === active;
-            return (
-              <li key={r.skill}>
-                <button
-                  onClick={() => setActive(i)}
-                  aria-pressed={selected}
-                  className={`w-full grid grid-cols-[6.5rem_1fr] items-center gap-4 rounded-xl px-3 py-2.5 text-left motion-safe:transition-colors motion-safe:duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${
-                    selected ? 'bg-base-200' : 'hover:bg-base-200/60'
-                  }`}
+      <ul className="space-y-2" role="group" aria-label="Habilidades do exemplo">
+        {exampleSkills.map((r, i) => {
+          const selected = i === active;
+          return (
+            <li key={r.skill}>
+              <button
+                onClick={() => setActive(i)}
+                aria-pressed={selected}
+                className={`w-full min-h-[3.25rem] grid grid-cols-[7.5rem_1fr] items-center gap-4 rounded-xl px-3 text-left motion-safe:transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${
+                  selected ? 'bg-base-200' : 'hover:bg-black/[0.04]'
+                }`}
+              >
+                <span className="font-display text-xl font-bold">{r.skill}</span>
+                <span
+                  className="flex h-6 rounded-full overflow-hidden"
+                  role="img"
+                  aria-label={`${r.reinforce} precisam de reforço, ${r.progress} em progresso, ${r.mastered} dominando`}
                 >
-                  <span className="font-display text-lg font-extrabold">{r.skill}</span>
-                  <span
-                    className="flex h-5 rounded-full overflow-hidden"
-                    role="img"
-                    aria-label={`${r.reinforce} precisam de reforço, ${r.progress} em progresso, ${r.mastered} dominando`}
-                  >
-                    {levels.map((l) => (
-                      <span key={l.key} className={l.bar} style={{ flexGrow: r[l.key] }} />
-                    ))}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-
-        <ul className="flex flex-wrap gap-2 px-3" aria-label="Níveis de domínio">
-          {levels.map((l) => (
-            <li key={l.key} className={`rounded-full px-3 py-1 text-sm font-extrabold ${l.chip}`}>
-              {l.label}
+                  {levels.map((l) => (
+                    <span key={l.key} className={l.bar} style={{ flexGrow: r[l.key] }} />
+                  ))}
+                </span>
+              </button>
             </li>
-          ))}
-        </ul>
+          );
+        })}
+      </ul>
 
-        <div className="border-t border-base-300 pt-6 space-y-1.5" aria-live="polite">
-          <p className="font-display text-2xl font-extrabold tracking-[-0.02em]">{current.advice}</p>
-          <p className="text-base text-base-content/80">{current.reason}</p>
-        </div>
+      <ul className="flex flex-wrap gap-2 px-3" aria-label="Níveis de domínio">
+        {levels.map((l) => (
+          <li key={l.key} className={`rounded-full px-3.5 py-1 text-base font-bold ${l.chip}`}>
+            {l.label}
+          </li>
+        ))}
+      </ul>
+
+      <div className="border-t border-base-300 pt-6 space-y-1.5" aria-live="polite">
+        <p className="font-display text-3xl font-bold tracking-tight">{current.advice}</p>
+        <p className="text-lg text-base-content/75">{current.reason}</p>
       </div>
-    </section>
+    </div>
   );
 };

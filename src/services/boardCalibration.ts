@@ -21,10 +21,20 @@ export interface CalibrationLayout {
   corners: Record<number, Point[]>;
 }
 
-export function calibrationLayout(width: number, height: number): CalibrationLayout {
+// Distância dos marcadores até a borda, como fração do menor lado da tela. Perto da borda o
+// projetor costuma desfocar, entortar ou cortar a imagem; a homografia vale para a tela inteira
+// mesmo com os marcadores mais para dentro.
+export const CALIBRATION_INSETS = [
+  { value: 0.04, label: 'Na borda' },
+  { value: 0.1, label: 'Um pouco para dentro' },
+  { value: 0.16, label: 'Bem para dentro' },
+] as const;
+export const DEFAULT_INSET = CALIBRATION_INSETS[1].value;
+
+export function calibrationLayout(width: number, height: number, inset: number = DEFAULT_INSET): CalibrationLayout {
   const base = Math.min(width, height);
   const size = Math.round(base * 0.18);
-  const pad = Math.round(base * 0.04);
+  const pad = Math.round(base * inset);
   const square = (left: number, top: number): Point[] =>
     [
       { x: left, y: top },
@@ -45,10 +55,11 @@ export function calibrationLayout(width: number, height: number): CalibrationLay
 }
 
 export interface CalibrationState {
-  seen: number[]; // ids de calibração vistos neste quadro
-  streak: number; // quadros seguidos com os 4
+  seen: number[]; // ids de calibração vistos há pouco (não pisca quando um quadro falha)
+  streak: number; // leituras boas do canto com menos leituras, até CALIBRATION_FRAMES
   markerPx: number; // lado médio do marcador na imagem da câmera (0 se nenhum visto)
   error: number | null; // erro de reprojeção da última tentativa, como fração da largura
+  worstId: number | null; // marcador com o maior erro na última tentativa que falhou
   homography: Homography | null; // preenchida quando a calibração termina
 }
 
@@ -63,12 +74,40 @@ const sideLength = (corners: Point[]): number =>
     return s + Math.hypot(n.x - c.x, n.y - c.y);
   }, 0) / corners.length;
 
-// Junta os marcadores 900 a 903 ao longo dos quadros; com 10 seguidos calcula a homografia
-// camera -> tela (em frações da tela) e confere o erro.
+const median = (values: number[]): number => {
+  const v = [...values].sort((a, b) => a - b);
+  const m = Math.floor(v.length / 2);
+  return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+};
+
+const SEEN_FOR = 15; // um marcador conta como visto por até 15 quadros depois da última leitura
+const MIN_SIZE = 0.6; // marcador menor que 60% da mediana é cópia (ex.: a prévia da câmera projetada)
+const MAX_JUMP = 0.5; // leitura com o centro a mais de meio lado da média do canto é descartada
+const RESTART_AFTER = 8; // tantas leituras descartadas seguidas: a câmera mexeu, recomeça o canto
+
+interface Track {
+  sum: Point[]; // soma dos cantos das leituras aceitas
+  count: number;
+  lastFrame: number;
+  rejected: number; // leituras descartadas seguidas
+}
+
+const emptyState = (): CalibrationState => ({
+  seen: [],
+  streak: 0,
+  markerPx: 0,
+  error: null,
+  worstId: null,
+  homography: null,
+});
+
+// Junta as leituras dos marcadores 900 a 903, cada um no seu ritmo: um canto que falha num quadro
+// não zera os outros. Com 10 leituras boas de cada, calcula a homografia câmera -> tela
+// (em frações da tela) e confere o erro.
 export class BoardCalibrator {
-  private streak = 0;
-  private sums: Record<number, Point[]> = {};
-  private state: CalibrationState = { seen: [], streak: 0, markerPx: 0, error: null, homography: null };
+  private frame = 0;
+  private tracks: Record<number, Track> = {};
+  private state: CalibrationState = emptyState();
 
   constructor(private layout: CalibrationLayout, private aspect: number) {}
 
@@ -77,60 +116,90 @@ export class BoardCalibrator {
   }
 
   public reset(): void {
-    this.streak = 0;
-    this.sums = {};
-    this.state = { seen: [], streak: 0, markerPx: 0, error: null, homography: null };
+    this.frame = 0;
+    this.tracks = {};
+    this.state = emptyState();
   }
 
   public feed(markers: DetectedMarker[]): CalibrationState {
     if (this.state.homography) return this.state;
-    const found = markers.filter((m) => (CALIBRATION_IDS as readonly number[]).includes(m.id));
-    const seen = found.map((m) => m.id);
+    this.frame += 1;
+
+    let found = markers.filter((m) => (CALIBRATION_IDS as readonly number[]).includes(m.id));
+    // A prévia da câmera aparece na projeção com os marcadores em miniatura: descarta os pequenos
+    if (found.length > 1) {
+      const typical = median(found.map((m) => sideLength(m.corners)));
+      found = found.filter((m) => sideLength(m.corners) >= typical * MIN_SIZE);
+    }
     const markerPx = found.length ? found.reduce((s, m) => s + sideLength(m.corners), 0) / found.length : 0;
 
-    if (found.length < CALIBRATION_IDS.length) {
-      this.streak = 0;
-      this.sums = {};
-      this.state = { ...this.state, seen, streak: 0, markerPx };
-      return this.state;
-    }
-
-    this.streak += 1;
     found.forEach((m) => {
-      const acc = this.sums[m.id] ?? m.corners.map(() => ({ x: 0, y: 0 }));
-      this.sums[m.id] = acc.map((p, i) => ({ x: p.x + m.corners[i].x, y: p.y + m.corners[i].y }));
+      const t = this.tracks[m.id];
+      if (!t || t.count === 0) {
+        this.tracks[m.id] = { sum: m.corners.map((c) => ({ ...c })), count: 1, lastFrame: this.frame, rejected: 0 };
+        return;
+      }
+      const mean = markerCenter(t.sum.map((p) => ({ x: p.x / t.count, y: p.y / t.count })));
+      const here = markerCenter(m.corners);
+      const side = sideLength(m.corners);
+      t.lastFrame = this.frame;
+      if (Math.hypot(here.x - mean.x, here.y - mean.y) > side * MAX_JUMP) {
+        t.rejected += 1;
+        if (t.rejected >= RESTART_AFTER) {
+          this.tracks[m.id] = { sum: m.corners.map((c) => ({ ...c })), count: 1, lastFrame: this.frame, rejected: 0 };
+        }
+        return;
+      }
+      t.rejected = 0;
+      if (t.count < CALIBRATION_FRAMES) {
+        t.sum = t.sum.map((p, i) => ({ x: p.x + m.corners[i].x, y: p.y + m.corners[i].y }));
+        t.count += 1;
+      }
     });
 
-    if (this.streak < CALIBRATION_FRAMES) {
-      this.state = { ...this.state, seen, streak: this.streak, markerPx };
+    const seen = CALIBRATION_IDS.filter((id) => {
+      const t = this.tracks[id];
+      return t && this.frame - t.lastFrame <= SEEN_FOR;
+    });
+    const counts = CALIBRATION_IDS.map((id) => (seen.includes(id) ? this.tracks[id].count : 0));
+    const streak = Math.min(...counts);
+
+    if (streak < CALIBRATION_FRAMES) {
+      this.state = { ...this.state, seen, streak, markerPx };
       return this.state;
     }
 
-    // Média dos 10 quadros: 16 pares de cantos (4 por marcador) para os mínimos quadrados
+    // Média das leituras de cada canto: 16 pares de cantos (4 por marcador) para os mínimos quadrados
     const src: Point[] = [];
     const dst: Point[] = [];
+    const owner: number[] = [];
     CALIBRATION_IDS.forEach((id) => {
-      this.sums[id].forEach((p, i) => {
-        src.push({ x: p.x / this.streak, y: p.y / this.streak });
+      const t = this.tracks[id];
+      t.sum.forEach((p, i) => {
+        src.push({ x: p.x / t.count, y: p.y / t.count });
         dst.push(this.layout.corners[id][i]);
+        owner.push(id);
       });
     });
     const h = computeHomography(src, dst);
     let error = Infinity;
+    let worstId: number | null = null;
     if (h) {
-      error = Math.max(
-        ...src.map((p, i) => {
-          const q = applyHomography(h, p);
-          return Math.hypot(q.x - dst[i].x, (q.y - dst[i].y) / this.aspect);
-        })
-      );
+      error = 0;
+      src.forEach((p, i) => {
+        const q = applyHomography(h, p);
+        const e = Math.hypot(q.x - dst[i].x, (q.y - dst[i].y) / this.aspect);
+        if (e > error) {
+          error = e;
+          worstId = owner[i];
+        }
+      });
     }
-    this.streak = 0;
-    this.sums = {};
+    this.tracks = {};
     this.state =
       h && error <= MAX_ERROR
-        ? { seen, streak: CALIBRATION_FRAMES, markerPx, error, homography: h }
-        : { seen, streak: 0, markerPx, error: Number.isFinite(error) ? error : null, homography: null };
+        ? { seen, streak: CALIBRATION_FRAMES, markerPx, error, worstId: null, homography: h }
+        : { seen, streak: 0, markerPx, error: Number.isFinite(error) ? error : null, worstId, homography: null };
     return this.state;
   }
 }

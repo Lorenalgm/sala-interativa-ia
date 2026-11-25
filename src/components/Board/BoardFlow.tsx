@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Printer, Users } from 'lucide-react';
+import { ArrowLeft, Check, Printer, Users } from 'lucide-react';
 import { GroupFormation, Question, Student } from '../../types';
 import { Homography } from '../../services/homography';
 import { PADDLE_MARKERS } from '../../services/markerRanges';
@@ -110,10 +110,20 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
 
   if (stage === 'summary' && formation) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Resultado da lousa</h1>
-          <p className="text-sm text-base-content/70 mt-1">Por grupo e por pergunta, sem ranking.</p>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 space-y-8">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div className="space-y-2">
+            <h1 className="font-display text-4xl lg:text-[2.75rem] font-bold tracking-tight leading-[1.05]">Resultado da lousa</h1>
+            <p className="text-lg text-base-content/75">Por grupo e por pergunta, sem ranking.</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button onClick={onBack} className={pillSecondary}>
+              Voltar ao modelo
+            </button>
+            <button onClick={() => setStage('setup')} className={pillPrimary}>
+              Nova rodada
+            </button>
+          </div>
         </div>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -124,20 +134,20 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
             const second = own.filter((r) => r.correct && !r.firstTry).length;
             const wrong = own.filter((r) => !r.correct).length;
             return (
-              <div key={g.id} className="bg-base-100 border border-base-300 rounded-box p-4 space-y-3">
-                <h2 className="font-bold text-lg">{g.name}</h2>
+              <div key={g.id} className="bg-base-100 border border-base-300 rounded-[0.875rem] p-5 space-y-4">
+                <h2 className="font-display text-2xl font-bold tracking-tight">{g.name}</h2>
                 <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-lg bg-green-100 text-green-900 py-2">
-                    <p className="text-3xl font-extrabold leading-none">{first}</p>
-                    <p className="text-sm font-semibold mt-1">de primeira</p>
+                  <div className="rounded-[0.625rem] bg-[#e8f5ec] text-[#14532d] py-3">
+                    <p className="font-display text-4xl font-bold leading-none">{first}</p>
+                    <p className="text-[0.9375rem] font-semibold mt-1.5">de primeira</p>
                   </div>
-                  <div className="rounded-lg bg-amber-100 text-amber-900 py-2">
-                    <p className="text-3xl font-extrabold leading-none">{second}</p>
-                    <p className="text-sm font-semibold mt-1">na 2ª tentativa</p>
+                  <div className="rounded-[0.625rem] bg-amber-100 text-amber-950 py-3">
+                    <p className="font-display text-4xl font-bold leading-none">{second}</p>
+                    <p className="text-[0.9375rem] font-semibold mt-1.5">na 2ª tentativa</p>
                   </div>
-                  <div className="rounded-lg bg-red-100 text-red-900 py-2">
-                    <p className="text-3xl font-extrabold leading-none">{wrong}</p>
-                    <p className="text-sm font-semibold mt-1">não acertou</p>
+                  <div className="rounded-[0.625rem] bg-red-100 text-red-950 py-3">
+                    <p className="font-display text-4xl font-bold leading-none">{wrong}</p>
+                    <p className="text-[0.9375rem] font-semibold mt-1.5">não acertou</p>
                   </div>
                 </div>
               </div>
@@ -145,34 +155,25 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
           })}
         </section>
 
-        <section className="bg-base-100 border border-base-300 rounded-box p-4 space-y-3">
-          <h2 className="font-bold">Perguntas</h2>
-          <ol className="space-y-2">
+        <section aria-labelledby="lousa-perguntas" className="space-y-2">
+          <h2 id="lousa-perguntas" className={groupHeader}>Perguntas</h2>
+          <ol className="bg-base-100 rounded-[0.875rem] border border-base-300 overflow-hidden">
             {results.map((r, i) => (
-              <li key={r.questionId + i} className="flex items-start gap-3">
+              <li key={r.questionId + i} className={`flex flex-wrap items-center gap-3 px-4 py-3.5 ${i > 0 ? 'border-t border-base-300' : ''}`}>
                 <span
-                  className={`badge badge-lg font-semibold flex-shrink-0 whitespace-nowrap ${
-                    r.firstTry ? 'badge-success' : r.correct ? 'badge-warning' : 'badge-error'
+                  className={`inline-flex items-center min-h-[1.75rem] px-2.5 rounded-full text-[0.9375rem] font-semibold flex-shrink-0 whitespace-nowrap ${
+                    r.firstTry ? 'bg-[#e8f5ec] text-[#14532d]' : r.correct ? 'bg-amber-100 text-amber-950' : 'bg-red-100 text-red-950'
                   }`}
                 >
                   {r.firstTry ? 'De primeira' : r.correct ? 'Na 2ª tentativa' : 'Não acertou'}
                 </span>
-                <span>
+                <span className="text-lg">
                   <span className="font-semibold">{r.groupName}:</span> {r.prompt}
                 </span>
               </li>
             ))}
           </ol>
         </section>
-
-        <div className="flex gap-2">
-          <button onClick={() => setStage('setup')} className="btn btn-primary">
-            Nova rodada
-          </button>
-          <button onClick={onBack} className="btn">
-            Voltar ao roteiro
-          </button>
-        </div>
       </div>
     );
   }
@@ -180,99 +181,144 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
   const groupsFull = formation && formation.groups.length > MAX_GROUPS;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      <div>
-        <button onClick={onBack} className="btn btn-sm rounded-full mb-3">
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Roteiro
-        </button>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Quiz no quadro</h1>
-        <p className="text-sm text-base-content/70 mt-1">
-          Escolha as perguntas. Depois você monta os grupos, calibra a câmera e começa no datashow.
-        </p>
-      </div>
-
-      <section className="bg-base-100 border border-base-300 rounded-box p-4 space-y-3">
-        <h2 className="font-bold">
-          Perguntas ({chosen.length} de {questions.length})
-        </h2>
-        <ul className="space-y-2">
-          {questions.map((q) => (
-            <li key={q.id}>
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-sm mt-1"
-                  checked={selected.includes(q.id)}
-                  onChange={() => toggle(q.id)}
-                />
-                <span>{q.prompt}</span>
-              </label>
-            </li>
-          ))}
-        </ul>
-        {questions.length === 0 && (
-          <p className="text-sm text-base-content/70">
-            Cadastre perguntas em "Preparar aula" de outro roteiro antes de usar a lousa.
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 space-y-8">
+      <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+        <div>
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-1 min-h-[2.75rem] px-2 -ml-2 mb-2 rounded-lg text-base font-semibold text-primary hover:bg-black/5"
+          >
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            Modelo
+          </button>
+          <h1 className="font-display text-4xl lg:text-[2.75rem] font-bold tracking-tight leading-[1.05]">Lousa interativa</h1>
+          <p className="text-lg text-base-content/75 mt-2">
+            Marque as perguntas. Depois você monta os grupos, ajusta a câmera ao quadro e começa no datashow.
           </p>
-        )}
-      </section>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {settings.input === 'paddle' && (
+            <button onClick={() => setStage('print')} className={pillSecondary}>
+              <Printer className="w-4 h-4" aria-hidden="true" />
+              Imprimir paletas
+            </button>
+          )}
+          <button onClick={() => setStage('groups')} disabled={chosen.length === 0} className={pillPrimary}>
+            <Users className="w-4 h-4" aria-hidden="true" />
+            Montar os grupos
+          </button>
+        </div>
+      </header>
 
       {groupsFull && (
-        <p role="alert" className="text-sm text-red-800">
+        <p role="alert" className="text-base font-semibold rounded-[0.625rem] bg-red-100 text-red-950 px-4 py-3">
           A lousa tem paletas para até {MAX_GROUPS} grupos. Monte os grupos de novo com menos grupos.
         </p>
       )}
 
-      <section className="bg-base-100 border border-base-300 rounded-box p-4 space-y-3">
-        <h2 className="font-bold">Como o grupo aponta</h2>
-        <div className="join" role="group" aria-label="Forma de apontar">
-          {([['paddle', 'Paleta de papel'], ['hand', 'Mão']] as const).map(([value, label]) => (
-            <button
-              key={value}
-              onClick={() => setSettings((s) => ({ ...s, input: value }))}
-              aria-pressed={settings.input === value}
-              className={`btn btn-sm join-item ${settings.input === value ? 'btn-neutral' : ''}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        {settings.input === 'hand' && (
-          <div className="space-y-2">
-            <p className="text-sm text-base-content/70">
-              A mão inteira é o mouse: o centro da palma move o ponto. Sem nada para imprimir.
-            </p>
-            <div className="join" role="group" aria-label="Como clicar">
-              {([['pinch', 'Clicar juntando polegar e indicador'], ['dwell', 'Clicar parando 1 s']] as const).map(
-                ([value, label]) => (
-                  <button
-                    key={value}
-                    onClick={() => setSettings((s) => ({ ...s, click: value }))}
-                    aria-pressed={settings.click === value}
-                    className={`btn btn-sm join-item ${settings.click === value ? 'btn-neutral' : ''}`}
-                  >
-                    {label}
-                  </button>
-                )
-              )}
+      <section aria-labelledby="lousa-apontar" className="space-y-2">
+        <h2 id="lousa-apontar" className={groupHeader}>Como o grupo aponta</h2>
+        <div className="bg-base-100 rounded-[0.875rem] border border-base-300 p-4 space-y-4">
+          <Segmented
+            label="Forma de apontar"
+            value={settings.input}
+            options={[['paddle', 'Paleta de papel'], ['hand', 'Mão']]}
+            onChange={(v) => setSettings((s) => ({ ...s, input: v as typeof s.input }))}
+          />
+          {settings.input === 'hand' && (
+            <div className="space-y-3">
+              <p className="text-base text-base-content/75">
+                A mão inteira é o mouse: o centro da palma move o ponto. Não precisa imprimir nada.
+              </p>
+              <Segmented
+                label="Como clicar"
+                value={settings.click}
+                options={[['pinch', 'Juntar polegar e indicador'], ['dwell', 'Parar a mão por 1 s']]}
+                onChange={(v) => setSettings((s) => ({ ...s, click: v as typeof s.click }))}
+              />
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </section>
 
-      <div className="flex flex-wrap gap-2">
-        {settings.input === 'paddle' && (
-          <button onClick={() => setStage('print')} className="btn">
-            <Printer className="w-4 h-4" />
-            Imprimir paletas
-          </button>
+      <section aria-labelledby="lousa-perguntas-lista" className="space-y-2">
+        <h2 id="lousa-perguntas-lista" className={groupHeader}>
+          {chosen.length} de {questions.length} perguntas marcadas
+        </h2>
+        {questions.length === 0 ? (
+          <p className="bg-base-100 rounded-[0.875rem] border border-base-300 p-5 text-lg text-base-content/75">
+            Ainda não há perguntas. Cadastre algumas no banco de perguntas antes de usar a lousa.
+          </p>
+        ) : (
+          <ul className="bg-base-100 rounded-[0.875rem] border border-base-300 overflow-hidden">
+            {questions.map((q, i) => {
+              const on = selected.includes(q.id);
+              return (
+                <li key={q.id}>
+                  <button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={on}
+                    onClick={() => toggle(q.id)}
+                    className="w-full flex items-center gap-3 pl-4 text-left hover:bg-black/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
+                  >
+                    <span
+                      className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center ${
+                        on ? 'bg-primary text-primary-content' : 'border-2 border-[#aeaeb2]'
+                      }`}
+                      aria-hidden="true"
+                    >
+                      {on && <Check className="w-4 h-4" strokeWidth={3} />}
+                    </span>
+                    <span
+                      className={`flex-1 min-h-[3.5rem] py-3 pr-4 flex items-center text-lg font-semibold leading-snug ${
+                        i > 0 ? 'border-t border-base-300' : ''
+                      } ${on ? '' : 'text-base-content/60'}`}
+                    >
+                      {q.prompt}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         )}
-        <button onClick={() => setStage('groups')} disabled={chosen.length === 0} className="btn btn-primary">
-          <Users className="w-4 h-4" />
-          Montar os grupos
-        </button>
-      </div>
+      </section>
     </div>
   );
 };
+
+// Botões e cabeçalhos no padrão das outras telas de preparação
+const pillBase =
+  'inline-flex items-center gap-2 min-h-[2.75rem] rounded-full text-base font-semibold disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+const pillPrimary = `${pillBase} px-6 bg-primary text-primary-content hover:bg-[#0036bd]`;
+const pillSecondary = `${pillBase} px-5 bg-[#e3e3e8] hover:bg-[#d8d8de]`;
+const groupHeader = 'px-4 text-[0.8125rem] font-semibold uppercase tracking-wide text-base-content/70';
+
+// Controle segmentado: trilho cinza, opção escolhida em azul
+const Segmented: React.FC<{
+  label: string;
+  value: string;
+  options: readonly (readonly [string, string])[];
+  onChange: (value: string) => void;
+}> = ({ label, value, options, onChange }) => (
+  <div role="radiogroup" aria-label={label} className="inline-flex flex-wrap rounded-[0.75rem] bg-[#e3e3e8] p-1 gap-1">
+    {options.map(([v, text]) => {
+      const active = v === value;
+      return (
+        <button
+          key={v}
+          type="button"
+          role="radio"
+          aria-checked={active}
+          onClick={() => onChange(v)}
+          className={`min-h-[2.75rem] rounded-[0.5625rem] px-4 text-base font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+            active ? 'bg-primary text-primary-content shadow-[0_1px_3px_rgb(0_0_0/0.25)]' : 'text-base-content hover:bg-black/5'
+          }`}
+        >
+          {text}
+        </button>
+      );
+    })}
+  </div>
+);

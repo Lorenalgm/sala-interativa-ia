@@ -5,7 +5,9 @@ import {
   BoardCalibrator,
   CALIBRATION_FRAMES,
   CALIBRATION_IDS,
+  CALIBRATION_INSETS,
   CalibrationState,
+  DEFAULT_INSET,
   MAX_ERROR,
   calibrationLayout,
   markerCenter,
@@ -22,9 +24,11 @@ interface BoardCalibrationProps {
   onCameraStatusChange?: (active: boolean) => void;
 }
 
+const INSET_KEY = 'board-calibration-inset';
+
 const CORNER_NAMES = ['em cima à esquerda', 'em cima à direita', 'embaixo à direita', 'embaixo à esquerda'];
 
-// Tela branca com os 4 marcadores nos cantos. Quando a câmera os vê por 10 quadros seguidos,
+// Tela branca com os 4 marcadores nos cantos. Quando a câmera lê cada um 10 vezes,
 // o app aprende onde está a projeção; depois a tela vira um teste: um ponto segue a paleta.
 export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBack, onDone, onCameraStatusChange }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -35,7 +39,15 @@ export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBac
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const layout = useMemo(() => calibrationLayout(size.w, size.h), [size]);
+  const [inset, setInset] = useState<number>(() => {
+    const saved = Number(localStorage.getItem(INSET_KEY));
+    return CALIBRATION_INSETS.some((o) => o.value === saved) ? saved : DEFAULT_INSET;
+  });
+  useEffect(() => localStorage.setItem(INSET_KEY, String(inset)), [inset]);
+
+  const layout = useMemo(() => calibrationLayout(size.w, size.h, inset), [size, inset]);
+  // O painel do meio não pode cobrir os marcadores
+  const panelWidth = Math.max(280, size.w - 2 * (layout.pad + layout.size) - 32);
   const calibrator = useMemo(() => new BoardCalibrator(layout, size.w / size.h), [layout, size]);
   const svgs = useMemo(
     () => Object.fromEntries(CALIBRATION_IDS.map((id) => [id, cropMarker(markerSvg(id))])),
@@ -54,6 +66,7 @@ export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBac
       setState((prev) =>
         prev.streak === next.streak &&
         prev.seen.join() === next.seen.join() &&
+        prev.error === next.error &&
         prev.homography === next.homography &&
         Math.abs(prev.markerPx - next.markerPx) < 1
           ? prev
@@ -89,11 +102,13 @@ export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBac
   if (error) message = 'Não foi possível abrir a câmera. Confira a permissão do navegador.';
   else if (handError) message = 'Não foi possível carregar a leitura da mão. Volte e use a paleta.';
   else if (done) message = `Calibrado. ${input === 'hand' ? 'Passe a mão aberta pelos 4 cantos para testar o ponto.' : 'Passe uma paleta pelos 4 cantos para testar o ponto.'}`;
-  else if (failed)
-    message = `A leitura ficou imprecisa (erro de ${(state.error! * 100).toFixed(1)}%, o máximo é ${(MAX_ERROR * 100).toFixed(1)}%). Reposicione a câmera, mais afastada e de frente para o quadro.`;
+  else if (failed) {
+    const worst = state.worstId !== null ? CALIBRATION_IDS.indexOf(state.worstId as (typeof CALIBRATION_IDS)[number]) : -1;
+    message = `A leitura ficou imprecisa (erro de ${(state.error! * 100).toFixed(1)}%, o máximo é ${(MAX_ERROR * 100).toFixed(1)}%)${worst >= 0 ? `, pior no marcador ${CORNER_NAMES[worst]}` : ''}. Tentando de novo… Se repetir, deixe a câmera de frente para o quadro e veja se esse canto não está com reflexo ou cortado.`;
+  }
   else if (state.seen.length > 0 && state.seen.length < 4)
-    message = `Faltam ${4 - state.seen.length} marcador(es). Afaste a câmera ou mude o ângulo.`;
-  else if (state.streak > 0) message = 'Lendo… mantenha a câmera parada.';
+    message = `Faltam ${4 - state.seen.length} marcador(es). Se a borda da projeção está embaçada ou cortada, traga os marcadores para dentro.`;
+  else if (state.streak > 0 || state.seen.length === 4) message = 'Lendo… mantenha a câmera parada.';
 
   return (
     <div className="fixed inset-0 z-50 bg-white text-zinc-900 overflow-hidden">
@@ -116,7 +131,7 @@ export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBac
       })}
 
       <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
-        <div className="pointer-events-auto w-full max-w-xl bg-white border border-zinc-300 rounded-2xl shadow-lg p-5 space-y-4">
+        <div style={{ maxWidth: Math.min(576, panelWidth) }} className="pointer-events-auto w-full bg-white border border-zinc-300 rounded-2xl shadow-lg p-5 space-y-4">
           <h1 className="text-2xl font-extrabold">Calibrar a lousa</h1>
 
           <div className="aspect-video bg-neutral rounded-xl overflow-hidden relative">
@@ -139,9 +154,27 @@ export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBac
             })}
           </ul>
 
+          {!done && (
+            <fieldset className="flex flex-wrap items-center gap-2 text-sm">
+              <legend className="sr-only">Distância dos marcadores até a borda</legend>
+              <span className="text-zinc-600">Marcadores:</span>
+              {CALIBRATION_INSETS.map((o) => (
+                <button
+                  key={o.value}
+                  type="button"
+                  aria-pressed={inset === o.value}
+                  onClick={() => setInset(o.value)}
+                  className={`btn btn-xs rounded-full ${inset === o.value ? 'btn-primary' : ''}`}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </fieldset>
+          )}
+
           <p className="text-sm text-zinc-600 tabular-nums">
             {input === 'hand' && !handsReady && !handError && 'Carregando a leitura da mão… '}
-            {done ? 'Pronto' : `Quadros seguidos: ${state.streak} de ${CALIBRATION_FRAMES}`}
+            {done ? 'Pronto' : `Leituras de cada canto: ${state.streak} de ${CALIBRATION_FRAMES}`}
             {state.markerPx > 0 && ` · marcador com ${Math.round(state.markerPx)} px na imagem`}
             {stats && ` · ${stats.fps} quadros/s · ${stats.detectMs} ms por leitura`}
           </p>

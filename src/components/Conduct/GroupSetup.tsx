@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowLeft, History, Play, Shuffle } from 'lucide-react';
+import {
+  ArrowLeft, Check, History, Play, Shuffle } from 'lucide-react';
 import { Group, GroupFormation, Student } from '../../types';
 import { formGroups, moveStudent } from '../../services/groupDraw';
 import { loadClassroom, loadFormation, saveFormation } from '../../services/storageService';
@@ -63,60 +64,76 @@ export const GroupSetup: React.FC<GroupSetupProps> = ({ students, onBack, onStar
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <button onClick={onBack} className="btn btn-sm rounded-full mb-3">
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Voltar para as perguntas
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-1 min-h-[2.75rem] px-2 -ml-2 mb-2 rounded-lg text-base font-semibold text-primary hover:bg-black/5"
+          >
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            Perguntas
           </button>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Montar os grupos</h1>
-          <p className="text-sm text-base-content/70 mt-1">
-            Marque quem faltou e sorteie grupos de 3 ou 4. Arraste os alunos para trocar de grupo.
+          <h1 className="font-display text-4xl lg:text-[2.75rem] font-bold tracking-tight leading-[1.05]">Montar os grupos</h1>
+          <p className="text-lg text-base-content/75 mt-2">
+            Desmarque quem faltou e sorteie grupos de 3 ou 4. Arraste um aluno para trocar de grupo.
           </p>
         </div>
-        <button onClick={start} disabled={!canStart} className="btn btn-primary">
-          <Play className="w-4 h-4" />
+        <button
+          onClick={start}
+          disabled={!canStart}
+          className="inline-flex items-center gap-2 min-h-[2.75rem] px-6 rounded-full bg-primary text-primary-content text-base font-semibold hover:bg-[#0036bd] disabled:bg-[#e3e3e8] disabled:text-base-content/45"
+        >
+          <Play className="w-4 h-4 fill-current" aria-hidden="true" />
           Iniciar no datashow
         </button>
       </div>
 
-      <section className="bg-base-100 border border-base-300 rounded-box p-5 space-y-3">
-        <h2 className="text-lg font-bold">
-          Quem veio hoje? <span className="text-base-content/70 font-medium">({presentCount} presentes)</span>
+      <section className="bg-base-100 border border-base-300 rounded-[0.875rem] p-5 sm:p-6 space-y-4">
+        <h2 className="font-display text-2xl font-bold tracking-tight">
+          Quem veio hoje? <span className="text-base-content/70 font-normal text-xl">{presentCount} presentes</span>
         </h2>
         <ul className="flex flex-wrap gap-2">
           {students.map((s) => {
             const absent = absentIds.includes(s.id);
             return (
               <li key={s.id}>
-                <label
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-btn border cursor-pointer text-sm ${
-                    absent ? 'bg-base-200 border-base-300 text-base-content/60 line-through' : 'bg-base-100 border-base-300'
+                {/* Marcado = presente. Um toque marca a falta */}
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={!absent}
+                  onClick={() => toggleAbsent(s.id)}
+                  className={`inline-flex items-center gap-2 min-h-[2.75rem] pl-2 pr-4 rounded-full border text-base font-medium ${
+                    absent
+                      ? 'bg-base-200 border-base-300 text-base-content/55 line-through'
+                      : 'bg-base-100 border-base-300 hover:bg-black/[0.03]'
                   }`}
                 >
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-sm"
-                    checked={absent}
-                    onChange={() => toggleAbsent(s.id)}
-                  />
+                  <span
+                    className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                      absent ? 'border-2 border-[#aeaeb2]' : 'bg-primary text-primary-content'
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {!absent && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
+                  </span>
                   {s.name}
-                  <span className="sr-only">{absent ? '(ausente)' : '(presente)'}</span>
-                </label>
+                  <span className="sr-only">{absent ? '(faltou)' : '(presente)'}</span>
+                </button>
               </li>
             );
           })}
         </ul>
         <div className="flex flex-wrap gap-2 pt-2">
-          <button onClick={() => draw(3)} disabled={presentCount < 3} className="btn btn-sm btn-neutral">
-            <Shuffle className="w-4 h-4" />
+          <button onClick={() => draw(3)} disabled={presentCount < 3} className="inline-flex items-center gap-2 min-h-[2.75rem] px-5 rounded-full bg-[#e3e3e8] hover:bg-[#d8d8de] text-base font-semibold disabled:opacity-40">
+            <Shuffle className="w-4 h-4" aria-hidden="true" />
             Sortear grupos de 3
           </button>
-          <button onClick={() => draw(4)} disabled={presentCount < 3} className="btn btn-sm btn-neutral">
-            <Shuffle className="w-4 h-4" />
+          <button onClick={() => draw(4)} disabled={presentCount < 3} className="inline-flex items-center gap-2 min-h-[2.75rem] px-5 rounded-full bg-[#e3e3e8] hover:bg-[#d8d8de] text-base font-semibold disabled:opacity-40">
+            <Shuffle className="w-4 h-4" aria-hidden="true" />
             Sortear grupos de 4
           </button>
           {saved && (
-            <button onClick={reuse} className="btn btn-sm">
-              <History className="w-4 h-4" />
+            <button onClick={reuse} className="inline-flex items-center gap-2 min-h-[2.75rem] px-4 rounded-full text-base font-semibold text-primary hover:bg-black/5">
+              <History className="w-4 h-4" aria-hidden="true" />
               Reaproveitar última formação
             </button>
           )}
@@ -133,10 +150,10 @@ export const GroupSetup: React.FC<GroupSetupProps> = ({ students, onBack, onStar
                 if (dragId !== null) move(dragId, g.id);
                 setDragId(null);
               }}
-              className="bg-base-100 border border-base-300 rounded-box p-4 space-y-2 min-h-[8rem]"
+              className="bg-base-100 border border-base-300 rounded-[0.875rem] p-4 space-y-2.5 min-h-[8rem]"
             >
-              <h3 className="font-bold">
-                {g.name} <span className="text-base-content/60 font-medium">({g.studentIds.length})</span>
+              <h3 className="font-display text-xl font-bold">
+                {g.name} <span className="text-base-content/70 font-normal">{g.studentIds.length} alunos</span>
               </h3>
               <ul className="space-y-1.5">
                 {g.studentIds.map((id) => (
@@ -144,14 +161,14 @@ export const GroupSetup: React.FC<GroupSetupProps> = ({ students, onBack, onStar
                     key={id}
                     draggable
                     onDragStart={() => setDragId(id)}
-                    className="flex items-center justify-between gap-2 bg-base-200 rounded-btn px-3 py-1.5 cursor-grab"
+                    className="flex items-center justify-between gap-2 bg-base-200 rounded-[0.625rem] pl-3 pr-1 min-h-[2.75rem] cursor-grab"
                   >
-                    <span className="truncate text-sm font-medium">{nameOf(id)}</span>
+                    <span className="truncate text-base font-medium">{nameOf(id)}</span>
                     <select
                       aria-label={`Mover ${nameOf(id)} para outro grupo`}
                       value={g.id}
                       onChange={(e) => move(id, e.target.value)}
-                      className="select select-ghost select-xs w-24"
+                      className="select select-ghost select-sm w-28 text-base"
                     >
                       {groups.map((o) => (
                         <option key={o.id} value={o.id}>
@@ -170,12 +187,12 @@ export const GroupSetup: React.FC<GroupSetupProps> = ({ students, onBack, onStar
       {unassigned.length > 0 && groups.length > 0 && (
         <section
           onDragOver={(e) => e.preventDefault()}
-          className="bg-amber-50 border border-amber-200 rounded-box p-4 space-y-2"
+          className="bg-amber-50 border border-amber-300 rounded-[0.875rem] p-4 space-y-2"
         >
           <h3 className="font-bold text-amber-950">Sem grupo</h3>
           <ul className="flex flex-wrap gap-2">
             {unassigned.map((s) => (
-              <li key={s.id} className="flex items-center gap-2 bg-base-100 rounded-btn px-3 py-1.5 text-sm">
+              <li key={s.id} className="flex items-center gap-2 bg-base-100 rounded-[0.625rem] pl-3 pr-1 min-h-[2.75rem] text-base">
                 {s.name}
                 <select
                   aria-label={`Colocar ${s.name} em um grupo`}

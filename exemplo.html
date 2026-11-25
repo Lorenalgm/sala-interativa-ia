@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassPlay · exemplo</title>
+    <style>
+      body { font-family: system-ui, sans-serif; background: #f2f2f7; color: #000; margin: 0; padding: 3rem 1rem; }
+      main { max-width: 40rem; margin: 0 auto; background: #fff; border: 1px solid #c6c6c8; border-radius: 1.25rem; padding: 2rem; }
+      h1 { margin: 0 0 .5rem; font-size: 2rem; }
+      p, li { font-size: 1.0625rem; line-height: 1.5; color: #3c3c43; }
+      button, a.btn { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1.5rem; border-radius: 999px; border: 0; font-size: 1rem; font-weight: 600; cursor: pointer; text-decoration: none; }
+      .primary { background: #0040dd; color: #fff; }
+      .secondary { background: #e3e3e8; color: #000; }
+      .row { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1.25rem; }
+      #status { font-weight: 600; color: #1f7a3a; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Dados de exemplo</h1>
+      <p>Só no modo de desenvolvimento. Cria 3 turmas de exemplo (6º A, 6º B e 7º A) com alunos, perguntas e rodadas das últimas semanas, ao lado das suas turmas. Nada do que já existe é apagado; rodar de novo só troca o próprio exemplo.</p>
+      <ul>
+        <li><strong>6º A:</strong> 24 alunos, 8 rodadas, a turma melhora em Frações ao longo das semanas.</li>
+        <li><strong>6º B:</strong> 22 alunos, 6 rodadas, vai bem, mas dois alunos quase não respondem.</li>
+        <li><strong>7º A:</strong> 26 alunos, 5 rodadas, o acerto está caindo em Leitura de gráficos.</li>
+      </ul>
+      <div class="row">
+        <button class="primary" id="load">Carregar exemplo</button>
+        <button class="secondary" id="remove">Remover o exemplo</button>
+      </div>
+      <p id="status" role="status"></p>
+      <div class="row"><a class="btn secondary" href="/desempenho">Abrir o Desempenho</a></div>
+    </main>
+    <script type="module">
+      import {
+        loadClassrooms, saveClassroom, setActiveClassroom, addDemoRounds, loadQuestions, saveQuestions, deleteClassroom,
+      } from '/src/services/storageService.ts';
+
+      // Gerador determinístico: o mesmo exemplo toda vez
+      let seed = 11;
+      const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+      const pick = (arr) => arr[Math.floor(rnd() * arr.length)];
+
+      // Perguntas por habilidade. trap = a alternativa errada que costuma atrair a turma
+      const Q = (id, category, prompt, options, correctOption, trap, explanation) =>
+        ({ id: `exemplo-${id}`, category, prompt, options, correctOption, explanation, trap });
+      const questions = [
+        Q('fr1', 'Frações', 'Qual fração é maior: 1/3 ou 1/4?', { A: '1/3', B: '1/4', C: 'São iguais', D: 'Não dá para saber' }, 'A', 'B', 'Dividir em 3 partes dá pedaços maiores que dividir em 4.'),
+        Q('fr2', 'Frações', 'Quanto é 1/2 + 1/4?', { A: '2/6', B: '3/4', C: '2/4', D: '1/6' }, 'B', 'A', '1/2 é o mesmo que 2/4. Somando com 1/4, dá 3/4.'),
+        Q('fr3', 'Frações', 'Quanto é 3/4 de 20?', { A: '12', B: '15', C: '16', D: '5' }, 'B', 'D', '20 dividido por 4 é 5; três vezes 5 é 15.'),
+        Q('fr4', 'Frações', 'Qual fração é equivalente a 2/3?', { A: '3/4', B: '4/5', C: '4/6', D: '2/6' }, 'C', 'D', 'Multiplicando em cima e embaixo por 2: 4/6.'),
+        Q('mu1', 'Multiplicação', 'Quanto é 7 × 8?', { A: '54', B: '48', C: '56', D: '64' }, 'C', 'A', '7 × 8 = 56. Dica: 5, 6, 7, 8 → 56 = 7 × 8.'),
+        Q('mu2', 'Multiplicação', 'Quanto é 12 × 5?', { A: '50', B: '60', C: '65', D: '17' }, 'B', 'D', '10 × 5 = 50 e 2 × 5 = 10; somando, 60.'),
+        Q('mu3', 'Multiplicação', 'Uma caixa tem 6 ovos. Quantos ovos há em 9 caixas?', { A: '15', B: '54', C: '45', D: '63' }, 'B', 'A', '9 caixas com 6 ovos: 9 × 6 = 54.'),
+        Q('gr1', 'Leitura de gráficos', 'No gráfico de barras, qual mês teve mais chuva: a barra mais alta ou a mais larga?', { A: 'A mais larga', B: 'A mais alta', C: 'A primeira', D: 'A última' }, 'B', 'A', 'No gráfico de barras, a altura mostra a quantidade.'),
+        Q('gr2', 'Leitura de gráficos', 'Num gráfico de linha que sobe da esquerda para a direita, o que acontece com o valor?', { A: 'Diminui', B: 'Fica igual', C: 'Aumenta', D: 'Some' }, 'C', 'A', 'Subir na linha significa que o valor aumenta com o tempo.'),
+        Q('gr3', 'Leitura de gráficos', 'Num gráfico de pizza, a fatia maior representa:', { A: 'A menor parte', B: 'A maior parte', C: 'O total', D: 'Nada' }, 'B', 'C', 'Cada fatia é uma parte do total; a maior fatia é a maior parte.'),
+        Q('ag1', 'Ciclo da água', 'Como se chama a passagem da água líquida para vapor?', { A: 'Condensação', B: 'Evaporação', C: 'Solidificação', D: 'Precipitação' }, 'B', 'A', 'Evaporação: o calor transforma a água líquida em vapor.'),
+        Q('ag2', 'Ciclo da água', 'O que forma as nuvens?', { A: 'Fumaça', B: 'Vapor que esfriou e virou gotinhas', C: 'Gelo do chão', D: 'Ar quente' }, 'B', 'D', 'O vapor sobe, esfria e condensa em gotinhas que formam as nuvens.'),
+        Q('ag3', 'Ciclo da água', 'A chuva é uma etapa chamada:', { A: 'Precipitação', B: 'Evaporação', C: 'Infiltração', D: 'Transpiração' }, 'A', 'C', 'Quando as gotas ficam pesadas e caem, é precipitação.'),
+        Q('tx1', 'Interpretação de texto', '"Pedro saiu sem guarda-chuva e chegou encharcado." O que aconteceu?', { A: 'Fez sol', B: 'Choveu', C: 'Pedro nadou', D: 'Ventou' }, 'B', 'C', 'Encharcado sem guarda-chuva indica que choveu.'),
+        Q('tx2', 'Interpretação de texto', 'Qual é a ideia principal de um texto?', { A: 'A primeira palavra', B: 'O assunto mais importante', C: 'O título sempre', D: 'O último parágrafo' }, 'B', 'C', 'A ideia principal é o assunto central, que o texto todo desenvolve.'),
+        Q('tx3', 'Interpretação de texto', '"A menina sorriu de orelha a orelha." Como ela estava?', { A: 'Triste', B: 'Com dor', C: 'Muito feliz', D: 'Com sono' }, 'C', 'B', '"Sorrir de orelha a orelha" é uma expressão para muita alegria.'),
+      ];
+
+      const first = ['Ana', 'Bruno', 'Camila', 'Davi', 'Eduarda', 'Felipe', 'Giovana', 'Heitor', 'Isadora', 'João', 'Kauã', 'Larissa', 'Miguel', 'Nicole', 'Otávio', 'Pietra', 'Rafael', 'Sofia', 'Thiago', 'Valentina', 'Wesley', 'Yasmin', 'Arthur', 'Beatriz', 'Caio', 'Lívia', 'Enzo', 'Manuela', 'Gustavo', 'Helena'];
+      const last = ['Souza', 'Oliveira', 'Santos', 'Lima', 'Pereira', 'Costa', 'Rodrigues', 'Almeida', 'Nascimento', 'Ferreira', 'Carvalho', 'Gomes', 'Ribeiro', 'Martins', 'Rocha', 'Barbosa', 'Araújo', 'Melo'];
+      const students = (n, offset) =>
+        Array.from({ length: n }, (_, i) => ({ id: i + 1, name: `${first[(i + offset) % first.length]} ${last[(i * 7 + offset) % last.length]}` }));
+
+      const LETTERS = ['A', 'B', 'C', 'D'];
+      const day = 86400000;
+
+      // Cada turma: alunos, habilidades mais difíceis, quem falta, e como o acerto evolui nas rodadas
+      const classes = [
+        {
+          id: 'exemplo-6a', name: '6º A', students: students(24, 0),
+          hard: { 'Frações': 0.32, 'Leitura de gráficos': 0.08 }, weak: [3, 9, 17], strong: [5, 12, 20], absent: [],
+          drift: (ri, total) => -0.18 + (0.3 * ri) / (total - 1), // melhora com o tempo
+          plan: [[40, 'quick-question', ['fr1', 'mu1', 'ag1']], [36, 'quick-question', ['fr2', 'tx1', 'mu2']], [31, 'group-draw', ['fr3', 'ag2', 'gr1']], [27, 'quick-question', ['fr1', 'fr4', 'tx2', 'mu3']], [21, 'interactive-board', ['ag3', 'fr2', 'gr2']], [14, 'quick-question', ['fr3', 'tx3', 'mu1', 'fr4']], [8, 'group-draw', ['fr1', 'gr3', 'ag1', 'fr2']], [3, 'quick-question', ['fr4', 'fr3', 'tx1', 'mu2', 'gr1']]],
+        },
+        {
+          id: 'exemplo-6b', name: '6º B', students: students(22, 9),
+          hard: { 'Multiplicação': 0.12, 'Interpretação de texto': 0.18 }, weak: [6, 14], strong: [2, 8, 11, 19], absent: [10, 21],
+          drift: () => 0,
+          plan: [[34, 'quick-question', ['mu1', 'tx1', 'ag1']], [28, 'quick-question', ['tx2', 'fr1', 'mu2', 'gr1']], [21, 'group-draw', ['tx3', 'mu3', 'ag2']], [15, 'quick-question', ['fr2', 'tx2', 'gr2', 'mu1']], [9, 'interactive-board', ['ag3', 'tx1', 'mu2']], [4, 'quick-question', ['tx3', 'mu3', 'fr3', 'gr3']]],
+        },
+        {
+          id: 'exemplo-7a', name: '7º A', students: students(26, 17),
+          hard: { 'Leitura de gráficos': 0.3, 'Ciclo da água': 0.1 }, weak: [4, 13, 22, 25], strong: [1, 7, 16], absent: [18],
+          drift: (ri, total) => 0.1 - (0.25 * ri) / (total - 1), // está caindo
+          plan: [[30, 'quick-question', ['gr1', 'mu1', 'tx1']], [23, 'quick-question', ['gr2', 'ag1', 'fr1', 'mu2']], [16, 'group-draw', ['gr3', 'ag2', 'tx2']], [9, 'quick-question', ['gr1', 'gr2', 'ag3', 'fr2']], [2, 'interactive-board', ['gr3', 'mu3', 'tx3']]],
+        },
+      ];
+
+      const byId = (id) => questions.find((q) => q.id === `exemplo-${id}`);
+
+      function roundsFor(c) {
+        const ability = new Map(c.students.map((s) => [s.id, 0.74 + (rnd() - 0.5) * 0.2 + (c.weak.includes(s.id) ? -0.38 : 0) + (c.strong.includes(s.id) ? 0.2 : 0)]));
+        const now = Date.now();
+        return c.plan.map(([daysAgo, scriptId, ids], ri) => {
+          const ts = now - daysAgo * day - Math.floor(rnd() * 3) * 3600000;
+          const records = ids.map((qid, qi) => {
+            const q = byId(qid);
+            const wrongs = LETTERS.filter((l) => l !== q.correctOption);
+            const responses = {};
+            c.students.forEach((s) => {
+              if (c.absent.includes(s.id) && rnd() < 0.65) return;
+              if (rnd() < 0.04) return;
+              const p = Math.max(0.05, Math.min(0.97, ability.get(s.id) - (c.hard[q.category] ?? -0.05) + c.drift(ri, c.plan.length)));
+              responses[s.id] = rnd() < p ? q.correctOption : rnd() < 0.72 ? q.trap : pick(wrongs);
+            });
+            return { id: `${c.id}-r${ri}-q${qi}`, questionId: q.id, questionPrompt: q.prompt, skill: q.category, correctOption: q.correctOption, timestamp: ts + qi * 90000, responses, totalClassStudents: c.students.length };
+          });
+          const total = records.reduce((a, r) => a + Object.keys(r.responses).length, 0);
+          const right = records.reduce((a, r) => a + Object.values(r.responses).filter((v) => v === r.correctOption).length, 0);
+          return { id: `${c.id}-r${ri}`, name: `Rodada ${ri + 1}`, timestamp: ts, totalClassStudents: c.students.length, questions: records, overallAccuracy: Math.round((right / total) * 100), totalResponses: total, scriptId, demo: true };
+        }).reverse();
+      }
+
+      const status = document.getElementById('status');
+
+      function removeExample() {
+        loadClassrooms().filter((c) => c.id.startsWith('exemplo-')).forEach((c) => deleteClassroom(c.id));
+        saveQuestions(loadQuestions().filter((q) => !q.id.startsWith('exemplo-')));
+      }
+
+      document.getElementById('load').onclick = () => {
+        removeExample();
+        // Perguntas novas no banco (sem o campo trap, que é só do gerador)
+        saveQuestions([...questions.map(({ trap, ...q }) => q), ...loadQuestions()]);
+        classes.forEach((c) => {
+          saveClassroom({ id: c.id, name: c.name, students: c.students });
+          setActiveClassroom(c.id);
+          addDemoRounds(roundsFor(c));
+        });
+        setActiveClassroom('exemplo-6a');
+        status.textContent = 'Exemplo carregado. A turma ativa agora é o 6º A; troque pela barra de navegação.';
+      };
+
+      document.getElementById('remove').onclick = () => {
+        removeExample();
+        status.textContent = 'Exemplo removido. Suas turmas e perguntas ficaram como estavam.';
+      };
+    </script>
+  </body>
+</html>

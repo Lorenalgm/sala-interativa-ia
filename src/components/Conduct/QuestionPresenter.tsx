@@ -18,7 +18,7 @@ import { drawFromGroup, drawOnePerGroup } from '../../services/groupDraw';
 import { ResponseRoster } from './ResponseRoster';
 import { QuestionResults } from './QuestionResults';
 import { ArucoCardDetector } from '../../services/arucoDetector';
-import { saveQuestionSession, saveRoundSession } from '../../services/storageService';
+import { saveRoundSession } from '../../services/storageService';
 import {
   Camera,
   CameraOff,
@@ -65,6 +65,8 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
   const [cameraError, setCameraError] = useState(false);
   // Sugestões ficam escondidas por padrão: a turma vê o datashow e a regra revela a resposta
   const [showSuggestions, setShowSuggestions] = useState(false);
+  // A imagem da câmera fica escondida por padrão: no projetor ela parece borrada e distrai a turma
+  const [showCameraPreview, setShowCameraPreview] = useState(false);
   const [recentId, setRecentId] = useState<number | null>(null);
 
   // Roteiro de grupo: discussão → sorteio → resposta dos sorteados → resultado
@@ -180,7 +182,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
             const student = studentsRef.current.find((s) => s.id === marker.id);
             const allowed = allowedIdsRef.current;
             if (student && (!allowed || allowed.includes(marker.id))) {
-              // Só conta depois de ~0,5 s com o cartão parado na mesma letra
+              // Conta quando a mesma letra aparece em leituras seguidas por ~0,25 s
               const confirmed = readerRef.current.feed(marker.id, marker.option, performance.now());
               if (confirmed) {
                 setResponses((prev) => {
@@ -256,18 +258,6 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
       setRoundGroupResults((prev) => ({ ...prev, [currentQuestion.id]: results! }));
     }
 
-    saveQuestionSession({
-      id: `sessao-${Date.now()}`,
-      questionId: currentQuestion.id,
-      questionPrompt: currentQuestion.prompt,
-      skill: currentQuestion.category,
-      correctOption: currentQuestion.correctOption,
-      timestamp: Date.now(),
-      responses,
-      totalClassStudents: students.length,
-      groupResults: results,
-    });
-
     if (onSessionComplete) onSessionComplete();
   };
 
@@ -320,6 +310,12 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
     };
 
     saveRoundSession(roundRecord);
+
+    // Projetando: o fim da rodada também é para a turma. A tela cheia está presa a esta
+    // tela, que vai sair; passa para a página inteira antes, ainda no gesto do professor.
+    if (document.fullscreenElement && document.fullscreenElement === containerRef.current) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
 
     if (onFinishRound) {
       onFinishRound(roundRecord);
@@ -467,6 +463,13 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
   const optionsKeys: Alternative[] = ['A', 'B', 'C', 'D'];
 
+  // Botões da barra no padrão do sistema: cápsulas de 44px, cinza para secundários e azul para a ação principal
+  const tbBase =
+    'inline-flex items-center justify-center gap-2 min-h-[2.75rem] rounded-full text-[0.9375rem] font-semibold disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+  const tbSecondary = `${tbBase} px-4 bg-[#e3e3e8] text-base-content hover:bg-[#d8d8de]`;
+  const tbIcon = `${tbBase} w-11 bg-[#e3e3e8] text-base-content hover:bg-[#d8d8de]`;
+  const tbQuiet = `${tbBase} px-3 text-base-content/75 hover:bg-black/5`;
+
   return (
     <div
       ref={containerRef}
@@ -476,34 +479,34 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
     >
       {/* Barra de controle do professor: some na tela cheia, onde vale o teclado */}
       {!isFullscreen && (
-        <div className="no-print bg-base-100 border border-base-300 rounded-box px-3 py-2.5 flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="no-print bg-base-100 border border-base-300 rounded-[0.875rem] px-3 py-2.5 flex flex-wrap items-center justify-between gap-3 mb-4">
           {/* Navegação entre perguntas */}
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrev}
               disabled={currentIndex === 0}
-              className="btn btn-sm btn-square"
+              className={tbIcon}
               aria-label="Pergunta anterior"
               title="Pergunta anterior (←)"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-5 h-5" aria-hidden="true" />
             </button>
 
-            <span className="text-base font-bold text-base-content px-1 whitespace-nowrap">
+            <span className="text-lg font-semibold text-base-content px-1.5 whitespace-nowrap tabular-nums">
               Pergunta {currentIndex + 1} de {questions.length}
             </span>
 
             <button
               onClick={handleNext}
               disabled={isLastQuestion}
-              className="btn btn-sm btn-square"
+              className={tbIcon}
               aria-label="Próxima pergunta"
               title="Próxima pergunta (→)"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-5 h-5" aria-hidden="true" />
             </button>
 
-            <span className="hidden sm:inline-flex badge badge-ghost">
+            <span className="hidden sm:inline-flex items-center min-h-[2rem] px-3 rounded-full bg-base-200 text-[0.9375rem] font-medium text-base-content/80">
               {currentQuestion.category}
             </span>
           </div>
@@ -513,16 +516,16 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
             <button
               onClick={handleSimulateQuickAnswers}
               disabled={isGroup && phase !== 'answer'}
-              className="btn btn-sm btn-ghost"
-              title="Preenche respostas falsas para testar sem câmera"
+              className={tbQuiet}
+              title="Preenche respostas de exemplo para testar sem câmera"
             >
-              <Sparkles className="w-4 h-4 text-amber-600" />
-              <span className="hidden sm:inline">Simular respostas</span>
+              <Sparkles className="w-4 h-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Simular</span>
             </button>
 
             <button
               onClick={toggleFullscreen}
-              className="btn btn-sm"
+              className={tbSecondary}
               title="Tela cheia para projetar (F)"
             >
               <Maximize2 className="w-4 h-4" />
@@ -532,7 +535,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
             {isAnswerRevealed && (
               <button
                 onClick={handleReset}
-                className="btn btn-sm"
+                className={tbSecondary}
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>Repetir</span>
@@ -541,7 +544,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
             <button
               onClick={handlePrimaryAction}
-              className="btn btn-sm btn-primary min-w-[12rem]"
+              className={`${tbBase} px-6 min-w-[13rem] bg-primary text-primary-content hover:bg-[#0036bd]`}
               title="Espaço"
             >
               {isGroup && !isAnswerRevealed && phase === 'discussion' ? (
@@ -580,9 +583,9 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
         {/* Painel Esquerdo: Pergunta e Alternativas ou Gabarito (ocupa 9 colunas) */}
         <div className="lg:col-span-9 flex flex-col min-h-0">
           {!isAnswerRevealed ? (
-            <div className="bg-base-100 border border-base-300 rounded-box p-6 sm:p-10 flex flex-col gap-8 lg:gap-10 flex-1 min-h-0">
-              {/* Enunciado amplo e de fácil leitura de longe */}
-              <h1 className="text-3xl sm:text-4xl xl:text-5xl font-extrabold text-base-content tracking-tight leading-tight max-w-[32ch]">
+            <div className="bg-base-100 border border-base-300 rounded-[1.25rem] p-6 sm:p-10 xl:p-14 flex flex-col justify-center gap-[clamp(2rem,6vh,4.5rem)] flex-1 min-h-0">
+              {/* Enunciado amplo e de fácil leitura de longe: cresce com a largura e com a altura da tela */}
+              <h1 className="font-display text-[clamp(2rem,min(4.2vw,7.5vh),5.25rem)] font-bold text-base-content tracking-tight leading-[1.08] max-w-[28ch]">
                 {currentQuestion.prompt}
               </h1>
 
@@ -617,16 +620,16 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
               )}
 
               {/* Alternativas A, B, C, D: sempre as quatro visíveis, em tamanho de sala */}
-              <ol className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
+              <ol className="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-[clamp(1.5rem,4.5vh,3rem)]">
                 {optionsKeys.map((opt) => (
-                  <li key={opt} className="flex items-center gap-4">
+                  <li key={opt} className="flex items-center gap-6">
                     <span
                       aria-hidden="true"
-                      className="w-14 h-14 lg:w-16 lg:h-16 rounded-btn bg-primary text-primary-content flex items-center justify-center font-extrabold text-2xl lg:text-3xl flex-shrink-0"
+                      className="w-[clamp(3.5rem,min(5.2vw,10vh),6.5rem)] aspect-[4/5] rounded-[0.75rem] border-[3px] border-black bg-white text-black flex items-center justify-center font-display font-bold text-[clamp(1.75rem,min(3vw,5.5vh),3.5rem)] flex-shrink-0 shadow-[0_6px_10px_-6px_rgb(0_0_0/0.35)]"
                     >
                       {opt}
                     </span>
-                    <p className="text-2xl lg:text-3xl font-bold text-base-content leading-snug">
+                    <p className="text-[clamp(1.5rem,min(2.7vw,5vh),3.25rem)] font-semibold text-base-content leading-snug">
                       <span className="sr-only">{opt}: </span>
                       {currentQuestion.options[opt]}
                     </p>
@@ -637,7 +640,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
           ) : (
             <div className="flex-1 min-h-0 flex flex-col gap-4">
               {/* A pergunta continua visível para a turma conferir a resposta */}
-              <p className="text-2xl lg:text-3xl font-bold text-base-content leading-snug px-1">
+              <p className="font-display text-[clamp(1.5rem,2.4vw,2.75rem)] font-bold tracking-tight text-base-content leading-snug px-1">
                 {currentQuestion.prompt}
               </p>
               <QuestionResults
@@ -651,59 +654,70 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
         {/* Painel Direito: Câmera no topo e Quadrante de Alunos embaixo (ocupa 3 colunas) */}
         <div className="lg:col-span-3 flex flex-col gap-3 min-h-0">
-          {/* Câmera visível por padrão na lateral */}
-          <div className="bg-base-100 border border-base-300 rounded-2xl p-2.5 shadow-sm flex flex-col space-y-2 flex-shrink-0">
-            <div className="flex items-center justify-between px-1 text-xs">
-              <span className="font-bold text-base-content">
-                Câmera da sala
+          {/* Câmera: só uma linha de estado. A imagem abre sob demanda, para o professor conferir o enquadramento */}
+          <div className="bg-base-100 border border-base-300 rounded-[0.875rem] px-3 py-2 flex flex-col gap-2 flex-shrink-0">
+            <div className="flex items-center justify-between gap-2 min-h-[2.75rem]">
+              <span className="inline-flex items-center gap-2.5 pl-1 text-base font-semibold text-base-content">
+                <span
+                  aria-hidden="true"
+                  className={`w-3 h-3 rounded-full ${isCameraActive ? 'bg-success' : 'bg-[#aeaeb2]'}`}
+                />
+                {isCameraActive ? 'Lendo os cartões' : 'Câmera desligada'}
               </span>
               {isCameraActive ? (
-                <button onClick={stopCamera} className="btn btn-xs btn-ghost text-error no-print">
-                  <CameraOff className="w-3.5 h-3.5" />
-                  Desligar
+                <button
+                  onClick={() => setShowCameraPreview((v) => !v)}
+                  aria-expanded={showCameraPreview}
+                  className="no-print inline-flex items-center min-h-[2.75rem] px-2 rounded-lg text-[0.9375rem] font-semibold text-primary hover:bg-black/5"
+                >
+                  {showCameraPreview ? 'Esconder imagem' : 'Ver imagem'}
                 </button>
               ) : (
-                <span className="text-xs font-semibold text-base-content/70">Desligada</span>
+                <button
+                  onClick={startCamera}
+                  className="no-print inline-flex items-center min-h-[2.75rem] px-4 rounded-full bg-primary text-primary-content text-[0.9375rem] font-semibold hover:bg-[#0036bd]"
+                >
+                  {cameraError ? 'Tentar de novo' : 'Ligar câmera'}
+                </button>
               )}
             </div>
 
-            <div className="w-full aspect-video bg-neutral rounded-xl relative overflow-hidden flex items-center justify-center">
-              {/* O elemento de vídeo está visível na página para decodificação imediata pelo navegador */}
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className={`w-full h-full object-cover ${isCameraActive ? 'block' : 'hidden'}`}
-              />
-              <canvas
-                ref={canvasRef}
-                className="absolute inset-0 w-full h-full pointer-events-none"
-              />
+            {cameraError && !isCameraActive && (
+              <p role="alert" className="px-1 pb-1 text-[0.9375rem] text-base-content/75">
+                Não foi possível abrir a câmera. Confira a permissão do navegador.
+              </p>
+            )}
 
-              {!isCameraActive && (
-                <div className="flex flex-col items-center justify-center text-center p-3 space-y-2">
-                  <Camera className="w-6 h-6 text-neutral-content/60" />
-                  <p role={cameraError ? 'alert' : undefined} className="text-sm text-neutral-content/80">
-                    {cameraError
-                      ? 'Não foi possível abrir a câmera. Confira a permissão do navegador.'
-                      : 'A câmera lê os cartões da turma.'}
-                  </p>
-                  <button
-                    onClick={startCamera}
-                    className="btn btn-sm btn-primary"
-                  >
-                    {cameraError ? 'Tentar de novo' : 'Ligar câmera'}
-                  </button>
-                </div>
-              )}
+            {/* O vídeo fica sempre na página (o navegador só decodifica o que está montado); escondido, continua lendo */}
+            <div
+              className={
+                isCameraActive && showCameraPreview
+                  ? 'w-full aspect-video bg-neutral rounded-xl relative overflow-hidden mb-1'
+                  : 'absolute w-px h-px overflow-hidden opacity-0 pointer-events-none'
+              }
+              aria-hidden={!showCameraPreview}
+            >
+              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+              <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
             </div>
 
-            {/* Indicação sutil de cartão reconhecido */}
-            {lastDetectedStudent && (
-              <div role="status" className="alert alert-success py-1.5 px-2 gap-1.5 rounded-btn text-xs font-medium bg-emerald-50 border-emerald-200 text-emerald-900">
-                <CheckCircle className="w-3.5 h-3.5 text-success flex-shrink-0" />
-                <span className="truncate">{lastDetectedStudent}</span>
+            {showCameraPreview && isCameraActive && (
+              <div className="no-print flex items-center justify-between gap-2 pb-1">
+                {lastDetectedStudent ? (
+                  <span role="status" className="flex items-center gap-2 min-w-0 text-[0.9375rem] font-semibold text-[#14532d]">
+                    <CheckCircle className="w-4 h-4 text-success flex-shrink-0" aria-hidden="true" />
+                    <span className="truncate">{lastDetectedStudent}</span>
+                  </span>
+                ) : (
+                  <span />
+                )}
+                <button
+                  onClick={stopCamera}
+                  className="inline-flex items-center gap-1.5 min-h-[2.75rem] px-2 rounded-lg text-[0.9375rem] font-semibold text-error hover:bg-black/5"
+                >
+                  <CameraOff className="w-4 h-4" aria-hidden="true" />
+                  Desligar
+                </button>
               </div>
             )}
           </div>
@@ -714,6 +728,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
             responses={responses}
             recentId={recentId}
             onCorrect={handleCorrect}
+            showNameToggle={!isFullscreen}
           />
 
           {isAnswerRevealed && (
@@ -725,7 +740,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
                   checked={showSuggestions}
                   onChange={(e) => setShowSuggestions(e.target.checked)}
                 />
-                <span className="label-text text-sm text-base-content/70">Sugestões para o professor</span>
+                <span className="label-text text-base text-base-content/80">Sugestões para o professor</span>
               </label>
               {showSuggestions && (
                 <SuggestionsPanel
@@ -735,13 +750,6 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
             </div>
           )}
 
-          {isFullscreen && (
-            <p className="text-sm text-base-content/70 text-center">
-              <kbd className="kbd kbd-sm">Espaço</kbd> resposta / próxima ·{' '}
-              <kbd className="kbd kbd-sm">←</kbd> <kbd className="kbd kbd-sm">→</kbd> navegar ·{' '}
-              <kbd className="kbd kbd-sm">Esc</kbd> sair
-            </p>
-          )}
         </div>
       </div>
     </div>

@@ -1,245 +1,295 @@
-import {
-  Classroom,
-  GroupFormation,
-  PerformanceStats,
-  Question,
-  QuestionSessionRecord,
-  RoundSession,
-  Student,
-} from '../types';
+import { Classroom, GroupFormation, Question, RoundSession, Student } from '../types';
 import { STUDENT_MARKERS } from './markerRanges';
 import { defaultStudents } from '../data/defaultStudents';
 import { defaultQuestions } from '../data/defaultQuestions';
 
+// Tudo fica no navegador deste computador. Esta é a única camada que conhece o armazenamento:
+// trocar localStorage por IndexedDB depois mexe só aqui.
+
 // IDs das perguntas de exemplo da primeira versão
 const LEGACY_DEFAULT_IDS = ['ia-01', 'ia-02', 'ia-03', 'ia-04', 'ia-05', 'ia-06'];
 
-const STORAGE_KEYS = {
-  CLASSROOM: 'classplay_turma_v2',
+const KEYS = {
+  CLASSROOMS: 'classplay_turmas_v3',
+  ACTIVE: 'classplay_turma_ativa_v3',
   QUESTIONS: 'classplay_perguntas_v2',
-  HISTORY: 'classplay_historico_v2',
   ROUNDS: 'classplay_rodadas_v2',
-  FORMATION: 'classplay_grupos_v1',
-};
+  FORMATIONS: 'classplay_grupos_v2',
+  // Versões anteriores, lidas só na migração
+  LEGACY_CLASSROOM: 'classplay_turma_v2',
+  LEGACY_FORMATION: 'classplay_grupos_v1',
+} as const;
 
-// Recupera a turma atual configurada ou retorna os alunos pré-carregados
+function read<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch (err) {
+    console.error(`Falha ao ler ${key}:`, err);
+    return fallback;
+  }
+}
+
+// Devolve false se o navegador recusar (cota cheia, modo privado): quem chama pode avisar o professor
+function write(key: string, value: unknown): boolean {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (err) {
+    console.error(`Falha ao salvar ${key}:`, err);
+    return false;
+  }
+}
+
+const newId = (prefix: string) =>
+  `${prefix}-${typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : Date.now().toString(36)}`;
+
+// ---------- Turmas ----------
+
+// Migração da versão com uma turma só: a turma antiga vira a primeira, e as rodadas e o grupo salvos vão junto
+function migrateLegacy(): Classroom[] {
+  const legacy = read<Classroom | null>(KEYS.LEGACY_CLASSROOM, null);
+  // O nome padrão da primeira versão não foi escolhido pelo professor: vira "Minha turma"
+  const first: Classroom = legacy
+    ? { ...legacy, name: legacy.name === 'Turma de Inteligência Artificial' ? 'Minha turma' : legacy.name }
+    : { id: newId('turma'), name: 'Minha turma', students: defaultStudents };
+  write(KEYS.CLASSROOMS, [first]);
+  write(KEYS.ACTIVE, first.id);
+
+  const rounds = read<RoundSession[]>(KEYS.ROUNDS, []);
+  if (rounds.some((r) => !r.classroomId)) {
+    write(KEYS.ROUNDS, rounds.map((r) => (r.classroomId ? r : { ...r, classroomId: first.id })));
+  }
+  const formation = read<GroupFormation | null>(KEYS.LEGACY_FORMATION, null);
+  if (formation) write(KEYS.FORMATIONS, { [first.id]: { ...formation, classroomId: first.id } });
+  return [first];
+}
+
+export function loadClassrooms(): Classroom[] {
+  const list = read<Classroom[] | null>(KEYS.CLASSROOMS, null);
+  return list && list.length > 0 ? list : migrateLegacy();
+}
+
+export function getActiveClassroomId(): string {
+  const list = loadClassrooms();
+  const active = read<string | null>(KEYS.ACTIVE, null);
+  return list.some((c) => c.id === active) ? (active as string) : list[0].id;
+}
+
+export function setActiveClassroom(id: string): void {
+  write(KEYS.ACTIVE, id);
+}
+
+// Turma ativa: a que aparece na barra e em todas as telas
 export function loadClassroom(): Classroom {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.CLASSROOM);
-    if (raw) {
-      return JSON.parse(raw);
-    }
-  } catch (err) {
-    console.error('Falha ao carregar turma local:', err);
-  }
-
-  const initialClassroom: Classroom = {
-    id: 'turma-ia',
-    name: 'Turma de Inteligência Artificial',
-    students: defaultStudents,
-  };
-  saveClassroom(initialClassroom);
-  return initialClassroom;
+  const list = loadClassrooms();
+  const id = getActiveClassroomId();
+  return list.find((c) => c.id === id) ?? list[0];
 }
 
-// Salva as alterações da turma no armazenamento local
-export function saveClassroom(classroom: Classroom): void {
-  try {
-    localStorage.setItem(STORAGE_KEYS.CLASSROOM, JSON.stringify(classroom));
-  } catch (err) {
-    console.error('Falha ao salvar turma:', err);
-  }
+export function saveClassroom(classroom: Classroom): boolean {
+  const list = loadClassrooms();
+  const exists = list.some((c) => c.id === classroom.id);
+  return write(KEYS.CLASSROOMS, exists ? list.map((c) => (c.id === classroom.id ? classroom : c)) : [...list, classroom]);
 }
 
-// Atualiza a lista de alunos
+export function createClassroom(name: string): Classroom {
+  const classroom: Classroom = { id: newId('turma'), name: name.trim() || 'Nova turma', students: [] };
+  saveClassroom(classroom);
+  setActiveClassroom(classroom.id);
+  return classroom;
+}
+
+export function renameClassroom(id: string, name: string): void {
+  const c = loadClassrooms().find((x) => x.id === id);
+  if (c && name.trim()) saveClassroom({ ...c, name: name.trim() });
+}
+
+// Apaga a turma, as rodadas dela e o grupo salvo. Precisa sobrar pelo menos uma turma
+export function deleteClassroom(id: string): void {
+  const list = loadClassrooms();
+  if (list.length <= 1) return;
+  write(KEYS.CLASSROOMS, list.filter((c) => c.id !== id));
+  write(KEYS.ROUNDS, read<RoundSession[]>(KEYS.ROUNDS, []).filter((r) => r.classroomId !== id));
+  const formations = read<Record<string, GroupFormation>>(KEYS.FORMATIONS, {});
+  delete formations[id];
+  write(KEYS.FORMATIONS, formations);
+  if (getActiveClassroomId() === id) setActiveClassroom(list.find((c) => c.id !== id)!.id);
+}
+
+// ---------- Alunos (sempre da turma ativa) ----------
+
 export function updateStudents(students: Student[]): void {
-  const current = loadClassroom();
-  current.students = students;
-  saveClassroom(current);
+  saveClassroom({ ...loadClassroom(), students });
 }
 
-// Adiciona um novo aluno
+// O aluno recebe o menor número de cartão livre na faixa de 1 a 199
 export function addStudent(name: string): Student {
   const current = loadClassroom();
-  // Menor número livre na faixa dos cartões de aluno (1 a 199)
   const used = new Set(current.students.map((s) => s.id));
   let nextId = STUDENT_MARKERS.min;
   while (used.has(nextId) && nextId <= STUDENT_MARKERS.max) nextId++;
   if (nextId > STUDENT_MARKERS.max) {
     throw new Error(`A turma já tem ${STUDENT_MARKERS.max} alunos, o limite de cartões.`);
   }
-
-  const newStudent: Student = { id: nextId, name };
-  current.students.push(newStudent);
-  saveClassroom(current);
-  return newStudent;
+  const student: Student = { id: nextId, name };
+  if (!saveClassroom({ ...current, students: [...current.students, student] })) {
+    throw new Error('O navegador não deixou salvar. Confira se há espaço livre e se não está numa janela anônima.');
+  }
+  return student;
 }
 
-// Remove um aluno da turma
 export function removeStudent(studentId: number): void {
   const current = loadClassroom();
-  current.students = current.students.filter((s) => s.id !== studentId);
-  saveClassroom(current);
+  saveClassroom({ ...current, students: current.students.filter((s) => s.id !== studentId) });
 }
 
-// Recupera a lista de perguntas configuradas
+// ---------- Perguntas (compartilhadas entre as turmas) ----------
+
 export function loadQuestions(): Question[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.QUESTIONS);
-    if (raw) {
-      const stored: Question[] = JSON.parse(raw);
-      // Troca as antigas perguntas de exemplo sobre IA pelas novas, mantendo as criadas pelo professor
-      if (stored.some((q) => LEGACY_DEFAULT_IDS.includes(q.id))) {
-        const custom = stored.filter((q) => !LEGACY_DEFAULT_IDS.includes(q.id));
-        const migrated = [...custom, ...defaultQuestions];
-        saveQuestions(migrated);
-        return migrated;
-      }
-      return stored;
-    }
-  } catch (err) {
-    console.error('Falha ao carregar perguntas:', err);
+  const stored = read<Question[] | null>(KEYS.QUESTIONS, null);
+  if (!stored) {
+    saveQuestions(defaultQuestions);
+    return defaultQuestions;
   }
-
-  saveQuestions(defaultQuestions);
-  return defaultQuestions;
+  // Troca as antigas perguntas de exemplo sobre IA pelas novas, mantendo as criadas pelo professor
+  if (stored.some((q) => LEGACY_DEFAULT_IDS.includes(q.id))) {
+    const migrated = [...stored.filter((q) => !LEGACY_DEFAULT_IDS.includes(q.id)), ...defaultQuestions];
+    saveQuestions(migrated);
+    return migrated;
+  }
+  return stored;
 }
 
-// Salva a lista de perguntas
 export function saveQuestions(questions: Question[]): void {
-  try {
-    localStorage.setItem(STORAGE_KEYS.QUESTIONS, JSON.stringify(questions));
-  } catch (err) {
-    console.error('Falha ao salvar perguntas:', err);
-  }
+  write(KEYS.QUESTIONS, questions);
 }
 
-// Adiciona uma nova pergunta
 export function addQuestion(question: Question): void {
-  const questions = loadQuestions();
-  questions.unshift(question);
-  saveQuestions(questions);
+  saveQuestions([question, ...loadQuestions()]);
 }
 
-// Troca uma pergunta existente pela versão editada, na mesma posição
+// Troca a pergunta pela versão editada, na mesma posição
 export function updateQuestion(question: Question): void {
-  const questions = loadQuestions().map((q) => (q.id === question.id ? question : q));
-  saveQuestions(questions);
+  saveQuestions(loadQuestions().map((q) => (q.id === question.id ? question : q)));
 }
 
-// Exclui uma pergunta
 export function deleteQuestion(questionId: string): void {
-  const questions = loadQuestions();
-  const filtered = questions.filter((q) => q.id !== questionId);
-  saveQuestions(filtered);
+  saveQuestions(loadQuestions().filter((q) => q.id !== questionId));
 }
 
-// Recupera o histórico de rodadas
-export function loadRoundHistory(): RoundSession[] {
+// ---------- Rodadas (por turma) ----------
+
+const allRounds = () => read<RoundSession[]>(KEYS.ROUNDS, []);
+
+// Rodadas da turma ativa (ou da turma indicada), da mais recente para a mais antiga
+export function loadRoundHistory(classroomId = getActiveClassroomId()): RoundSession[] {
+  loadClassrooms(); // garante a migração antes de filtrar
+  return allRounds().filter((r) => r.classroomId === classroomId);
+}
+
+export function saveRoundSession(round: RoundSession): boolean {
+  const ok = write(KEYS.ROUNDS, [{ ...round, classroomId: round.classroomId ?? getActiveClassroomId() }, ...allRounds()]);
+  requestPersistence();
+  return ok;
+}
+
+// Pede ao navegador para não apagar os dados quando faltar espaço. Sem garantia: a cópia de segurança é a proteção real
+function requestPersistence(): void {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.ROUNDS);
-    if (raw) {
-      return JSON.parse(raw);
-    }
-  } catch (err) {
-    console.error('Falha ao carregar rodadas:', err);
-  }
-  return [];
-}
-
-// Salva uma rodada completa no histórico
-export function saveRoundSession(round: RoundSession): void {
-  try {
-    const history = loadRoundHistory();
-    history.unshift(round);
-    localStorage.setItem(STORAGE_KEYS.ROUNDS, JSON.stringify(history));
-  } catch (err) {
-    console.error('Falha ao salvar rodada:', err);
+    navigator.storage?.persist?.().catch(() => undefined);
+  } catch {
+    // navegador sem suporte: segue sem pedir
   }
 }
 
-// Limpa o histórico de rodadas
+// Rodadas de exemplo da turma ativa: entram no lugar das anteriores de exemplo
+export function addDemoRounds(rounds: RoundSession[]): void {
+  const id = getActiveClassroomId();
+  const others = allRounds().filter((r) => !(r.demo && r.classroomId === id));
+  write(
+    KEYS.ROUNDS,
+    [...rounds.map((r) => ({ ...r, classroomId: id })), ...others].sort((a, b) => b.timestamp - a.timestamp)
+  );
+}
+
+// Tira só as rodadas de exemplo da turma ativa; as reais ficam
+export function removeDemoRounds(): void {
+  const id = getActiveClassroomId();
+  write(KEYS.ROUNDS, allRounds().filter((r) => !(r.demo && r.classroomId === id)));
+}
+
+// Apaga o histórico só da turma ativa
 export function clearRoundHistory(): void {
-  localStorage.removeItem(STORAGE_KEYS.ROUNDS);
-  localStorage.removeItem(STORAGE_KEYS.HISTORY);
+  const id = getActiveClassroomId();
+  write(KEYS.ROUNDS, allRounds().filter((r) => r.classroomId !== id));
 }
 
-// Recupera o histórico legado de perguntas respondidas
-export function loadQuestionHistory(): QuestionSessionRecord[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.HISTORY);
-    if (raw) {
-      return JSON.parse(raw);
-    }
-  } catch (err) {
-    console.error('Falha ao carregar histórico:', err);
-  }
-  return [];
-}
+// ---------- Grupos (última formação de cada turma) ----------
 
-// Salva o resultado de uma questão individual
-export function saveQuestionSession(record: QuestionSessionRecord): void {
-  try {
-    const history = loadQuestionHistory();
-    history.unshift(record);
-    localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
-  } catch (err) {
-    console.error('Falha ao salvar sessão de pergunta:', err);
-  }
-}
-
-// Calcula estatísticas agrupadas para rodadas
-export function calculateRoundStats(round: RoundSession, students: Student[]): PerformanceStats {
-  const byStudent: Record<number, { total: number; correct: number }> = {};
-  students.forEach((s) => {
-    byStudent[s.id] = { total: 0, correct: 0 };
-  });
-
-  let totalResponses = 0;
-  let totalCorrect = 0;
-
-  round.questions.forEach((session) => {
-    Object.entries(session.responses).forEach(([studentIdStr, answer]) => {
-      const studentId = parseInt(studentIdStr, 10);
-      if (!byStudent[studentId]) {
-        byStudent[studentId] = { total: 0, correct: 0 };
-      }
-      byStudent[studentId].total += 1;
-      totalResponses += 1;
-
-      if (answer === session.correctOption) {
-        byStudent[studentId].correct += 1;
-        totalCorrect += 1;
-      }
-    });
-  });
-
-  const accuracyRate =
-    totalResponses > 0 ? Math.round((totalCorrect / totalResponses) * 100) : 0;
-
-  return {
-    totalQuestions: round.questions.length,
-    totalResponses,
-    accuracyRate,
-    byStudent,
-  };
-}
-
-// Última formação de grupos, para reaproveitar na próxima aula
 export function loadFormation(): GroupFormation | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.FORMATION);
-    if (raw) return JSON.parse(raw);
-  } catch (err) {
-    console.error('Falha ao carregar grupos:', err);
-  }
-  return null;
+  loadClassrooms();
+  const id = getActiveClassroomId();
+  return read<Record<string, GroupFormation>>(KEYS.FORMATIONS, {})[id] ?? null;
 }
 
 export function saveFormation(formation: GroupFormation): void {
+  const formations = read<Record<string, GroupFormation>>(KEYS.FORMATIONS, {});
+  write(KEYS.FORMATIONS, { ...formations, [formation.classroomId]: formation });
+}
+
+// ---------- Cópia de segurança ----------
+
+const BACKUP_KEYS = [KEYS.CLASSROOMS, KEYS.ACTIVE, KEYS.QUESTIONS, KEYS.ROUNDS, KEYS.FORMATIONS] as const;
+
+export interface Backup {
+  app: 'classplay';
+  schemaVersion: 3;
+  exportedAt: string;
+  data: Record<string, unknown>;
+}
+
+export function exportBackup(): Backup {
+  loadClassrooms();
+  return {
+    app: 'classplay',
+    schemaVersion: 3,
+    exportedAt: new Date().toISOString(),
+    data: Object.fromEntries(BACKUP_KEYS.map((k) => [k, read<unknown>(k, null)])),
+  };
+}
+
+// Restaura uma cópia no lugar dos dados atuais. Confere o formato antes de gravar qualquer coisa
+export function importBackup(text: string): { ok: true } | { ok: false; reason: string } {
+  let parsed: Backup;
   try {
-    localStorage.setItem(STORAGE_KEYS.FORMATION, JSON.stringify(formation));
-  } catch (err) {
-    console.error('Falha ao salvar grupos:', err);
+    parsed = JSON.parse(text);
+  } catch {
+    return { ok: false, reason: 'O arquivo não é uma cópia do ClassPlay.' };
   }
+  const d = parsed?.data;
+  const valid =
+    parsed?.app === 'classplay' &&
+    parsed.schemaVersion === 3 &&
+    d &&
+    Array.isArray(d[KEYS.CLASSROOMS]) &&
+    (d[KEYS.CLASSROOMS] as unknown[]).every((c) => {
+      const x = c as Classroom;
+      return typeof x?.id === 'string' && typeof x.name === 'string' && Array.isArray(x.students);
+    }) &&
+    Array.isArray(d[KEYS.QUESTIONS] ?? []) &&
+    Array.isArray(d[KEYS.ROUNDS] ?? []);
+  if (!valid) return { ok: false, reason: 'O arquivo não é uma cópia do ClassPlay ou é de uma versão que este app não lê.' };
+  BACKUP_KEYS.forEach((k) => {
+    if (d[k] === null || d[k] === undefined) localStorage.removeItem(k);
+    else write(k, d[k]);
+  });
+  return { ok: true };
+}
+
+// Apaga tudo o que o ClassPlay guardou neste navegador
+export function wipeAllData(): void {
+  Object.keys(localStorage)
+    .filter((k) => k.startsWith('classplay_'))
+    .forEach((k) => localStorage.removeItem(k));
 }
