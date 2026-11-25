@@ -36,7 +36,7 @@ const shelf: { script: ScriptId; method: string; text: string }[] = [
   {
     script: 'interactive-board',
     method: 'Lousa interativa',
-    text: 'O grupo leva uma paleta de papel até a resposta projetada no quadro.',
+    text: 'O grupo leva a mão até a resposta projetada no quadro.',
   },
 ];
 
@@ -114,11 +114,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               id="abertura"
               className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.02]"
             >
-              A turma inteira responde de uma vez.
+              A turma inteira participa, sem celular.
             </h1>
             <p className="text-xl sm:text-2xl leading-snug text-base-content/75 max-w-3xl mx-auto">
-              Cada aluno levanta um cartão de papel e a câmera do professor lê todos de uma vez, sem
-              celular na mão de ninguém. No datashow aparece quem respondeu e quantos acertaram.
+              Com um datashow e uma webcam, a câmera lê os cartões da turma e a mão dos alunos no
+              quadro. O resultado aparece na hora.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 pt-2">
               <button onClick={onOpenLibrary} className={pillButton}>
@@ -153,9 +153,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 space-y-14">
           <SectionTitle
             id="modelos-titulo"
-            lead="Cada modelo tem as etapas prontas. Você cadastra as suas perguntas e conduz a aula."
+            lead="Com cartões, a turma toda responde de uma vez às perguntas que você cadastra. Com a mão no quadro, os alunos apontam, arrastam e misturam em atividades que já vêm prontas."
           >
-            Escolha o jeito de perguntar.
+            Escolha como a turma participa.
           </SectionTitle>
 
           <ul className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-14 justify-items-center">
@@ -212,12 +212,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             id="comecar-titulo"
             className="font-display text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]"
           >
-            Para começar, você precisa de um datashow, uma webcam virada para a turma e cartões
-            impressos em A4.
+            Para começar, basta um datashow e uma webcam. Para os cartões, folhas A4.
           </h2>
-          <p className="inline-flex items-start gap-2 text-lg text-base-content/75 max-w-2xl text-left sm:text-center">
+          <p className="inline-flex items-start gap-2 text-lg text-base-content/75 max-w-3xl text-left sm:text-center [text-wrap:balance]">
             <Lock className="w-5 h-5 shrink-0 mt-1" aria-hidden="true" />
-            A imagem da câmera não sai do seu computador. A turma e o histórico ficam salvos só nele.
+            Nada sai do seu computador: a imagem da câmera, a turma e o histórico ficam só nele.
           </p>
           <div>
             <button onClick={onOpenLibrary} className={pillButton}>
