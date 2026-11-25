@@ -10,11 +10,12 @@ import {
   setActiveClassroom,
   loadQuestions,
 } from './services/storageService';
-import { Classroom, Question, ScriptId } from './types';
+import { Classroom, HAND_SCRIPT_IDS, HandScriptId, Question, ScriptId } from './types';
 
 // Telas carregadas só quando abertas: a primeira abertura do app fica leve
 const QuestionBank = lazy(() => import('./components/Questions/QuestionBank').then((m) => ({ default: m.QuestionBank })));
 const BoardFlow = lazy(() => import('./components/Board/BoardFlow').then((m) => ({ default: m.BoardFlow })));
+const HandModelFlow = lazy(() => import('./components/Hand/HandModels'));
 const QuestionFlow = lazy(() => import('./components/Conduct/QuestionFlow').then((m) => ({ default: m.QuestionFlow })));
 const CameraTest = lazy(() => import('./components/Camera/CameraTest').then((m) => ({ default: m.CameraTest })));
 const CardPrintView = lazy(() => import('./components/CardGenerator/CardPrintView').then((m) => ({ default: m.CardPrintView })));
@@ -36,7 +37,7 @@ const TAB_PATHS: Partial<Record<ActiveTab, string>> = {
   cards: '/cartas',
 };
 
-const SCRIPT_IDS: ScriptId[] = ['quick-question', 'group-draw', 'peer-instruction', 'interactive-board'];
+const SCRIPT_IDS: ScriptId[] = ['quick-question', 'group-draw', 'peer-instruction', 'interactive-board', ...HAND_SCRIPT_IDS];
 
 const buildPath = ({ tab, scriptId }: Route): string => {
   if (tab === 'script') return `/modelos/${scriptId}`;
@@ -60,6 +61,7 @@ export const App: React.FC = () => {
   const [route, setRoute] = useState<Route>(() => parsePath(window.location.pathname));
   const activeTab = route.tab;
   const activeScriptId = route.scriptId;
+  const isHand = (HAND_SCRIPT_IDS as ScriptId[]).includes(activeScriptId);
   const [classroom, setClassroom] = useState<Classroom>(() => loadClassroom());
   const [classrooms, setClassrooms] = useState<Classroom[]>(() => loadClassrooms());
   const [questions, setQuestions] = useState<Question[]>(() => loadQuestions());
@@ -167,7 +169,16 @@ export const App: React.FC = () => {
           />
         )}
 
-        {activeTab === 'prepare' && activeScriptId !== 'interactive-board' && (
+        {activeTab === 'prepare' && isHand && (
+          <HandModelFlow
+            scriptId={activeScriptId as HandScriptId}
+            onBack={() => go('script')}
+            onCameraStatusChange={setCameraActive}
+            onRoundProgressChange={setIsRoundInProgress}
+          />
+        )}
+
+        {activeTab === 'prepare' && activeScriptId !== 'interactive-board' && !isHand && (
           <QuestionFlow
             scriptId={activeScriptId}
             questions={questions}

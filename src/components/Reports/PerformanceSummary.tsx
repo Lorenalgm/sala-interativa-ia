@@ -25,6 +25,9 @@ const SHORT_SCRIPT: Record<string, string> = {
   'group-draw': 'Grupo',
   'interactive-board': 'Lousa',
   'peer-instruction': 'Pares',
+  'where-is': 'Onde fica',
+  'sort-groups': 'Classificar',
+  'color-mix': 'Cores',
 };
 
 // Níveis de domínio: paleta validada (faixa de luminosidade e daltonismo entre todos os pares).

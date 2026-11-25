@@ -1,6 +1,17 @@
 export type Alternative = 'A' | 'B' | 'C' | 'D';
 
-export type ScriptId = 'quick-question' | 'group-draw' | 'peer-instruction' | 'interactive-board';
+export type ScriptId =
+  | 'quick-question'
+  | 'group-draw'
+  | 'peer-instruction'
+  | 'interactive-board'
+  | 'where-is'
+  | 'sort-groups'
+  | 'color-mix';
+
+// Modelos em que a mão do aluno no quadro é a própria resposta (sem cartões)
+export type HandScriptId = 'where-is' | 'sort-groups' | 'color-mix';
+export const HAND_SCRIPT_IDS: HandScriptId[] = ['where-is', 'sort-groups', 'color-mix'];
 
 export interface Student {
   id: number; // corresponde ao identificador do marcador fiducial do cartão

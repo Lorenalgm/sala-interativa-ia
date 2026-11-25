@@ -61,6 +61,10 @@ export class PinchGate {
     return this.ratio !== null && this.ratio >= PINCH_OPEN;
   }
 
+  public get isClosed(): boolean {
+    return this.closed;
+  }
+
   public heldFor(now: number): number {
     return this.closed ? now - this.closedSince : 0;
   }
@@ -126,7 +130,7 @@ const inside = (z: Zone, p: Point, margin: number) =>
 const distanceTo = (z: Zone, p: Point) =>
   Math.hypot(Math.max(z.x - p.x, 0, p.x - (z.x + z.w)), Math.max(z.y - p.y, 0, p.y - (z.y + z.h)));
 
-// Suaviza a posição da paleta e transforma "ficar parado sobre uma zona" em clique
+// Suaviza a posição do ponteiro e transforma "ficar parado sobre uma zona" em clique
 export class DwellPointer {
   private pos: Point | null = null;
   private lastSeen = 0;
