@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Camera, Clock, Package, Play } from 'lucide-react';
+import { ArrowLeft, Camera, Clock, Info, Package, Play } from 'lucide-react';
 import { ActiveScript } from '../../data/scripts';
 import { Emblem, Spine, bindingFor } from './BookParts';
 
@@ -83,10 +83,17 @@ export const ScriptPage: React.FC<ScriptPageProps> = ({ script, onBack, onPrepar
             </ul>
           </div>
 
-          {script.id === 'interactive-board' && (
+          {(script.id === 'interactive-board' || script.format === 'Mão no quadro') && (
             <p className="flex items-start gap-2 text-base rounded-xl bg-amber-50 border border-amber-200 text-amber-950 px-3.5 py-2.5">
               <Camera className="w-4 h-4 mt-1 flex-shrink-0 text-amber-700" aria-hidden="true" />
               Câmera ao lado do datashow, virada para o quadro e vendo os 4 cantos da projeção.
+            </p>
+          )}
+
+          {script.note && (
+            <p className="flex items-start gap-2 text-base rounded-xl bg-base-200 border border-base-300 text-base-content/80 px-3.5 py-2.5">
+              <Info className="w-4 h-4 mt-1 flex-shrink-0 text-base-content/60" aria-hidden="true" />
+              {script.note}
             </p>
           )}
 
