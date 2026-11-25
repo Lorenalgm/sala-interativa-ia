@@ -1,9 +1,6 @@
 import { ClickMode } from '../../services/pointer';
 
-// Como o grupo aponta na lousa: paleta de papel ou a mão (palma = ponteiro)
-export type BoardInput = 'paddle' | 'hand';
-
+// Na lousa o grupo aponta com a mão (palma = ponteiro) e clica com pinça ou parando 1 s
 export interface BoardInputSettings {
-  input: BoardInput;
-  click: ClickMode; // só vale com a mão: pinça ou parar 1 s
+  click: ClickMode;
 }

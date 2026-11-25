@@ -1,10 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alternative, Group, Question } from '../../types';
-import { ArucoCardDetector } from '../../services/arucoDetector';
-import { markerCenter } from '../../services/boardCalibration';
 import { Homography, Point, applyHomography, clamp01 } from '../../services/homography';
 import { HandReading } from '../../services/handTracker';
-import { PADDLE_MARKERS } from '../../services/markerRanges';
 import { DwellPointer, PINCH_CLOSED, PINCH_OPEN, PointerState, Zone } from '../../services/pointer';
 import { BoardFrame, useBoardCamera } from './useBoardCamera';
 import { BoardInputSettings } from './boardInput';
@@ -43,9 +40,6 @@ const ZONES: Zone[] = LETTERS.map((letter, i) => ({
   h: 0.28,
 }));
 
-const RING_R = 26;
-const RING_LEN = 2 * Math.PI * RING_R;
-
 interface Game {
   idx: number;
   turn: number; // quantas vezes a vez passou; o grupo é turn % grupos
@@ -73,8 +67,7 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
   onCameraStatusChange,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const isHand = settings.input === 'hand';
-  const pointer = useMemo(() => new DwellPointer(isHand ? settings.click : 'dwell', isHand, isHand ? 0.15 : 0), []); // eslint-disable-line react-hooks/exhaustive-deps
+  const pointer = useMemo(() => new DwellPointer(settings.click, true, 0.15), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [game, setGame] = useState<Game>({ idx: 0, turn: 0, attempts: 0, chosen: [], results: [] });
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [intro, setIntro] = useState<number | null>(INTRO_SECONDS); // contagem antes de cada pergunta
@@ -88,7 +81,6 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
   const question = questions[game.idx];
   const groupIndex = game.turn % groups.length;
   const group = groups[groupIndex];
-  const paddleId = PADDLE_MARKERS.min + groupIndex;
 
   useEffect(() => () => {
     if (timer.current) window.clearTimeout(timer.current);
@@ -164,37 +156,32 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
     setIntro(INTRO_SECONDS);
   };
 
-  const { error, handError, handsReady, stats } = useBoardCamera(
+  const { error, handError, handsReady } = useBoardCamera(
     videoRef,
-    ({ markers, hand }: BoardFrame, now) => {
+    ({ hand }: BoardFrame, now) => {
       if (feedback || intro !== null) return;
       let point = null;
       let pinch: number | null = null;
-      if (isHand) {
-        if (hand) {
-          point = clamp01(applyHomography(homography, hand.palm));
-          pinch = hand.pinch;
-        }
-        handRef.current = hand;
-      } else {
-        const paddle = ArucoCardDetector.paddlesOnly(markers).find((m) => m.id === paddleId);
-        point = paddle ? applyHomography(homography, markerCenter(paddle.corners)) : null;
+      if (hand) {
+        point = clamp01(applyHomography(homography, hand.palm));
+        pinch = hand.pinch;
       }
+      handRef.current = hand;
       const next = pointer.update(now, point, ZONES, pinch);
       setView(next);
       // Sombra da mão: o esqueleto inteiro, ancorado no ponteiro já suavizado
-      if (isHand && hand && next.pos) {
+      if (hand && next.pos) {
         const g = ghostSmoother.update(homography, hand, window.innerWidth, window.innerHeight);
         const pos = next.pos;
         setGhost(
           g.shape && { pinch: g.pinch, points: g.shape.map((o) => ({ x: pos.x + o.x, y: pos.y + o.y })) }
         );
-      } else if (isHand) {
+      } else {
         setGhost(null);
       }
       if (next.fired) choose(next.fired as Alternative);
     },
-    { markers: !isHand, hands: isHand },
+    { markers: false, hands: true },
     onCameraStatusChange
   );
 
@@ -225,7 +212,7 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
 
       <div className="absolute left-[4%] right-[4%] top-[2%] flex items-center justify-between gap-4">
         <span className="text-[2.2vw] font-extrabold">
-          Vez do {group.name}{!isHand && ` · Paleta ${groupIndex + 1}`}
+          Vez do {group.name}
         </span>
         <span className="flex items-center gap-[1.5vw]">
           <span className="text-[1.6vw] text-zinc-500 font-semibold">
@@ -276,7 +263,7 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
         );
       })}
 
-      {isHand && ghost && !feedback && intro === null && (
+      {ghost && !feedback && intro === null && (
         <HandGhost
           points={ghost.points}
           closed={ghost.pinch <= PINCH_CLOSED}
@@ -284,31 +271,6 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
         />
       )}
 
-      {view.pos && !feedback && intro === null && !isHand && (
-        <svg
-          aria-hidden="true"
-          width="64"
-          height="64"
-          viewBox="0 0 64 64"
-          className="absolute pointer-events-none -ml-8 -mt-8"
-          style={{ left: `${view.pos.x * 100}%`, top: `${view.pos.y * 100}%` }}
-        >
-          <circle cx="32" cy="32" r={RING_R} fill="rgba(255,255,255,0.7)" stroke="#d4d4d8" strokeWidth="6" />
-          <circle
-            cx="32"
-            cy="32"
-            r={RING_R}
-            fill="none"
-            stroke="#0040dd"
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeDasharray={RING_LEN}
-            strokeDashoffset={RING_LEN * (1 - view.progress)}
-            transform="rotate(-90 32 32)"
-          />
-          <circle cx="32" cy="32" r="6" fill="#0040dd" />
-        </svg>
-      )}
 
       <div className="absolute left-[4%] right-[4%] bottom-[0.6%] flex justify-between text-[1.1vw] text-zinc-500">
         <span>
@@ -316,12 +278,12 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
             ? 'Câmera indisponível. Confira a permissão do navegador.'
             : handError
               ? 'Leitura da mão indisponível.'
-              : isHand && !handsReady
+              : !handsReady
                 ? 'Carregando a leitura da mão…'
-                : !view.pos && (isHand ? 'Não estou vendo a mão.' : `A paleta ${groupIndex + 1} não está sendo vista.`)}
+                : !view.pos && 'Não estou vendo a mão.'}
         </span>
         <span>
-          {isHand && settings.click === 'pinch' ? `Junte polegar e indicador para clicar${ghost ? ` (pinça ${ghost.pinch.toFixed(2)})` : ''} · ` : ''}P pula a vez · Z desfaz · Esc sai{stats ? ` · ${stats.fps} quadros/s` : ''}
+          {settings.click === 'pinch' ? `Junte polegar e indicador para clicar${ghost ? ` (pinça ${ghost.pinch.toFixed(2)})` : ''} · ` : ''}P pula a vez · Z desfaz · Esc sai
         </span>
       </div>
 
@@ -332,7 +294,7 @@ export const BoardPlayer: React.FC<BoardPlayerProps> = ({
           </p>
           <p className="font-display font-bold text-[7vw] leading-none">{group.name}</p>
           <p className="text-[3vw] font-bold">
-            {isHand ? 'vai responder' : `vai responder com a Paleta ${groupIndex + 1}`}
+            vai responder
           </p>
           <p aria-live="polite" className="font-display font-bold text-[14vw] leading-none text-primary tabular-nums">
             {intro}

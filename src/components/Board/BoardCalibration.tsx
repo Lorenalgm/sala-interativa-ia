@@ -10,15 +10,12 @@ import {
   DEFAULT_INSET,
   MAX_ERROR,
   calibrationLayout,
-  markerCenter,
 } from '../../services/boardCalibration';
 import { Homography, applyHomography } from '../../services/homography';
 import { cropMarker } from '../CardGenerator/cropMarker';
 import { BoardFrame, useBoardCamera } from './useBoardCamera';
-import { BoardInput } from './boardInput';
 
 interface BoardCalibrationProps {
-  input: BoardInput;
   onBack: () => void;
   onDone: (homography: Homography) => void;
   onCameraStatusChange?: (active: boolean) => void;
@@ -29,8 +26,8 @@ const INSET_KEY = 'board-calibration-inset';
 const CORNER_NAMES = ['em cima à esquerda', 'em cima à direita', 'embaixo à direita', 'embaixo à esquerda'];
 
 // Tela branca com os 4 marcadores nos cantos. Quando a câmera lê cada um 10 vezes,
-// o app aprende onde está a projeção; depois a tela vira um teste: um ponto segue a paleta.
-export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBack, onDone, onCameraStatusChange }) => {
+// o app aprende onde está a projeção; depois a tela vira um teste: um ponto segue a palma da mão.
+export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ onBack, onDone, onCameraStatusChange }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [size, setSize] = useState({ w: window.innerWidth, h: window.innerHeight });
   useEffect(() => {
@@ -56,7 +53,7 @@ export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBac
 
   const [state, setState] = useState<CalibrationState>(calibrator.result);
   const [dot, setDot] = useState<{ x: number; y: number } | null>(null);
-  const lastPaddleAt = useRef(0);
+  const lastHandAt = useRef(0);
   useEffect(() => setState(calibrator.result), [calibrator]);
 
   const { error, handError, handsReady, stats } = useBoardCamera(
@@ -73,23 +70,17 @@ export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBac
           : next
       );
       if (next.homography) {
-        // No teste, o ponto segue a paleta ou a palma da mão
-        const target =
-          input === 'hand'
-            ? hand?.palm
-            : (() => {
-                const paddle = ArucoCardDetector.paddlesOnly(markers)[0];
-                return paddle ? markerCenter(paddle.corners) : undefined;
-              })();
+        // No teste, o ponto segue a palma da mão
+        const target = hand?.palm;
         if (target) {
-          lastPaddleAt.current = now;
+          lastHandAt.current = now;
           setDot(applyHomography(next.homography, target));
-        } else if (now - lastPaddleAt.current > 300) {
+        } else if (now - lastHandAt.current > 300) {
           setDot(null);
         }
       }
     },
-    { markers: !state.homography || input === 'paddle', hands: input === 'hand' },
+    { markers: !state.homography, hands: true },
     onCameraStatusChange
   );
 
@@ -100,8 +91,8 @@ export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBac
 
   let message = 'Aponte a câmera para o quadro, de modo que os 4 marcadores apareçam.';
   if (error) message = 'Não foi possível abrir a câmera. Confira a permissão do navegador.';
-  else if (handError) message = 'Não foi possível carregar a leitura da mão. Volte e use a paleta.';
-  else if (done) message = `Calibrado. ${input === 'hand' ? 'Passe a mão aberta pelos 4 cantos para testar o ponto.' : 'Passe uma paleta pelos 4 cantos para testar o ponto.'}`;
+  else if (handError) message = 'Não foi possível carregar a leitura da mão. Recarregue a página e tente de novo.';
+  else if (done) message = 'Calibrado. Passe a mão aberta pelos 4 cantos para testar o ponto.';
   else if (failed) {
     const worst = state.worstId !== null ? CALIBRATION_IDS.indexOf(state.worstId as (typeof CALIBRATION_IDS)[number]) : -1;
     message = `A leitura ficou imprecisa (erro de ${(state.error! * 100).toFixed(1)}%, o máximo é ${(MAX_ERROR * 100).toFixed(1)}%)${worst >= 0 ? `, pior no marcador ${CORNER_NAMES[worst]}` : ''}. Tentando de novo… Se repetir, deixe a câmera de frente para o quadro e veja se esse canto não está com reflexo ou cortado.`;
@@ -173,7 +164,7 @@ export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ input, onBac
           )}
 
           <p className="text-sm text-zinc-600 tabular-nums">
-            {input === 'hand' && !handsReady && !handError && 'Carregando a leitura da mão… '}
+            {!handsReady && !handError && 'Carregando a leitura da mão… '}
             {done ? 'Pronto' : `Leituras de cada canto: ${state.streak} de ${CALIBRATION_FRAMES}`}
             {state.markerPx > 0 && ` · marcador com ${Math.round(state.markerPx)} px na imagem`}
             {stats && ` · ${stats.fps} quadros/s · ${stats.detectMs} ms por leitura`}

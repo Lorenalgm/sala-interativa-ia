@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Check, Printer, Users } from 'lucide-react';
+import { ArrowLeft, Check, Users } from 'lucide-react';
 import { GroupFormation, Question, Student } from '../../types';
 import { Homography } from '../../services/homography';
-import { PADDLE_MARKERS } from '../../services/markerRanges';
 import { GroupSetup } from '../Conduct/GroupSetup';
 import { HandCalibration } from './HandCalibration';
 import { BoardCalibration } from './BoardCalibration';
 import { BoardPlayer, BoardTurnResult } from './BoardPlayer';
-import { PaddlePrintView } from './PaddlePrintView';
 import { BoardInputSettings } from './boardInput';
 
 interface BoardFlowProps {
@@ -18,9 +16,7 @@ interface BoardFlowProps {
   onRoundProgressChange: (inProgress: boolean) => void;
 }
 
-type Stage = 'setup' | 'print' | 'groups' | 'calibrate' | 'handcal' | 'play' | 'summary';
-
-const MAX_GROUPS = PADDLE_MARKERS.max - PADDLE_MARKERS.min + 1;
+type Stage = 'setup' | 'groups' | 'calibrate' | 'handcal' | 'play' | 'summary';
 
 // Etapas do roteiro da lousa: perguntas, grupos, calibração, rodada e resumo
 export const BoardFlow: React.FC<BoardFlowProps> = ({
@@ -34,7 +30,7 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
   const [selected, setSelected] = useState<string[]>(() => questions.map((q) => q.id));
   const [formation, setFormation] = useState<GroupFormation | null>(null);
   const [homography, setHomography] = useState<Homography | null>(null);
-  const [settings, setSettings] = useState<BoardInputSettings>({ input: 'paddle', click: 'pinch' });
+  const [settings, setSettings] = useState<BoardInputSettings>({ click: 'pinch' });
   const [results, setResults] = useState<BoardTurnResult[]>([]);
 
   useEffect(() => {
@@ -44,10 +40,6 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
   const chosen = questions.filter((q) => selected.includes(q.id));
   const toggle = (id: string) =>
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-
-  if (stage === 'print') {
-    return <PaddlePrintView groupCount={formation?.groups.length ?? 4} onBack={() => setStage('setup')} />;
-  }
 
   if (stage === 'groups') {
     return (
@@ -65,13 +57,12 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
   if (stage === 'calibrate' && formation) {
     return (
       <BoardCalibration
-        input={settings.input}
         onBack={() => setStage('groups')}
         onCameraStatusChange={onCameraStatusChange}
         onDone={(h) => {
           setHomography(h);
           setResults([]);
-          setStage(settings.input === 'hand' ? 'handcal' : 'play');
+          setStage('handcal');
         }}
       />
     );
@@ -178,8 +169,6 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
     );
   }
 
-  const groupsFull = formation && formation.groups.length > MAX_GROUPS;
-
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16 space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
@@ -197,12 +186,6 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          {settings.input === 'paddle' && (
-            <button onClick={() => setStage('print')} className={pillSecondary}>
-              <Printer className="w-4 h-4" aria-hidden="true" />
-              Imprimir paletas
-            </button>
-          )}
           <button onClick={() => setStage('groups')} disabled={chosen.length === 0} className={pillPrimary}>
             <Users className="w-4 h-4" aria-hidden="true" />
             Montar os grupos
@@ -210,34 +193,18 @@ export const BoardFlow: React.FC<BoardFlowProps> = ({
         </div>
       </header>
 
-      {groupsFull && (
-        <p role="alert" className="text-base font-semibold rounded-[0.625rem] bg-red-100 text-red-950 px-4 py-3">
-          A lousa tem paletas para até {MAX_GROUPS} grupos. Monte os grupos de novo com menos grupos.
-        </p>
-      )}
-
       <section aria-labelledby="lousa-apontar" className="space-y-2">
         <h2 id="lousa-apontar" className={groupHeader}>Como o grupo aponta</h2>
         <div className="bg-base-100 rounded-[0.875rem] border border-base-300 p-4 space-y-4">
+          <p className="text-base text-base-content/75">
+            A mão inteira é o mouse: o centro da palma move o ponto. Não precisa imprimir nada.
+          </p>
           <Segmented
-            label="Forma de apontar"
-            value={settings.input}
-            options={[['paddle', 'Paleta de papel'], ['hand', 'Mão']]}
-            onChange={(v) => setSettings((s) => ({ ...s, input: v as typeof s.input }))}
+            label="Como clicar"
+            value={settings.click}
+            options={[['pinch', 'Juntar polegar e indicador'], ['dwell', 'Parar a mão por 1 s']]}
+            onChange={(v) => setSettings((s) => ({ ...s, click: v as typeof s.click }))}
           />
-          {settings.input === 'hand' && (
-            <div className="space-y-3">
-              <p className="text-base text-base-content/75">
-                A mão inteira é o mouse: o centro da palma move o ponto. Não precisa imprimir nada.
-              </p>
-              <Segmented
-                label="Como clicar"
-                value={settings.click}
-                options={[['pinch', 'Juntar polegar e indicador'], ['dwell', 'Parar a mão por 1 s']]}
-                onChange={(v) => setSettings((s) => ({ ...s, click: v as typeof s.click }))}
-              />
-            </div>
-          )}
         </div>
       </section>
 
