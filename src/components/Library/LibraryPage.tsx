@@ -111,8 +111,7 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
-        <div className="space-y-2">
+      <header className="space-y-2">
           <h1 className="font-display text-4xl lg:text-[2.75rem] font-bold tracking-tight leading-[1.05]">
             Modelos de atividade
           </h1>
@@ -120,50 +119,51 @@ export const LibraryPage: React.FC<LibraryPageProps> = ({
             Escolha um modelo e cadastre as suas perguntas para montar a aula. Os alunos não usam
             aparelho; você precisa do datashow e de uma câmera.
           </p>
-        </div>
-
-        {/* Controle segmentado: um trilho, o segmento escolhido em azul */}
-        <div
-          role="radiogroup"
-          aria-label="Filtrar por formato"
-          className="inline-flex rounded-[0.75rem] bg-[#e3e3e8] p-1 gap-1"
-        >
-          {['Todos', ...formats].map((f) => {
-            const active = f === format;
-            const count = f === 'Todos' ? available.length : available.filter((s) => s.format === f).length;
-            return (
-              <button
-                key={f}
-                role="radio"
-                aria-checked={active}
-                onClick={() => setFormat(f)}
-                className={`min-h-[2.75rem] rounded-[0.5625rem] px-4 text-base font-semibold motion-safe:transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
-                  active
-                    ? 'bg-primary text-primary-content shadow-[0_1px_3px_rgb(0_0_0/0.25)]'
-                    : 'text-base-content hover:bg-black/5'
-                }`}
-              >
-                {f} <span className={active ? 'font-normal opacity-85' : 'font-normal text-base-content/70'}>{count}</span>
-              </button>
-            );
-          })}
-        </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_20rem] gap-10 items-start">
-        {/* Estante: cresce com a biblioteca */}
-        <div className="grid grid-cols-[repeat(auto-fill,17rem)] justify-center sm:justify-start gap-x-8 gap-y-10 pb-4">
-          {visible.map((script, i) => (
-            <ScriptBook
-              key={script.id}
-              script={script}
-              index={i}
-              onOpen={() => onOpenScript(script.id)}
-            />
-          ))}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_20rem] gap-x-6 gap-y-8 items-start">
+        <div className="flex flex-col gap-6 min-w-0">
+          {/* Controle segmentado: filtra a estante, por isso fica logo acima dela */}
+          <div
+            role="radiogroup"
+            aria-label="Filtrar por formato"
+            className="self-start inline-flex rounded-[0.75rem] bg-[#e3e3e8] p-1 gap-1"
+          >
+            {['Todos', ...formats].map((f) => {
+              const active = f === format;
+              const count = f === 'Todos' ? available.length : available.filter((s) => s.format === f).length;
+              return (
+                <button
+                  key={f}
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => setFormat(f)}
+                  className={`min-h-[2.75rem] rounded-[0.5625rem] px-4 text-base font-semibold motion-safe:transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                    active
+                      ? 'bg-primary text-primary-content shadow-[0_1px_3px_rgb(0_0_0/0.25)]'
+                      : 'text-base-content hover:bg-black/5'
+                  }`}
+                >
+                  {f} <span className={active ? 'font-normal opacity-85' : 'font-normal text-base-content/70'}>{count}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Estante: cresce com a biblioteca */}
+          <div className="grid grid-cols-[repeat(auto-fill,17rem)] justify-center sm:justify-start gap-x-6 gap-y-10 pb-4">
+            {visible.map((script, i) => (
+              <ScriptBook
+                key={script.id}
+                script={script}
+                index={i}
+                onOpen={() => onOpenScript(script.id)}
+              />
+            ))}
+          </div>
         </div>
 
-        <aside className="space-y-7 lg:sticky lg:top-24">
+        <aside className="space-y-6 lg:sticky lg:top-20">
           <section aria-labelledby="antes-da-aula">
             <GroupHeader id="antes-da-aula">Antes da aula</GroupHeader>
             <ul className="bg-base-100 rounded-[0.875rem] border border-base-300 overflow-hidden">
