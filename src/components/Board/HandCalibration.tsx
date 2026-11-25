@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Play, RotateCcw } from 'lucide-react';
 import { Homography, Point, applyHomography, computeAffine } from '../../services/homography';
-import { PINCH_CLOSED, PINCH_HOLD_MS, PINCH_OPEN, PointFilter } from '../../services/pointer';
+import { PINCH_CLOSED, PINCH_HOLD_MS, PINCH_OPEN, PinchGate, PointFilter } from '../../services/pointer';
 import { BoardFrame, useBoardCamera } from './useBoardCamera';
 import { HandGhost } from './HandGhost';
 import { GhostSmoother } from './ghost';
@@ -56,7 +56,7 @@ export const HandCalibration: React.FC<HandCalibrationProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const recent = useRef<Sample[]>([]);
   const latched = useRef(true); // exige abrir a pinça antes do primeiro alvo
-  const closedSince = useRef<number | null>(null);
+  const pinchGate = useMemo(() => new PinchGate(), []);
   const [captured, setCaptured] = useState<(Point | null)[]>(TARGETS.map(() => null));
   const [notice, setNotice] = useState<string | null>(null);
   const ghostSmoother = useMemo(() => new GhostSmoother(), []);
@@ -101,7 +101,7 @@ export const HandCalibration: React.FC<HandCalibrationProps> = ({
     ({ hand }: BoardFrame, now: number) => {
       if (!hand) {
         recent.current = [];
-        closedSince.current = null;
+        pinchGate.feed(null, now); // um quadro sem mão não solta a pinça
         ghostSmoother.reset();
         palmFilter.reset();
         setGhost(null);
@@ -130,10 +130,9 @@ export const HandCalibration: React.FC<HandCalibrationProps> = ({
         }
       );
 
-      if (hand.pinch >= PINCH_OPEN) latched.current = false;
-      if (hand.pinch <= PINCH_CLOSED) closedSince.current = closedSince.current ?? now;
-      else closedSince.current = null;
-      const held = closedSince.current !== null && now - closedSince.current >= PINCH_HOLD_MS;
+      pinchGate.feed(hand.pinch, now);
+      if (pinchGate.isOpen) latched.current = false;
+      const held = pinchGate.heldFor(now) >= PINCH_HOLD_MS;
       if (complete || latched.current || !held) return;
 
       latched.current = true;
