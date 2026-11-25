@@ -84,7 +84,7 @@ export const scripts: ActiveScript[] = [
       'Ele para a mão e o anel enche. A tela mostra a resposta e o quão perto ele chegou.',
       'No fim, a tela mostra quantas foram na mosca, perto e longe.',
     ],
-    note: 'O resultado aparece na tela, mas não vai para o Desempenho: a mão no quadro ainda não identifica qual aluno respondeu.',
+    note: 'Este modelo não gera resultados no Desempenho.',
     status: 'available',
   },
   {
@@ -101,7 +101,7 @@ export const scripts: ActiveScript[] = [
       'Na caixa certa o cartão entra; na errada a caixa balança e ele volta.',
       'No fim, a tela mostra o que foi de primeira e o que vale conversar.',
     ],
-    note: 'O resultado aparece na tela, mas não vai para o Desempenho: a mão no quadro ainda não identifica qual aluno respondeu.',
+    note: 'Este modelo não gera resultados no Desempenho.',
     status: 'available',
   },
   {
@@ -118,7 +118,7 @@ export const scripts: ActiveScript[] = [
       'As barras mostram quanto de cada primária entrou. Na cor certa, ele segura 1 s.',
       'O triângulo se revela inteiro, com todas as misturas possíveis.',
     ],
-    note: 'O resultado aparece na tela, mas não vai para o Desempenho: a mão no quadro ainda não identifica qual aluno respondeu.',
+    note: 'Este modelo não gera resultados no Desempenho.',
     status: 'available',
   },
 ];
