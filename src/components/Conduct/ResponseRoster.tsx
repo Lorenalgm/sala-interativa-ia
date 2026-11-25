@@ -8,6 +8,8 @@ interface ResponseRosterProps {
   recentId?: number | null;
   // Correção manual: o professor clica no aluno e escolhe a alternativa
   onCorrect?: (studentId: number, option: Alternative) => void;
+  // Na tela cheia o interruptor some: é detalhe pequeno que só borra no projetor
+  showNameToggle?: boolean;
 }
 
 export const ResponseRoster: React.FC<ResponseRosterProps> = ({
@@ -15,10 +17,13 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
   responses,
   recentId,
   onCorrect,
+  showNameToggle = true,
 }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   // Os nomes ficam escondidos por padrão: a turma vê só os números dos cartões
-  const [showNames, setShowNames] = useState(false);
+  const [namesOn, setShowNames] = useState(false);
+  // Sem o interruptor (tela cheia), os nomes nunca aparecem no projetor
+  const showNames = namesOn && showNameToggle;
 
   const answeredCount = Object.keys(responses).length;
   const totalCount = students.length;
@@ -113,15 +118,17 @@ export const ResponseRoster: React.FC<ResponseRosterProps> = ({
         </div>
       )}
 
+      {showNameToggle && (
       <label className="label cursor-pointer justify-start gap-2 py-0 no-print">
         <input
           type="checkbox"
           className="toggle toggle-sm"
-          checked={showNames}
+          checked={namesOn}
           onChange={(e) => setShowNames(e.target.checked)}
         />
         <span className="label-text text-base text-base-content/80">Mostrar nomes</span>
       </label>
+      )}
     </section>
   );
 };

@@ -65,6 +65,8 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
   const [cameraError, setCameraError] = useState(false);
   // Sugestões ficam escondidas por padrão: a turma vê o datashow e a regra revela a resposta
   const [showSuggestions, setShowSuggestions] = useState(false);
+  // A imagem da câmera fica escondida por padrão: no projetor ela parece borrada e distrai a turma
+  const [showCameraPreview, setShowCameraPreview] = useState(false);
   const [recentId, setRecentId] = useState<number | null>(null);
 
   // Roteiro de grupo: discussão → sorteio → resposta dos sorteados → resultado
@@ -180,7 +182,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
             const student = studentsRef.current.find((s) => s.id === marker.id);
             const allowed = allowedIdsRef.current;
             if (student && (!allowed || allowed.includes(marker.id))) {
-              // Só conta depois de ~0,5 s com o cartão parado na mesma letra
+              // Conta quando a mesma letra aparece em leituras seguidas por ~0,25 s
               const confirmed = readerRef.current.feed(marker.id, marker.option, performance.now());
               if (confirmed) {
                 setResponses((prev) => {
@@ -308,6 +310,12 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
     };
 
     saveRoundSession(roundRecord);
+
+    // Projetando: o fim da rodada também é para a turma. A tela cheia está presa a esta
+    // tela, que vai sair; passa para a página inteira antes, ainda no gesto do professor.
+    if (document.fullscreenElement && document.fullscreenElement === containerRef.current) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
 
     if (onFinishRound) {
       onFinishRound(roundRecord);
@@ -575,9 +583,9 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
         {/* Painel Esquerdo: Pergunta e Alternativas ou Gabarito (ocupa 9 colunas) */}
         <div className="lg:col-span-9 flex flex-col min-h-0">
           {!isAnswerRevealed ? (
-            <div className="bg-base-100 border border-base-300 rounded-[1.25rem] p-6 sm:p-10 xl:p-14 flex flex-col gap-8 lg:gap-12 flex-1 min-h-0">
-              {/* Enunciado amplo e de fácil leitura de longe */}
-              <h1 className="font-display text-[clamp(2rem,3.6vw,4.25rem)] font-bold text-base-content tracking-tight leading-[1.1] max-w-[30ch]">
+            <div className="bg-base-100 border border-base-300 rounded-[1.25rem] p-6 sm:p-10 xl:p-14 flex flex-col justify-center gap-[clamp(2rem,6vh,4.5rem)] flex-1 min-h-0">
+              {/* Enunciado amplo e de fácil leitura de longe: cresce com a largura e com a altura da tela */}
+              <h1 className="font-display text-[clamp(2rem,min(4.2vw,7.5vh),5.25rem)] font-bold text-base-content tracking-tight leading-[1.08] max-w-[28ch]">
                 {currentQuestion.prompt}
               </h1>
 
@@ -612,16 +620,16 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
               )}
 
               {/* Alternativas A, B, C, D: sempre as quatro visíveis, em tamanho de sala */}
-              <ol className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-7">
+              <ol className="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-[clamp(1.5rem,4.5vh,3rem)]">
                 {optionsKeys.map((opt) => (
-                  <li key={opt} className="flex items-center gap-5">
+                  <li key={opt} className="flex items-center gap-6">
                     <span
                       aria-hidden="true"
-                      className="w-[clamp(3.5rem,4.6vw,5.5rem)] aspect-[4/5] rounded-[0.625rem] border-[3px] border-black bg-white text-black flex items-center justify-center font-display font-bold text-[clamp(1.75rem,2.6vw,3rem)] flex-shrink-0 shadow-[0_6px_10px_-6px_rgb(0_0_0/0.35)]"
+                      className="w-[clamp(3.5rem,min(5.2vw,10vh),6.5rem)] aspect-[4/5] rounded-[0.75rem] border-[3px] border-black bg-white text-black flex items-center justify-center font-display font-bold text-[clamp(1.75rem,min(3vw,5.5vh),3.5rem)] flex-shrink-0 shadow-[0_6px_10px_-6px_rgb(0_0_0/0.35)]"
                     >
                       {opt}
                     </span>
-                    <p className="text-[clamp(1.5rem,2.3vw,2.75rem)] font-semibold text-base-content leading-snug">
+                    <p className="text-[clamp(1.5rem,min(2.7vw,5vh),3.25rem)] font-semibold text-base-content leading-snug">
                       <span className="sr-only">{opt}: </span>
                       {currentQuestion.options[opt]}
                     </p>
@@ -646,59 +654,70 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
 
         {/* Painel Direito: Câmera no topo e Quadrante de Alunos embaixo (ocupa 3 colunas) */}
         <div className="lg:col-span-3 flex flex-col gap-3 min-h-0">
-          {/* Câmera visível por padrão na lateral */}
-          <div className="bg-base-100 border border-base-300 rounded-[0.875rem] p-3 flex flex-col space-y-2 flex-shrink-0">
-            <div className="flex items-center justify-between px-1 text-[0.9375rem]">
-              <span className="font-bold text-base-content">
-                Câmera da sala
+          {/* Câmera: só uma linha de estado. A imagem abre sob demanda, para o professor conferir o enquadramento */}
+          <div className="bg-base-100 border border-base-300 rounded-[0.875rem] px-3 py-2 flex flex-col gap-2 flex-shrink-0">
+            <div className="flex items-center justify-between gap-2 min-h-[2.75rem]">
+              <span className="inline-flex items-center gap-2.5 pl-1 text-base font-semibold text-base-content">
+                <span
+                  aria-hidden="true"
+                  className={`w-3 h-3 rounded-full ${isCameraActive ? 'bg-success' : 'bg-[#aeaeb2]'}`}
+                />
+                {isCameraActive ? 'Lendo os cartões' : 'Câmera desligada'}
               </span>
               {isCameraActive ? (
-                <button onClick={stopCamera} className="no-print inline-flex items-center gap-1.5 min-h-[2.25rem] px-2 rounded-lg text-[0.9375rem] font-semibold text-error hover:bg-black/5">
+                <button
+                  onClick={() => setShowCameraPreview((v) => !v)}
+                  aria-expanded={showCameraPreview}
+                  className="no-print inline-flex items-center min-h-[2.75rem] px-2 rounded-lg text-[0.9375rem] font-semibold text-primary hover:bg-black/5"
+                >
+                  {showCameraPreview ? 'Esconder imagem' : 'Ver imagem'}
+                </button>
+              ) : (
+                <button
+                  onClick={startCamera}
+                  className="no-print inline-flex items-center min-h-[2.75rem] px-4 rounded-full bg-primary text-primary-content text-[0.9375rem] font-semibold hover:bg-[#0036bd]"
+                >
+                  {cameraError ? 'Tentar de novo' : 'Ligar câmera'}
+                </button>
+              )}
+            </div>
+
+            {cameraError && !isCameraActive && (
+              <p role="alert" className="px-1 pb-1 text-[0.9375rem] text-base-content/75">
+                Não foi possível abrir a câmera. Confira a permissão do navegador.
+              </p>
+            )}
+
+            {/* O vídeo fica sempre na página (o navegador só decodifica o que está montado); escondido, continua lendo */}
+            <div
+              className={
+                isCameraActive && showCameraPreview
+                  ? 'w-full aspect-video bg-neutral rounded-xl relative overflow-hidden mb-1'
+                  : 'absolute w-px h-px overflow-hidden opacity-0 pointer-events-none'
+              }
+              aria-hidden={!showCameraPreview}
+            >
+              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+              <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+            </div>
+
+            {showCameraPreview && isCameraActive && (
+              <div className="no-print flex items-center justify-between gap-2 pb-1">
+                {lastDetectedStudent ? (
+                  <span role="status" className="flex items-center gap-2 min-w-0 text-[0.9375rem] font-semibold text-[#14532d]">
+                    <CheckCircle className="w-4 h-4 text-success flex-shrink-0" aria-hidden="true" />
+                    <span className="truncate">{lastDetectedStudent}</span>
+                  </span>
+                ) : (
+                  <span />
+                )}
+                <button
+                  onClick={stopCamera}
+                  className="inline-flex items-center gap-1.5 min-h-[2.75rem] px-2 rounded-lg text-[0.9375rem] font-semibold text-error hover:bg-black/5"
+                >
                   <CameraOff className="w-4 h-4" aria-hidden="true" />
                   Desligar
                 </button>
-              ) : (
-                <span className="text-[0.9375rem] font-semibold text-base-content/70">Desligada</span>
-              )}
-            </div>
-
-            <div className="w-full aspect-video bg-neutral rounded-xl relative overflow-hidden flex items-center justify-center">
-              {/* O elemento de vídeo está visível na página para decodificação imediata pelo navegador */}
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className={`w-full h-full object-cover ${isCameraActive ? 'block' : 'hidden'}`}
-              />
-              <canvas
-                ref={canvasRef}
-                className="absolute inset-0 w-full h-full pointer-events-none"
-              />
-
-              {!isCameraActive && (
-                <div className="flex flex-col items-center justify-center text-center p-3 space-y-2">
-                  <Camera className="w-6 h-6 text-neutral-content/60" />
-                  <p role={cameraError ? 'alert' : undefined} className="text-sm text-neutral-content/80">
-                    {cameraError
-                      ? 'Não foi possível abrir a câmera. Confira a permissão do navegador.'
-                      : 'A câmera lê os cartões da turma.'}
-                  </p>
-                  <button
-                    onClick={startCamera}
-                    className="inline-flex items-center min-h-[2.75rem] px-5 rounded-full bg-primary text-primary-content text-base font-semibold hover:bg-[#0036bd]"
-                  >
-                    {cameraError ? 'Tentar de novo' : 'Ligar câmera'}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Indicação sutil de cartão reconhecido */}
-            {lastDetectedStudent && (
-              <div role="status" className="flex items-center py-2 px-2.5 gap-2 rounded-[0.625rem] text-[0.9375rem] font-semibold bg-[#e8f5ec] text-[#14532d]">
-                <CheckCircle className="w-4 h-4 text-success flex-shrink-0" aria-hidden="true" />
-                <span className="truncate">{lastDetectedStudent}</span>
               </div>
             )}
           </div>
@@ -709,6 +728,7 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
             responses={responses}
             recentId={recentId}
             onCorrect={handleCorrect}
+            showNameToggle={!isFullscreen}
           />
 
           {isAnswerRevealed && (
@@ -730,13 +750,6 @@ export const QuestionPresenter: React.FC<QuestionPresenterProps> = ({
             </div>
           )}
 
-          {isFullscreen && (
-            <p className="text-base text-base-content/75 text-center">
-              <kbd className="kbd kbd-sm">Espaço</kbd> resposta ou próxima ·{' '}
-              <kbd className="kbd kbd-sm">←</kbd> <kbd className="kbd kbd-sm">→</kbd> navegar ·{' '}
-              <kbd className="kbd kbd-sm">Esc</kbd> sair
-            </p>
-          )}
         </div>
       </div>
     </div>
