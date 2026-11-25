@@ -7,6 +7,7 @@ import { Insight, InsightKind, QuestionStat, answersCsv, nextClassInsights, ques
 import { mixedFormation } from '../../services/recommendations';
 import { addDemoRounds, clearRoundHistory, loadClassroom, loadRoundHistory, removeDemoRounds, saveFormation } from '../../services/storageService';
 import { buildDemoRounds } from '../../services/demoData';
+import { suggestForQuestion } from '../../services/suggestions';
 
 interface PerformanceSummaryProps {
   classroom: Classroom;
@@ -474,6 +475,67 @@ export const PerformanceSummary: React.FC<PerformanceSummaryProps> = ({ classroo
                 );
               })}
             </ul>
+
+            {/* O que retomar desta rodada: o mesmo que fica recolhido no fim da rodada */}
+            {(() => {
+              const items = round.questions.flatMap((q, idx) =>
+                suggestForQuestion(q.correctOption, q.responses)
+                  .filter((sg) => sg.id === 'reexplain' || sg.id.startsWith('confusion'))
+                  .map((sg) => ({ ...sg, key: `${q.id}-${sg.id}`, label: `Pergunta ${idx + 1}` }))
+              );
+              if (items.length === 0) return null;
+              return (
+                <div className="border-t border-base-300 pt-3 space-y-2">
+                  <p className="text-base font-semibold">Para retomar</p>
+                  <ul className="space-y-2">
+                    {items.map((it) => (
+                      <li key={it.key} className="text-[0.9375rem] leading-snug">
+                        <span className="font-semibold">
+                          {it.label}: {it.text}
+                        </span>
+                        <span className="block text-base-content/70">{it.reason}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
+
+            {/* Resultado de cada aluno nesta rodada: só aqui, nunca no datashow */}
+            <div className="border-t border-base-300 pt-3 space-y-2">
+              <p className="text-base font-semibold">Por aluno nesta rodada</p>
+              <ul className={`grid gap-1.5 ${showNames ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-3 sm:grid-cols-4'}`}>
+                {students.map((st) => {
+                  let total = 0;
+                  let right = 0;
+                  round.questions.forEach((q) => {
+                    const a = q.responses[st.id];
+                    if (a) {
+                      total++;
+                      if (a === q.correctOption) right++;
+                    }
+                  });
+                  const level: MasteryLevel = total === 0 ? 'nodata' : right / total >= 0.7 ? 'mastered' : right / total >= 0.5 ? 'progress' : 'reinforce';
+                  return (
+                    <li key={st.id}>
+                      <button
+                        onClick={() => {
+                          setAllStudents(true);
+                          setStudentSel(st.id);
+                          document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }}
+                        className="w-full flex items-center justify-between gap-2 min-h-[2.75rem] px-2.5 rounded-[0.5rem] text-[0.9375rem] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                        style={{ background: CELL[level].bg, color: CELL[level].fg }}
+                        aria-label={`${nameOf(st.id)}: ${total === 0 ? 'sem resposta' : `${right} de ${total}`}. Ver detalhe`}
+                      >
+                        <span className="truncate font-semibold">{showNames ? nameOf(st.id) : pad(st.id)}</span>
+                        <span className="font-display font-bold tabular-nums">{total === 0 ? '–' : `${right}/${total}`}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           </div>
           </div>
         </section>
