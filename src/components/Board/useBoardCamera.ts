@@ -14,6 +14,8 @@ interface Sources {
   hands: boolean;
 }
 
+const BOARD_DETECT_WIDTH = 960;
+
 // Abre a câmera da lousa e lê, a cada quadro, os marcadores e/ou a mão. Quem usa só recebe o quadro.
 export function useBoardCamera(
   videoRef: RefObject<HTMLVideoElement>,
@@ -37,7 +39,10 @@ export function useBoardCamera(
     let frame = 0;
     let cancelled = false;
     let tracker: HandTracker | null = null;
-    const detector = new ArucoCardDetector();
+    // Os marcadores da lousa são grandes e o preto projetado vira cinza: em 1920 px o limiar
+    // adaptativo só marca o contorno e a borda do marcador sai aberta. Em 960 px a leitura fecha
+    // o quadrado, acha os 4 cantos e fica 5x mais rápida.
+    const detector = new ArucoCardDetector(BOARD_DETECT_WIDTH);
 
     if (sources.hands) {
       HandTracker.create()
