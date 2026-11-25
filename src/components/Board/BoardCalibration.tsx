@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Check, Maximize, Play } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, Maximize } from 'lucide-react';
 import { ArucoCardDetector, markerSvg } from '../../services/arucoDetector';
 import {
   BoardCalibrator,
@@ -185,8 +185,8 @@ export const BoardCalibration: React.FC<BoardCalibrationProps> = ({ onBack, onDo
                   Calibrar de novo
                 </button>
                 <button onClick={() => onDone(state.homography!)} className="btn btn-sm btn-primary ml-auto">
-                  <Play className="w-4 h-4" />
-                  Começar a rodada
+                  Continuar
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               </>
             )}
